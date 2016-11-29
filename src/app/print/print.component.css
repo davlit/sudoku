@@ -1,0 +1,70 @@
+@page 
+{
+  margin-left:  50mm;  /* this affects the margin in the printer settings */
+  margin-right: 10mm;  /* this affects the margin in the printer settings */
+}
+
+
+.printcontent {
+  margin-left: 1in;
+}
+.printleft {
+  float: left;
+  width: 0.3in;
+}
+.printcenter {
+  float: left;
+}
+  .printtop {
+    height: 1in;
+  }
+  .printheader {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .printgrid {
+  }
+  .printfooter {
+    font-size: 15px;
+  }
+
+.printright {
+  float: left;
+  width: 0.3in;
+}
+.printbutton {
+  clear: left;
+  text-align: right;
+}
+
+.sGrid {    /* 1 */
+  display: table;
+  border: 2px solid black;
+}
+.bRow {     /* 3/grid */
+  display: table-row;
+}
+.box {      /* 3/boxrow, 9/grid */
+  display: table-cell;
+  float: left;
+  border: 2px solid gray;
+}
+.sRow {     /* 3/box, 9/grid */
+  display: table-row;
+}
+.sCell {    /* 3/gridrow, 9/box, 81/grid */
+  display: table-cell;
+  float: left;
+  height: 75px;
+  width:  75px;
+  border: 1px solid lightgray;
+  margin: -1px -1px -1px -1px;
+  text-align: center;
+  font-size: 50px;
+  font-weight: bold;
+  color: black;
+}
+.value {
+  line-height: 75px;
+  cursor: default;
+}

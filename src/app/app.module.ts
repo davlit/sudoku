@@ -4,17 +4,33 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+
+import { HomeComponent } from './home/home.component';
+import { HelpComponent } from './help/help.component';
+import { PlayComponent } from './play/play.component';
+import { PrintComponent } from './print/print.component';
+import { Sudoku }         from './model/sudoku';
+import { ActionLog }      from './action/actionLog';
+import { HintLog }        from './hint/hintLog';
+import { CounterComponent } from './play/counter/counter.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HomeComponent,
+    HelpComponent,
+    PlayComponent,
+    PrintComponent,
+    CounterComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    AppRoutingModule
   ],
-  providers: [],
+  providers: [Sudoku, ActionLog, HintLog],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

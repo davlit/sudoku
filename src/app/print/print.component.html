@@ -1,0 +1,31 @@
+
+<div id="printcontent" class="printcontent">
+  <div class="printleft">&nbsp;</div>
+  <div class="printcenter">
+    <div class="printtop"></div>
+    <div class="printheader">
+      {{getActualDifficulty()}}
+    </div>
+    <div class="printgrid">
+
+  <div id="grid" class="sGrid" tabindex="1">
+    <div class="bRow" *ngFor="let br of [0,1,2]">
+      <div class="box" *ngFor="let bc of [0,1,2]">
+        <div class="sRow" *ngFor="let cr of [0,1,2]">
+          <div class="sCell" *ngFor="let cc of [0,1,2]">
+            <span class="value">{{valueToChar_(br, bc, cr, cc)}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    </div>
+    <div class="printfooter">
+      Created by David Little
+    </div>
+  </div>
+  <div class="printright">&nbsp;</div>
+</div>
+
+<div class="printbutton"><button (click)="printGrid()">Print Sudoku</button></div>

@@ -1,0 +1,202 @@
+<section id="gridsection">
+<!--
+Sudoku grid based on
+- 3 rows and 3 columns of boxes
+- within each of the 9 boxes
+    - 3 rows and 3 columns of cells
+- total of 81 cells
+Sudoku model is based on 9 rows and 9 columns of cells
+s: sudoku, b: box, v: value, k: candidate
+ -->
+  <div id="grid" class="sGrid" (keyup)="handleKeyPress($event)" 
+       oncontextmenu="return false;" tabindex="1">
+    <div class="bRow" *ngFor="let br of [0,1,2]">
+      <div class="box" *ngFor="let bc of [0,1,2]">
+        <div class="sRow" *ngFor="let cr of [0,1,2]">
+          <div class="sCell" *ngFor="let cc of [0,1,2]"
+              [ngClass]="{
+                'locked':   isCellLocked_(br, bc, cr, cc),
+                'selected': isSelectedCell_(br, bc, cr, cc),
+                'invalid':  isCellInvalid_(br, bc, cr, cc)}"
+              (mousedown)="handleCellClick_($event, br, bc, cr, cc)">
+            
+            <!-- opt 1: value -->
+            <span class="value">
+              {{valueToChar_(br, bc, cr, cc)}}
+              <!--8-->
+            </span>
+
+            <!-- opt 2: candidates -->
+            <div class="kGrid"
+               [hidden]="getValue_(br, bc, cr, cc) > 0">
+              <div class="kRow" *ngFor="let kr of [0,1,2]">
+                <div class="kCell" *ngFor="let kc of [0,1,2]"
+                    (dblclick)="handleCandidateClick_(br, bc, cr, cc, kr, kc)">
+                  <span class="candidate"
+                      [hidden]="!candidatesShowing || !candidatesVisible_(kr, kc)">
+                    {{candToChar_(br, bc, cr, cc, kr, kc)}}
+                    <!--8-->
+                  </span>
+                </div>
+              </div>
+            </div>
+              
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+</section>
+
+<section id="controls">
+  
+  <div [ngSwitch]="playState">
+
+    <!-- ========== play-new ========== -->
+    <div *ngSwitchCase="PlayStates.NEW">
+
+      <p><span class="metalabel">New Puzzle Instructions:</span><br/>
+        - Select desired difficulty.<br/>
+        <!--- Press Generate.<br/>-->
+      </p>
+
+      <ul style="list-style: none;">
+        <div *ngFor="let difficulty of difficulties">
+          <li>
+            <input type="radio" name="diff" [(ngModel)]="desiredDifficulty" 
+              [value]="difficulty.value">
+            {{difficulty.label}}
+          </li>
+        </div>
+      </ul>
+
+      <p>
+        <button (click)="generate(desiredDifficulty)">Generate</button><br/>
+      </p>
+
+      <!-- SAVE these tests -->
+      <br/><br/><br/><br/><br/>
+      <p>
+        <!--<span class="metalabel">Testing:</span><br/>-->
+        <!--<button (click)="testNakedTriple()">Test Naked Triple</button><br/>-->
+
+        <!--<button (click)="testHiddenPair()">Test Hidden Pair</button><br/>-->
+        <!--<button (click)="testHiddenTriple()">Test Hidden Triple</button><br/>-->
+        <!--<button (click)="testHiddenQuad()">Test Hidden Quad</button><br/>-->
+        
+        <!--<button (click)="testSimple()">Test Simple</button><br/>-->
+        <!--<button (click)="testEasy()">Test Easy</button><br/>-->
+        <!--<button (click)="testMedium_1NP()">Test Medium_1NP</button><br/>-->
+        <!--<button (click)="testHard_1NP_3P_1G()">Test Hard_1NP_3P_1G</button><br/>-->
+        <!--<button (click)="testHard_3NP_1P_4G()">Test Hard_3NP_1P_4G</button><br/>-->
+        <!--<button (click)="testGuess()">Test Guess</button><br/>
+        <button (click)="testNakedPairBoxRow()">Test Naked Pair Box & Row @14,15</button><br/>
+        <button (click)="testPointingRow()">Test Pointing Row</button><br/>
+        <button (click)="testPointingCol()">Test Pointing Col</button><br/>
+        <button (click)="testRowBoxReduction()">Test Row-Box Reduction</button><br/>
+        <button (click)="testColBoxReduction()">Test Col-Box Reduction</button><br/>
+        <button (click)="testHiddenPairsRow()">Test Hidden Pairs Row</button>-->
+      </p>
+      
+    </div>  <!-- *ngSwitchCase="PlayStates.NEW" -->
+
+    <!-- ========== play-new ========== -->
+    <div *ngSwitchCase="PlayStates.CREATING">
+
+      <p>Creating A Sudoku ...</p>
+
+    </div>  <!-- *ngSwitchCase="PlayStates.CREATING" -->
+
+    <!-- ========== play-execute ========== -->
+    <div *ngSwitchCase="PlayStates.EXECUTE" (keyup)="handleKeyPress($event)">
+      <p><span class="metalabel">Difficulty:</span>&nbsp;{{actualDifficulty}}</p>
+
+      <p>
+        <span class="metalabel">All or Selected Candidates:</span><br/>
+        <button (click)="toggleCandidates()">
+          <span [hidden]="!candidatesShowing">Hide Candidates</span>
+          <span [hidden]="candidatesShowing">Show Candidates</span>
+        </button>
+        <span [hidden]="!candidatesShowing">
+          <button *ngFor="let k of [1,2,3,4,5,6,7,8,9]" 
+              (click)="candidateVisible(k)">
+            {{k}}
+          </button>
+          <button (click)="allCandidatesVisible()">All</button>
+        </span>
+      </p>
+
+      <table>
+        <tr>
+          <td><span class="metalabel">Incomplete values:</span></td>
+          <td *ngFor="let v of [1,2,3,4,5,6,7,8,9]" class="valStatus" 
+              [ngClass]="{'dim': valuesComplete[v]}">
+            &nbsp;{{v}}
+          </td>
+        </tr>
+      </table>
+
+      <p>
+        <span class="metalabel">Elapsed time:</span> {{elapsedTime}}
+      </p>
+
+      <p>
+        <span class="metalabel">Hint:</span>
+        <button *ngIf="hintButton()" (click)="handleHintClick()">
+            {{hintButtonLabel()}}</button>
+        <span>{{hintMessage}}</span>
+      </p>
+
+      <p>
+        <span class="metalabel">Auto Solve:</span>
+        <button *ngIf="autoSolveButton()" (click)="handleAutoSolveClick()">
+            {{autoSolveButtonLabel()}}
+        </button>
+        <span>{{autoSolveMessage}}</span>
+      </p>
+
+      <p><span class="metalabel">Action Log</span>&nbsp;(last on top)<span class="metalabel">:</span>&nbsp;&nbsp;
+        <button [hidden]="actionLog === ''" 
+                (click)="undoLastAction()">Undo Last Action</button><br/>
+        <textarea [ngModel]="actionLog" rows="10" cols="50"></textarea>
+      </p>
+
+      <p>
+        <span class="metalabel">Restarts:</span>
+        <button (click)="restartCurrentPuzzle()">Restart This Puzzle</button>
+        <button (click)="startNewPuzzle()">Start New Puzzle</button>
+      </p>
+
+      <p>
+        <span class="metalabel">Solution Clues:</span><br/>
+        <textarea [ngModel]="solutionClues" rows="5" cols="50"></textarea>
+      </p>
+
+      <p>
+        <!--<button (click)="printGrid()">Print Sudoku</button>-->
+        <a [routerLink]="['/print']">Print Sudoku</a>
+      </p>
+    </div>  <!-- *ngSwitchCase="PlayStates.EXECUTE" -->
+
+    <!-- ========== play-solved ========== -->
+    <div *ngSwitchCase="PlayStates.SOLVED">
+      <p><span class="metalabel">SOLVED!</span><br/>
+        <button (click)="restartCurrentPuzzle()">Restart This Puzzle</button>
+        <button (click)="startNewPuzzle()">Start New Puzzle</button>
+      </p>
+
+      <p>
+        <span class="metalabel">Elapsed time:</span> {{elapsedTime}}<br/>
+        <span class="metalabel">Hints viewed:</span> {{hintsViewed}}<br/>
+        <span class="metalabel">Hints applied:</span> {{hintsApplied}}
+      </p>
+
+      <p><span class="metalabel">Action Log:</span><br/>
+        <textarea [ngModel]="actionLog" rows="30" cols="50"></textarea>
+      </p>
+    </div>  <!-- *ngSwitchCase="playStates.SOLVED" -->
+
+  </div>  <!-- [ngSwitch]="playState" --> 
+
+</section>
