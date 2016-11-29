@@ -1,0 +1,75 @@
+TODOs
+-----
+Solved view
+- difficulty
+- user actions
+
+Instructions popup
+- keys
+- cell click
+- cell double click
+- candidate double click
+
+Play view
+- version lower right
+- grid background color
+- text area background color
+- print button
+
+
+
+https://github.com/angular/angular-cli
+
+https://github.com/ReactiveX/rxjs/
+https://github.com/ReactiveX/rxjs/blob/master/MIGRATION.md
+
+https://www.youtube.com/watch?v=ei7FsoXKPl0 -- 34:20 into it
+
+Run:
+$ ng serve
+
+http://localhost:4200
+
+Deploy 1 -- Dev Platform
+------------------------
+$ ng build --prod
+
+Deploy 2 -- Target Host
+-----------------------
+- Download/install NodeJS: https://nodejs.org/en/
+- Open a terminal window -- cmd on Windows
+- > node -v
+> npm -v
+> npm install http-server -g
+
+git
+---
+https://git-scm.com/book/en/v2/
+
+Local Storage
+-------------
+http://diveraj.com/lets-make-tiny-gradebook-angular2-storage/
+
+A group with 3 value and 6 open cells
+- if it has a naked quad, it also has a hidden pair
+
+Group with 4 value and 5 open cells
+- if it has a naked triple, it also has a hidden pair
+
+group with 5 value and 4 open cells
+- it it has a naked triple, it also has a hidden single
+
+group 
+1 open => naked single
+2 open => 2 naked singles
+          1 naked pairs (not actionable)
+3 open => 3 naked singles
+          1 naked pairs??????????
+4 open: naked pairs => hidden pairs
+5 open: naked trips => hidden pairs
+6 open: naked quads => hidden pairs
+
+naked pairs   => 4+ open cells
+naked triples => 5+ open cells
+naked quads   => 6+ open cells
+
