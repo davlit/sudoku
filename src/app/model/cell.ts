@@ -133,6 +133,9 @@ export class Cell {
    * Get an array of candidates.
    */
   getCandidates() : number[] {
+    if (this.hasValue()) {
+      return [];
+    }
     let candidates: number[] = [];
     for (let k of CANDIDATES) {
       if (this.candidates[k] === 1) {
@@ -146,6 +149,9 @@ export class Cell {
    * Returns the number of candidates in cell.
    */
   getNumberOfCandidates() {
+    if (this.hasValue()) {
+      return 0;
+    }
     let count = 0;
     for (let k of CANDIDATES) {
       if (this.candidates[k] === 1) {

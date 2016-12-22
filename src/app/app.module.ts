@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
+// import { BusyModule } from 'angular2-busy';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -28,6 +29,7 @@ import { CounterComponent } from './play/counter/counter.component';
     BrowserModule,
     FormsModule,
     HttpModule,
+    // BusyModule,
     AppRoutingModule
   ],
   providers: [Sudoku, ActionLog, HintLog],

@@ -104,16 +104,30 @@ export class Group {
     return true;
   }
 
-  getValueCellsCount() : number {
-    let count: number = 0;
+  /**
+   * Return the number of closed cells in the group.
+   * A closed cell has a value. Sometimes called a value cell. It can be closed
+   * by having an initial given value or by having a value assigned in solving
+   * the sudoku. A closed cell cannot have any candidates.
+   */
+  getClosedCellsCount() {
+    let count = 0;
     for (let v of VALUES) {
-      count += this._vOccurrences[v]
-      // or
       if (this._vOccurrences[v] > 0) {
         count++;
       }
     }
     return count;
+  }
+
+  /**
+   * Return the number of open cells in the group.
+   * An open cell does not have a value and will normally have 1 or more 
+   * candidates. If a cell does not have a value and has no candidates the
+   * sudoku cannot be solved in its current state.
+   */
+  getOpenCellsCount() {
+    return 9 - this.getOpenCellsCount();
   }
 
   /**

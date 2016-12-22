@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 import { Common }           from '../common/common';
 import { Difficulty }       from '../model/difficulty';
 import { Sudoku }           from '../model/sudoku';
+import { SudokuCreationService }           from '../model/sudoku-creation.service';
 import { Puzzle }           from '../model/puzzle';
 import { Hint }             from '../hint/hint';
 import { ValueHint }        from '../hint/hint';
@@ -18,6 +20,7 @@ import { Action }           from '../action/action';
 import { ValueAction }      from '../action/action';
 import { NakedType }        from '../model/naked.type';
 import { CounterComponent } from './counter/counter.component';
+import { CombinationIterator } from '../common/combination.iterator';
 
 enum PlayStates {
   NEW,
@@ -40,6 +43,7 @@ enum AutoSolveStates {
 
 @Component({
   selector: 'play',
+  /** */providers: [SudokuCreationService],
   templateUrl: './play.component.html',
   styleUrls: ['./play.component.css'],
   changeDetection: ChangeDetectionStrategy.Default
@@ -47,9 +51,13 @@ enum AutoSolveStates {
 export class PlayComponent implements OnInit {
 
   constructor(
+    private router: Router,
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
-    private board: Sudoku
+    private board: Sudoku,
+
+    /** */
+    private sudokuCreationService: SudokuCreationService
   ) {}
 
   // -----------------------------------------------------------------------
@@ -79,7 +87,7 @@ export class PlayComponent implements OnInit {
   candidatesShowing: boolean;   // also in execute
 
   // ----- new properties -----
-  pass: number;
+  passCount: string;
   desiredDifficulty: Difficulty;
 
   // ----- execute properties -----
@@ -89,6 +97,7 @@ export class PlayComponent implements OnInit {
   autoSolveMessage: string;
   actionLog: string;
   solutionClues: string;
+  // busy: Subscription;
   timerSubscription: Subscription;
   elapsedTime: string;
   hintsViewed: number;
@@ -107,6 +116,15 @@ export class PlayComponent implements OnInit {
 
     this.initializeUserInterface();
     this.changeDetectorRef.detectChanges();
+
+    // test
+    // let comboIt = new CombinationIterator([1,2,3], 3);
+    // // let comboIt = new CombinationIterator([1,2,3,4,5,6], 3);
+    // let i = 0;
+    // while (comboIt.hasNext()) {
+    //   i++
+    //   console.log(i + ' ' + JSON.stringify(comboIt.next()));
+    // }
   }
 
   // -----------------------------------------------------------------------
@@ -320,20 +338,49 @@ export class PlayComponent implements OnInit {
 
   /**
    * Responds to Generate button; makes sudoku puzzle of desired difficulty.
+   * ***** OLD VERSION *****
    */
-  generate(difficulty: Difficulty) {
+  xgenerate(difficulty: Difficulty) {
+    this.board.setId('OLD');
     this.board.setDesiredDifficulty(difficulty);
-
-    this.pass = 0;
+    this.passCount = '';
 
     // subscribe to observable sudoku generator
-    this.board.generatePuzzle$
-    .catch(err => Observable.of(err))
-    .subscribe(
-      pass => { this.pass++; this.changeDetectorRef.markForCheck(); },
-      err => console.log(err),
-      () => console.log('Completed')
-    );
+    this.board.generatePuzzle$.subscribe({
+      next: x => {
+        console.log('got passCount: ' + x);
+        this.passCount = '' + x; 
+      },
+      error: err => console.log(err),
+      complete: () => this.completeGenerate()
+    });
+  } // generate()
+
+  /**
+   * Responds to Generate button; makes sudoku puzzle of desired difficulty.
+   * ***** NEW VERSION *****
+   */
+  generate(difficulty: Difficulty) {
+    this.board.setId('NEW');
+    this.sudokuCreationService.setDesiredDifficulty(difficulty);
+    this.passCount = '';
+
+    // subscribe to observable sudoku generator
+    this.sudokuCreationService.generatePuzzle$.subscribe({
+      next: x => {
+        console.log('got passCount: ' + x);
+        this.passCount = '' + x; 
+      },
+      error: err => console.log(err),
+      complete: () => this.completeGenerate()
+    });
+  } // generate()
+
+  /**
+   * Complete the generation by loading sudoku and starting user execution.
+   * ***** OLD VERSION *****
+   */
+  xcompleteGenerate() {
 
     // retrieve finished sudoku
     this.currentPuzzle = this.board.getCurrentSudoku();
@@ -345,7 +392,56 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     // go to puzzle execution by user
     this.startUserTimer();
     this.playState = PlayStates.EXECUTE;
-  } // generate()
+  } // completeGenerate()
+
+  /**
+   * Complete the generation by loading sudoku and starting user execution.
+   * ***** NEW VERSION *****
+   */
+  completeGenerate() {
+
+    // retrieve finished sudoku
+    this.currentPuzzle = this.sudokuCreationService.getCurrentSudoku();
+console.log('Sudoku:\n' + this.currentPuzzle.toString());
+    this.actualDifficulty = 
+        Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
+    this.solutionClues = this.createSolutionClues();
+
+    this.board.loadProvidedSudoku(this.currentPuzzle.initialValues);
+    
+    // go to puzzle execution by user
+    this.startUserTimer();
+    this.playState = PlayStates.EXECUTE;
+  } // completeGenerate()
+
+  testObservable() {
+    this.board.setDesiredDifficulty(Difficulty.MEDIUM);
+
+    console.log('just before subscribe');
+    this.board.observable.subscribe({
+      next: x => {
+        console.log('got value ' + x); 
+        this.passCount = '' + x;
+      },
+      error: err => console.error('something wrong occurred: ' + err),
+      // complete: () => console.log('done'),
+      complete: () => this.testComplete(),
+    });
+    console.log('just after subscribe');   
+
+    // this.currentPuzzle = this.board.getCurrentSudoku();
+    // this.actualDifficulty = 
+    //     Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
+    // this.solutionClues = this.createSolutionClues();
+
+    // // go to puzzle execution by user
+    // this.startUserTimer();
+    // this.playState = PlayStates.EXECUTE;
+  }
+
+  testComplete() {
+    console.log('testComplete() done')
+  }
 
   // ----- EXECUTE state methods ------
 
@@ -536,6 +632,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * TODO wipe non-locked cells (rollback?), refresh cands,
    */
   restartCurrentPuzzle() {
+    this.stopUserTimer();
+    this.startUserTimer();
     this.board.initialize();
     var temp = this.actualDifficulty;   // save
     this.initializeUserInterface();
@@ -546,9 +644,14 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   
   // button 'Start New Puzzle' EXECUTION, SOLVED state
   startNewPuzzle() {
+    this.stopUserTimer();
     this.initializeUserInterface();
     this.board.initialize();
     this.playState = PlayStates.NEW;
+  }
+
+  printGrid() {
+    this.router.navigate(['/print']);
   }
   
   private loadTestPuzzle(initialValues: string) : void {
@@ -829,6 +932,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.valuesComplete[v] = false;
     }
 
+    this.passCount = null;
     this.playState = PlayStates.NEW;
     // this.generating = false;
     this.hint = null;

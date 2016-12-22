@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Group } from './group';
 import { Cell }  from './cell';
 import { Common } from '../common/common';
+import { CombinationIterator } from '../common/combination.iterator';
 import { NakedType }  from './naked.type';
 import { Difficulty }  from './difficulty';
 import { Puzzle }  from './puzzle';
@@ -63,6 +64,14 @@ import { BOX_CELLS } from  '../common/common';
 @Injectable()
 export class Sudoku {
 
+  private id: string;
+  setId(id: string) {
+    this.id = id;
+  }
+  getId() : string {
+    return this.id;
+  }
+
   private rows: Group[];
   private cols: Group[];
   private boxs: Group[];
@@ -84,8 +93,8 @@ export class Sudoku {
   // private puzzle: Puzzle;
 
   constructor(
-      private actionLog: ActionLog,
-      private hintLog: HintLog) {
+      public actionLog: ActionLog,
+      public hintLog: HintLog) {
     this.rows = new Array(9);
     this.cols = new Array(9);
     this.boxs = new Array(9);
@@ -205,7 +214,7 @@ export class Sudoku {
    * Determine the difficulty of a sudoku based on the techniques required to
    * achieve the solution.
    */
-  private static getActualDifficulty(hintCounts: HintCounts) : Difficulty {
+  static getActualDifficulty(hintCounts: HintCounts) : Difficulty {
 
     // HARDEST
     if (hintCounts.guesses > 0) {
@@ -241,6 +250,10 @@ export class Sudoku {
   // public functions
   //------------------------------------------------------------------------
 
+  getActiveHint() {
+    return this.hint;
+  }
+
   // getCurrentSudoku() {
   //   return this.currentSudoku;
   // }
@@ -265,6 +278,14 @@ export class Sudoku {
       this.valuesSet[v] = 0;
     }
   } // initialize()
+
+  /**
+   * 
+   */
+  initializeLogs() : void {
+    this.hintLog.initialize();
+    this.actionLog.initialize();
+  }
       
   /**
    * Gets value in cell at given row and column (1..9).
@@ -301,25 +322,33 @@ export class Sudoku {
   /**
    * Check for any hints at this state of the sudoku solution progress. If
    * maxDifficulty is set to EASY only the easy solution techniques will be
-   * sought for a hint.
+   * sought for a hint. Similarly for MEDIUM and HARD.
    */
-  private getHint(maxDifficulty : Difficulty) : Hint {
+  getHint(maxDifficulty : Difficulty) : Hint {
     this.hint = null;
-    if (maxDifficulty === Difficulty.EASY) {
-      if (   this.checkNakedSingles()
-          || this.checkHiddenSingles()) {
-        return this.hint;
-      }
-      return null;
+    
+    // first, easy techniques
+    if (   this.checkNakedSingles()
+        || this.checkHiddenSingles()) {
+      return this.hint;
     }
-    if (
-           this.checkNakedSingles()
-        || this.checkHiddenSingles()
-        || this.checkNakedPairs()
+    if (maxDifficulty === Difficulty.EASY) {
+      return null;  // no hints using easy techniques
+    }
+
+    // next, medium techniques
+    if (   this.checkNakedPairs()
         || this.checkPointingRowCol()
         || this.checkRowBoxReductions()
-        || this.checkColBoxReductions()
-        || this.checkNakedTriples()
+        || this.checkColBoxReductions()) {
+      return this.hint;
+    }
+    if (maxDifficulty === Difficulty.MEDIUM) {
+      return null;  // no hints using easy and medium techniques
+    }
+
+    // finally, hard techniques
+    if (   this.checkNakedTriples()
         || this.checkNakedQuads()
         || this.checkHiddenPairs()
         || this.checkHiddenTriples()
@@ -327,7 +356,7 @@ export class Sudoku {
         ) {
       return this.hint;
     }
-    return null;
+    return null;  // no hints using any techniques without guessing
   } // getHint()
 
   /**
@@ -358,6 +387,36 @@ export class Sudoku {
         }
     } // switch
     this.hint = null;
+  } // applyHint()
+
+  /**
+   * Apply hint toward solution.
+   */
+  applyGivenHint(hint: Hint) : void {
+    // let args = hint.removals;
+    if (hint == null) {
+      return;   // no hunt to apply
+    }
+    this.hintLog.addEntry(hint);
+
+    // switch (hint.action) {
+    switch (hint.type) {
+      case HintType.NAKED_SINGLE:
+      case HintType.HIDDEN_SINGLE_ROW:
+      case HintType.HIDDEN_SINGLE_COL:
+      case HintType.HIDDEN_SINGLE_BOX:
+        let vHint: ValueHint = <ValueHint> hint;
+        this.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, null, 
+            vHint);
+        break;
+      default:
+        let kHint: CandidatesHint = <CandidatesHint> hint;
+        let removals = kHint.removals;
+        for (let removal of removals) {
+          this.removeCandidate(removal.c, removal.k, kHint);
+        }
+    } // switch
+    hint = null;
   } // applyHint()
 
   /**
@@ -429,14 +488,11 @@ export class Sudoku {
   getNakedCandidates(r: number, c: number, maxCandidates: NakedType) {
     return this.cells[Common.cellIdx(r, c)].findNakedCandidates(maxCandidates);
   }
-        
-  /**
-   * 
-   */
-  // gen(desiredDifficultyType: Difficulty) : Puzzle {
-  //   return this.generatePuzzle(desiredDifficultyType);
-  // } // gen()
 
+  getCandidates(c: number) : number[] {
+    return this.cells[c].getCandidates();
+  }
+        
   /**
    * 
    */
@@ -484,7 +540,7 @@ export class Sudoku {
    * - restore the candidate
    * - remove log entry, don't create new one
    */
-  private undoAction(action: Action) : void {
+  undoAction(action: Action) : void {
     let actionType = action.type;
     switch (actionType) {
       case (ActionType.SET_VALUE):
@@ -576,6 +632,7 @@ console.log('Puzzle:\n' + puzzle.toString());
   }
 
   setDesiredDifficulty(desiredDifficulty) {
+// console.log('sudoku:\n' + this.toString());
     this.currentSudoku = new Puzzle();
     this.currentSudoku.desiredDifficulty = desiredDifficulty;
   }
@@ -588,6 +645,7 @@ console.log('Puzzle:\n' + puzzle.toString());
 
     // step 1 - generate random finished sudoku
     this.currentSudoku.completedPuzzle = this.makeRandomSolution();
+console.log(this.getId() + ' ' + this.toOneLineString());
 
     let pass = 0;
 
@@ -606,12 +664,32 @@ console.log('Puzzle:\n' + puzzle.toString());
 
       // step 3 - solve puzzle to get stats and actual difficulty
       this.completePuzzle(this.currentSudoku);
+
+      console.log('Diff: ' + this.currentSudoku.actualDifficulty);
+
     } // while not getting desired difficulty
 
     this.currentSudoku.generatePasses = pass;
     this.initializeModel(this.currentSudoku.initialValues);
     observer.complete();
   });
+
+
+observable = new Observable(observer => {
+  setTimeout(() => {
+    observer.next(1);
+  }, 1000);
+  setTimeout(() => {
+    observer.next(2);
+  }, 2000);
+  setTimeout(() => {
+    observer.next(3);
+  }, 3000);
+  setTimeout(() => {
+    observer.next(4);
+    observer.complete();
+  }, 4000);
+});
 
   /**
    * [Step 1]
@@ -624,8 +702,10 @@ console.log('Puzzle:\n' + puzzle.toString());
     let start: number = Date.now();
 
     this.initialize();
-    this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
-    this.randomValues = Common.shuffleArray(VALUES.slice());
+    // this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
+    // this.randomValues = Common.shuffleArray(VALUES.slice());
+    this.randomCellIndexes = Common.RANDOM_CELLS_1;
+    this.randomValues = Common.RANDOM_VALUES_1;
     for (let v of VALUES) {
       this.setValue(this.randomCellIndexes[v], v, ActionType.GUESS_VALUE);
     }
@@ -634,6 +714,7 @@ console.log('Puzzle:\n' + puzzle.toString());
     let elapsed: number = Date.now() - start;
     console.log('Step 1 elapsed: ' + elapsed + 'ms');
 
+console.log(JSON.stringify(this.cellsToValuesArray()));
     return this.cellsToValuesArray();
   } // makeRandomSolution()
 
@@ -645,16 +726,21 @@ console.log('Puzzle:\n' + puzzle.toString());
     let start: number = Date.now();
 
     this.setAllValues(puzzle.completedPuzzle);
-    this.actionLog.initialize();
-    this.hintLog.initialize();
-    this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
-    this.randomValues = Common.shuffleArray(VALUES.slice());
+    // this.actionLog.initialize();
+    // this.hintLog.initialize();
+    this.initializeLogs();
+    // this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
+    // this.randomValues = Common.shuffleArray(VALUES.slice());
+    // let randomParingCells = Common.shuffleArray(CELLS.slice(0, 41));
+    this.randomCellIndexes = Common.RANDOM_CELLS_2;
+    this.randomValues = Common.RANDOM_VALUES_2;
+    let randomParingCells = Common.RANDOM_PARING_CELLS_2;
     let hardCount: number = 0;
 
     // just scan half (plus center) cells (0..40); symC is in other half
     let pairsRemoved = 0;
     NEXT_CELL:
-    for (let c of Common.shuffleArray(CELLS.slice(0, 41))) {
+    for (let c of randomParingCells) {
 
       // cell & sym cell are 180deg rotationally symmetric
       let symC = 80 - c;
@@ -719,6 +805,7 @@ console.log('Puzzle:\n' + puzzle.toString());
     } else {
       puzzle.initialValues = this.cellsToValuesArray();
     }
+// console.log(puzzle.initialValues);
 
     let elapsed: number = Date.now() - start;
     console.log('Step 2 elapsed: ' + elapsed + 'ms');
@@ -736,16 +823,20 @@ console.log('Puzzle:\n' + puzzle.toString());
 
     let start: number = Date.now();
 
-      this.hintLog.initialize();
-      this.actionLog.initialize();
-      this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
-      this.randomValues =  Common.shuffleArray(VALUES.slice());
-     
-      this.solve();
+    // this.hintLog.initialize();
+    // this.actionLog.initialize();
+    this.initializeLogs();
 
-      puzzle.completedPuzzle = this.cellsToValuesArray();
-      puzzle.stats = this.hintLog.getHintCounts();
-      puzzle.actualDifficulty = Sudoku.getActualDifficulty(puzzle.stats);
+    // this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
+    // this.randomValues =  Common.shuffleArray(VALUES.slice());
+    this.randomCellIndexes = Common.RANDOM_CELLS_3;
+    this.randomValues = Common.RANDOM_VALUES_3;
+     
+    this.solve();
+
+    puzzle.completedPuzzle = this.cellsToValuesArray();
+    puzzle.stats = this.getHintCounts();
+    puzzle.actualDifficulty = Sudoku.getActualDifficulty(puzzle.stats);
 
     let elapsed: number = Date.now() - start;
     console.log('Step 3 elapsed: ' + elapsed + 'ms');
@@ -887,7 +978,7 @@ console.log('Puzzle:\n' + puzzle.toString());
    * naked single. Most of the time the fewest candidate cell will have only
    * two candidates. The cells are searched randomly.
    */
-  private findFewestCandidatesCell() : number {
+  findFewestCandidatesCell() : number {
     let minCands = 10;
     let minCandsCell: number = -1;
     let currentCellCands: number;
@@ -910,7 +1001,7 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * Return value of cell. Zero means no value;
    */
-  private getValue(idx: number) : number {
+  getValue(idx: number) : number {
     return this.cells[idx].getValue();
   };
 
@@ -946,7 +1037,7 @@ console.log('Puzzle:\n' + puzzle.toString());
    * - restore candidates in related CELLS
    * - remove log entry, don't create new one
    */     
-  private setValue(idx: number, newValue: number, actionType: ActionType, 
+  setValue(idx: number, newValue: number, actionType: ActionType, 
       guessPossibles? : number[], hint?: ValueHint) : void {
 
     // cannot change locked cell
@@ -1024,7 +1115,7 @@ console.log('Puzzle:\n' + puzzle.toString());
    * 
    * - conflict ................
    */
-  private removeValue(idx: number) : void {
+  removeValue(idx: number) : void {
     
     // cannot change locked cell
     if (this.cells[idx].isLocked()) {
@@ -1064,6 +1155,10 @@ console.log('Puzzle:\n' + puzzle.toString());
       this.addCandidate(rc, oldValue);
     }
   } // removeValue()
+
+  getNumberOfCandidates(c: number) : number {
+    return this.cells[c].getNumberOfCandidates();
+  }
 
   /**
    * Remove given candidate from given cell. This method is only
@@ -1171,14 +1266,14 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * Returns true if given cell has a value;
    */
-  private hasValue(idx: number) {
+  hasValue(idx: number) {
     return this.cells[idx].hasValue();
   }
     
   /**
    * 
    */
-  private isImpossible() : boolean {
+  isImpossible() : boolean {
     for (let i of CELLS) {
       if (this.cells[i].isImpossible()) {
         return true;
@@ -1190,7 +1285,7 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * Working backwards undo every action until a guess action 
    */
-  private rollbackToLastGuess() : GuessAction {
+  rollbackToLastGuess() : GuessAction {
 
     // undo entries that are not guesses
     let lastAction = this.actionLog.getLastEntry();
@@ -1212,7 +1307,7 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * Called in step 3 to clear everything except initial (given) values
    */
-  private rollbackAll() : void {
+  rollbackAll() : void {
     while (this.actionLog.getLastEntry()) {
       this.undoAction(this.actionLog.getLastEntry());
       this.actionLog.removeLastEntry();
@@ -1322,38 +1417,26 @@ console.log('Puzzle:\n' + puzzle.toString());
         }
 
         // see if cells with common candidates are in same group
-        let cells: number[] = [nakedCells[i1].idx, 
-            nakedCells[i2].idx]
-        let sameRow: boolean = Common.areCellsInSameRow(cells)
-        let sameCol: boolean = Common.areCellsInSameCol(cells)
-        let sameBox: boolean = Common.areCellsInSameBox(cells)
-
-        // if no common group, move on
-        if (!sameRow && !sameCol && !sameBox) {
-          continue;
-        }
+        let cells: number[] = [nakedCells[i1].idx, nakedCells[i2].idx]
 
         // look for actions; if none, move on
-        if (sameRow) {
+        if (Common.areCellsInSameRow(cells)) {
           if (this.checkNakedsRemovals(ROW_CELLS[Common.rowIdx(cells[0])],
               cells, candidates, HintType.NAKED_PAIRS_ROW)) {
             return true;    
           }
-          continue;
         }
-        if (sameCol) {
+        if (Common.areCellsInSameCol(cells)) {
           if (this.checkNakedsRemovals(COL_CELLS[Common.colIdx(cells[0])],
               cells, candidates, HintType.NAKED_PAIRS_COL)) {
             return true;
           }
-          continue;
         }
-        if (sameBox) {
+        if (Common.areCellsInSameBox(cells)) {
           if (this.checkNakedsRemovals(BOX_CELLS[Common.boxIdx(cells[0])],
               cells, candidates, HintType.NAKED_PAIRS_BOX)) {
             return true;
           }
-          continue;
         }
 
       } // for i2
@@ -1411,36 +1494,25 @@ console.log('Puzzle:\n' + puzzle.toString());
           // see if cells with common candidates are in same group
           let cells: number[] = [nakedCells[i1].idx, 
               nakedCells[i2].idx, nakedCells[i3].idx]
-          let sameRow: boolean = Common.areCellsInSameRow(cells)
-          let sameCol: boolean = Common.areCellsInSameCol(cells)
-          let sameBox: boolean = Common.areCellsInSameBox(cells)
-
-          // if no common group, move on
-          if (!sameRow && !sameCol && !sameBox) {
-            continue;
-          }
 
           // look for actions; if none, move on
-          if (sameRow) {
+          if (Common.areCellsInSameRow(cells)) {
             if (this.checkNakedsRemovals(ROW_CELLS[Common.rowIdx(cells[0])],
                 cells, candidates, HintType.NAKED_TRIPLES_ROW)) {
               return true;    
             }
-            continue;
           }
-          if (sameCol) {
+          if (Common.areCellsInSameCol(cells)) {
             if (this.checkNakedsRemovals(COL_CELLS[Common.colIdx(cells[0])],
                 cells, candidates, HintType.NAKED_TRIPLES_COL)) {
               return true;
             }
-            continue;
           }
-          if (sameBox) {
+          if (Common.areCellsInSameBox(cells)) {
             if (this.checkNakedsRemovals(BOX_CELLS[Common.boxIdx(cells[0])],
                 cells, candidates, HintType.NAKED_TRIPLES_BOX)) {
               return true;
             }
-            continue;
           }
 
         } // for i3
@@ -1452,21 +1524,80 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * TODO
    * Check for naked triples in rows, columns, and boxes. If found, create a 
-   * hint and return true, otherwise return false. A group must have at least 
-   * 5 open cells to allow a naked triple. If only 4 open cells then 5 value
+   * hint and return true, otherwise return false. A group must have  
+   * 5 or more open (4 or fewer closed) cells to allow a naked triple. 
+   * 
+   * If only 4 open cells then 5 value
    * cells means only 4 candidates in group. A naked triple takes 3 cells,
    * therefore the 4th cell must be a naked single which would have been 
    * already found.
    */
   private checkNakedTriplesGroup(group: Group, hintType: HintType) : boolean {
-    if (group.getValueCellsCount() > 4) {
+    if (group.getOpenCellsCount() < 5) {
       return false;   // see method comment 
     }
 
-    // approach 1
+    // approach 1 TODO
     // find cells in group with 2 or 3 (<= 3) cands -- cells23 [a, b, c, d, ...]
     // must have at least 3 cells (may be 3, 4, 5, 6, 7, 8, or 9)
     // for cells23, get cands cells23Cands [i, j, k, l, ...]
+
+    // get group cells 2 or 3 candidates; 
+    // there can't be any with 1 which would be naked single
+
+    // let cells = []; // cells with 2-3 candidates
+    // for (let c of group.groupCells) {
+    //   let cell = this.cells[c];
+    //   if (!cell.hasValue() && cell.getNumberOfCandidates() <= 3) {
+    //     cells.push(cell);
+    //   }
+    // }
+    // if (cells.length < 3) {
+    //   return false;   // need at least 3 for naked triple
+    // }
+
+    let nakedCells: [{ c: number, ks: number[] }];
+    for (let c of group.groupCells) {
+      let cands = this.cells[c].getCandidates()
+      if (cands.length <= 3) {
+        nakedCells.push({c: c, ks: cands});
+      }
+    }
+    if (nakedCells.length < 3) {
+      return false;   // need at least 3 for naked triple
+    }
+
+    // does a combo of cells have only 3 cands?
+    let it = new CombinationIterator(nakedCells, 3);
+    let cands: number[] = [];
+    while (it.hasNext()) {
+      let combination = it.next();
+      for (let c of combination) {
+        for (let k of c.ks) {
+          if (cands.indexOf(k) == -1) {
+            cands.push(k);
+          }
+        }
+      }
+      if (cands.length == 3) {
+        // 3 cells w/3 cands
+        // check for removals
+      }
+    }
+
+
+
+    // get candidates that appear in cells with 2-3 candidates
+    // let cands = [];
+    // for (let cell of nakedCells) {
+    //   for (let k of cell.getCandiates()) {
+    //     if (cands.indexOf(k) == -1) {
+    //       cands.push(k);
+    //     }
+    //   }
+    // }
+
+    // check for 3 cell combinations
 
     // approach 2
     // find cands in group occurring 2 or 3 (<= 3) times -- cands23 [k1, k2, k3, k4, ... ]
@@ -1536,36 +1667,25 @@ console.log('Puzzle:\n' + puzzle.toString());
             // see if cells with common candidates are in same group
             let cells: number[] = [nakedCells[i1].idx, 
                 nakedCells[i2].idx, nakedCells[i3].idx, nakedCells[i4].idx]
-            let sameRow: boolean = Common.areCellsInSameRow(cells)
-            let sameCol: boolean = Common.areCellsInSameCol(cells)
-            let sameBox: boolean = Common.areCellsInSameBox(cells)
-
-            // if no common group, move on
-            if (!sameRow && !sameCol && !sameBox) {
-              continue;
-            }
 
             // look for actions; if none, move on
-            if (sameRow) {
+            if (Common.areCellsInSameRow(cells)) {
               if (this.checkNakedsRemovals(ROW_CELLS[Common.rowIdx(cells[0])],
                   cells, candidates, HintType.NAKED_QUADS_ROW)) {
                 return true;    
               }
-              continue;
             }
-            if (sameCol) {
+            if (Common.areCellsInSameCol(cells)) {
               if (this.checkNakedsRemovals(COL_CELLS[Common.colIdx(cells[0])],
                   cells, candidates, HintType.NAKED_QUADS_COL)) {
                 return true;
               }
-              continue;
             }
-            if (sameBox) {
+            if (Common.areCellsInSameBox(cells)) {
               if (this.checkNakedsRemovals(BOX_CELLS[Common.boxIdx(cells[0])],
                   cells, candidates, HintType.NAKED_QUADS_BOX)) {
                 return true;
               }
-              continue;
             }
 
           } // for i4
@@ -2305,7 +2425,7 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * Represent the values of the sudoku as an array of 81 values.
    */
-  private cellsToValuesArray() : number[] {
+  cellsToValuesArray() : number[] {
     let v: number[] = [];
     for (let c of CELLS) {
       v.push(this.cells[c].getValue());
@@ -2314,9 +2434,16 @@ console.log('Puzzle:\n' + puzzle.toString());
   } // cellsToValuesArray()
 
   /**
+   * 
+   */
+  getHintCounts() : HintCounts {
+    return this.hintLog.getHintCounts();
+  }
+
+  /**
    * Represent the values of the sudoku as a single-line string.
    */
-  private toOneLineString() : string {
+  toOneLineString() : string {
     let s = '';
     let value: number;
     for (let i of CELLS) {
@@ -2333,7 +2460,7 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * Represent the values of the sudoku as a grid string.
    */
-  private toGridString() : string {
+  toGridString() : string {
     return this.arrayToGridString(this.cellsToValuesArray());
   } // toGridString()
 
@@ -2405,7 +2532,7 @@ console.log('Puzzle:\n' + puzzle.toString());
   /**
    * Represent the state of the sudoku as a string.
    */
-  private toString() : string {
+  toString() : string {
     let s = '';
     for (let r of ROWS) {
       s += this.rowToString(r) + '\n';

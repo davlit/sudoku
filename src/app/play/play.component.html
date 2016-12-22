@@ -75,6 +75,14 @@ s: sudoku, b: box, v: value, k: candidate
         <button (click)="generate(desiredDifficulty)">Generate</button><br/>
       </p>
 
+      <p>
+        <button (click)="testObservable()">Test Observable</button><br/>
+      </p>
+
+      <p>
+        <span class="metalabel">Pass: </span> {{passCount}}<br/>
+      </p>
+
       <!-- SAVE these tests -->
       <br/><br/><br/><br/><br/>
       <p>
@@ -98,6 +106,8 @@ s: sudoku, b: box, v: value, k: candidate
         <button (click)="testColBoxReduction()">Test Col-Box Reduction</button><br/>
         <button (click)="testHiddenPairsRow()">Test Hidden Pairs Row</button>-->
       </p>
+
+      <!--<div [ngBusy]="busy"></div>-->
       
     </div>  <!-- *ngSwitchCase="PlayStates.NEW" -->
 
@@ -110,6 +120,9 @@ s: sudoku, b: box, v: value, k: candidate
 
     <!-- ========== play-execute ========== -->
     <div *ngSwitchCase="PlayStates.EXECUTE" (keyup)="handleKeyPress($event)">
+
+      <!--<div [ngBusy]="busy"></div>-->
+      
       <p><span class="metalabel">Difficulty:</span>&nbsp;{{actualDifficulty}}</p>
 
       <p>
@@ -174,9 +187,9 @@ s: sudoku, b: box, v: value, k: candidate
       </p>
 
       <p>
-        <!--<button (click)="printGrid()">Print Sudoku</button>-->
-        <a [routerLink]="['/print']">Print Sudoku</a>
+        <button (click)="printGrid()">Print Sudoku</button>
       </p>
+
     </div>  <!-- *ngSwitchCase="PlayStates.EXECUTE" -->
 
     <!-- ========== play-solved ========== -->
@@ -188,8 +201,11 @@ s: sudoku, b: box, v: value, k: candidate
 
       <p>
         <span class="metalabel">Elapsed time:</span> {{elapsedTime}}<br/>
-        <span class="metalabel">Hints viewed:</span> {{hintsViewed}}<br/>
-        <span class="metalabel">Hints applied:</span> {{hintsApplied}}
+      </p>
+      <p>
+        <span class="metalabel">Hints:</span><br/>
+        <span>&nbsp;&nbsp;viewed:</span>&nbsp;&nbsp;{{hintsViewed}}<br/>
+        <span>&nbsp;&nbsp;applied:</span>&nbsp;&nbsp;{{hintsApplied}}
       </p>
 
       <p><span class="metalabel">Action Log:</span><br/>
