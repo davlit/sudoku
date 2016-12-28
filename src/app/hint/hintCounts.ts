@@ -1,4 +1,5 @@
 import { HintType } from './hint.type';
+import { Difficulty } from '../model/difficulty';
 
 export class HintCounts {
 
@@ -202,6 +203,45 @@ export class HintCounts {
       + this.guesses;
   }
 
+  /**
+   * Determine the difficulty of a sudoku based on the techniques required to
+   * achieve the solution.
+   */
+  getActualDifficulty() : Difficulty {
+
+    // HARDEST
+    if (this.guesses > 0) {
+      return Difficulty.HARDEST;
+    } 
+    
+    // HARD
+    if (   this.getNakedTriples()  > 0
+        || this.getNakedQuads()    > 0
+        || this.getHiddenPairs()   > 0
+        || this.getHiddenTriples() > 0
+        || this.getHiddenQuads()   > 0) {
+      return Difficulty.HARD;
+    }
+    
+    // MEDIUM
+    if (   this.getNakedPairs()       > 0
+        || this.getPointingRowsCols() > 0
+        || this.getBoxReductions()    > 0) {
+      return Difficulty.MEDIUM;
+    }
+    
+    // EASY
+    if (   this.getHiddenSingles() > 0
+        || this.nakedSingles       > 0) {
+      return Difficulty.EASY;
+    }
+
+    return  Difficulty.EASY;
+  } // getDifficultyType()
+
+  /**
+   * 
+   */
   toString() : string {
     let s ='';
     s += 'NS   : ' + this.nakedSingles + '\n'

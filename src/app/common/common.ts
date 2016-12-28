@@ -1,7 +1,7 @@
 export const TITLE = 'Sudoku Helper';
 export const MAJOR_VERSION = '0';
 export const VERSION = '12';
-export const SUB_VERSION = '1';
+export const SUB_VERSION = '2';
 export const COPYRIGHT = 
     'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 
@@ -113,6 +113,85 @@ export class Common {
     return {r: this.rowNr(cellIdx), c: this.colNr(cellIdx)}
   }
 
+  /**
+   * Related cells share the same row, column, or box of the given cell. The 
+   * given cell is not in the list of related cells. Any cell has 20 related 
+   * cells: 8 from the row, 8 from the column and 4 from the box that are not 
+   * in the row or column of the given cell.
+   */
+  static getRelatedCells(idx: number) : number[] {
+    let relatedCells: number[] = [];
+    let r = Common.rowIdx(idx);
+    let c = Common.colIdx(idx);
+    let b = Common.boxIdx(idx);
+    for (let r of ROW_CELLS[Common.rowIdx(idx)]) {
+      if (r === idx) {
+        continue;
+      }
+      relatedCells.push(r);
+    }
+    for (let c of COL_CELLS[Common.colIdx(idx)]) {
+      if (c === idx) {
+        continue;
+      }
+      relatedCells.push(c);
+    }
+    for (let b of BOX_CELLS[Common.boxIdx(idx)]) {
+      if (relatedCells.indexOf(b) < 0) {
+        relatedCells.push(b);
+      }
+    }
+    return relatedCells;
+  } // getRelatedCells()
+        
+  /**
+   * Return an array of pair combinations of items in a list.
+   */
+  static pairwise(list: any[]) : any[] {
+    let pairs: any[] = [];
+    let pos = 0;
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        pairs[pos++] = [list[i], list[j]];
+      }
+    }
+    return pairs;
+  }
+
+  /**
+   * Return an array of triple combinations of items in a list.
+   */
+  static tripwise(list: any[]) : any[] {
+    let trips: any[] = [];
+    let pos = 0;
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        for (let k = j + 1; k < list.length; k++) {
+          trips[pos++] = [list[i], list[j], list[k]];
+        }
+      }
+    }
+    return trips;
+  }
+
+  /**
+   * Return an array of quad combinations of items in a list.
+   */
+  static quadwise(list: any[]) : any[] {
+    let quads: any[] = [];
+    let pos = 0;
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        for (let k = j + 1; k < list.length; k++) {
+          for (let l = k + 1; l < list.length; l++) {
+            quads[pos++] = [list[i], list[j], list[k], list[l]];
+          }
+        }
+      }
+    }
+    return quads;
+  }
+
   // static rowIdx(cellIdx: number) : number {
   //   return Math.floor(cellIdx / 9);
   // }
@@ -181,7 +260,11 @@ export class Common {
 
   /**
    * Represent the values of the sudoku as a single-line string.
-   */
+   * The string should be a 81-character string representing with each 
+   * character representing a cell value. A blank cell is indicated by a 
+   * period character ('.'). E.g.
+   * '..24..1.391.3...6......928......5..6..3.9.8..5..2......245......7...3.283.5..84..'
+  */
   static valuesArrayToString(valuesArray: number[] ) : string {
     let s = '';
     let value: number;

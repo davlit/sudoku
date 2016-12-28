@@ -8,125 +8,48 @@ import { Puzzle } from './puzzle';
 import { GuessAction } from '../action/action';
 import { ActionType } from '../action/action.type';
 import { ActionLog } from '../action/actionLog';
-import { Hint } from '../hint/hint';
 import { ValueHint } from '../hint/hint';
-import { CandidatesHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
 import { HintLog } from '../hint/hintLog';
-import { HintCounts } from '../hint/hintCounts';
 
 import { Sudoku } from './sudoku';
+import { SudokuService } from './sudoku.service';
 
 import { VALUES } from     '../common/common';
-import { CANDIDATES } from '../common/common';
-import { GROUPS } from     '../common/common';
-import { ROWS } from       '../common/common';
-import { COLS } from       '../common/common';
-import { BOXS } from       '../common/common';
 import { CELLS } from      '../common/common';
-import { ROW_CELLS } from  '../common/common';
-import { COL_CELLS } from  '../common/common';
-import { BOX_CELLS } from  '../common/common';
 
 @Injectable()
 export class SudokuCreationService {
 
   constructor(
     private actionLog: ActionLog, 
-    private hintLog: HintLog) {};
+    private hintLog: HintLog/*,
+    private sudoku: SudokuService*/) {
+  }
   
   private sudoku = new Sudoku(this.actionLog, this.hintLog);
 
   private randomCellIndexes: number[];
   private randomValues: number[];
 
-  // public getNewSudoku(difficulty: Difficulty) : Puzzle {
-  //   return this.createSudoku(difficulty);
-  // }
-
-  // generatePuzzle$ = new Observable(observer => {
-
-  //   // step 1 - generate random finished sudoku
-  //   this.currentSudoku.completedPuzzle = this.makeRandomSolution();
-
-  //   let pass = 0;
-
-  //   // loop until we get sudoku of desired difficulty
-  //   let desiredDifficulty = this.currentSudoku.desiredDifficulty;
-  //   while (this.currentSudoku.actualDifficulty != desiredDifficulty) {
-  //     pass++;
-  //     observer.next(pass);
-
-  //     // step 2 - create starting values by paring cells
-  //     this.getStartingValues(this.currentSudoku);
-
-  //     if (this.currentSudoku.initialValues === null) {
-  //       continue;   // desired difficulty has not been attained
-  //     }
-
-  //     // step 3 - solve puzzle to get stats and actual difficulty
-  //     this.completePuzzle(this.currentSudoku);
-
-  //     console.log('Diff: ' + this.currentSudoku.actualDifficulty);
-
-  //   } // while not getting desired difficulty
-
-  //   this.currentSudoku.generatePasses = pass;
-  //   this.initializeModel(this.currentSudoku.initialValues);
-  //   observer.complete();
-  // });
-
-  // private createSudoku(difficulty: Difficulty) : Puzzle {
-
-  //   let currentSudoku = new Puzzle();
-  //   currentSudoku.desiredDifficulty = difficulty;
-
-  //   // step 1 - generate random finished sudoku
-  //   currentSudoku.completedPuzzle = this.makeRandomSolution();
-
-  //   let pass = 0;
-
-  //   // loop until we get sudoku of desired difficulty
-  //   let desiredDifficulty = currentSudoku.desiredDifficulty;
-  //   while (currentSudoku.actualDifficulty != desiredDifficulty) {
-  //     pass++;
-
-  //     // step 2 - create starting values by paring cells
-  //     this.getStartingValues(currentSudoku);
-
-  //     if (currentSudoku.initialValues === null) {
-  //       continue;   // desired difficulty has not been attained
-  //     }
-
-  //     // step 3 - solve puzzle to get stats and actual difficulty
-  //     this.completePuzzle(currentSudoku);
-
-  //     console.log('Diff: ' + currentSudoku.actualDifficulty);
-
-  //   } // while not getting desired difficulty
-
-  //   currentSudoku.generatePasses = pass;
-  //   return currentSudoku;
-  // }
-
   currentSudoku: Puzzle;
 
   setDesiredDifficulty(desiredDifficulty) {
 // console.log('sudoku:\n' + this.sudoku.toString());
-console.log(this.sudoku.getId() + ' ' + this.sudoku.toOneLineString());
+// console.log(this.sudoku.getId() + ' ' + this.sudoku.toOneLineString());
     this.currentSudoku = new Puzzle();
     this.currentSudoku.desiredDifficulty = desiredDifficulty;
-  }
+  } // setDesiredDifficulty()
 
   getCurrentSudoku() {
     return this.currentSudoku;
-  }
+  } // getCurrentSudoku{}
 
   generatePuzzle$ = new Observable(observer => {
 
     // step 1 - generate random finished sudoku
     this.currentSudoku.completedPuzzle = this.makeRandomSolution();
-console.log(this.sudoku.getId() + ' ' + this.sudoku.toOneLineString());
+// console.log(this.sudoku.getId() + ' ' + this.sudoku.toOneLineString());
 
     let pass = 0;
 
@@ -153,7 +76,7 @@ console.log(this.sudoku.getId() + ' ' + this.sudoku.toOneLineString());
     this.currentSudoku.generatePasses = pass;
     // this.initializeModel(this.currentSudoku.initialValues);
     observer.complete();
-  });
+  }); // generatePuzzle$
 
 
 observable = new Observable(observer => {
@@ -170,7 +93,7 @@ observable = new Observable(observer => {
     observer.next(4);
     observer.complete();
   }, 4000);
-});
+}); // observable
 
   /**
    * [Step 1]
@@ -195,7 +118,7 @@ observable = new Observable(observer => {
     let elapsed: number = Date.now() - start;
     console.log('Step 1 elapsed: ' + elapsed + 'ms');
 
-console.log(JSON.stringify(this.sudoku.cellsToValuesArray()));
+// console.log(JSON.stringify(this.sudoku.cellsToValuesArray()));
     return this.sudoku.cellsToValuesArray();
   } // makeRandomSolution()
 
@@ -317,7 +240,7 @@ console.log(JSON.stringify(this.sudoku.cellsToValuesArray()));
 
     puzzle.completedPuzzle = this.sudoku.cellsToValuesArray();
     puzzle.stats = this.sudoku.getHintCounts();
-    puzzle.actualDifficulty = Sudoku.getActualDifficulty(puzzle.stats);
+    puzzle.actualDifficulty = puzzle.stats.getActualDifficulty();
 
     let elapsed: number = Date.now() - start;
     console.log('Step 3 elapsed: ' + elapsed + 'ms');

@@ -277,6 +277,12 @@ export class PlayComponent implements OnInit {
           this.setCellValue(r, c, nakeds[0]);
           this.setSelectedCell(r, c);
         }
+        // new code for sudoku.service
+        // var candidates = this.board.getCandidates_(r, c);
+        // if (candidates.length === 1) {
+        //   this.setCellValue(r, c, candidates[0]);
+        //   this.setSelectedCell(r, c);
+        // }
         return;
       default:
         alert("you have a strange mouse");
@@ -290,7 +296,7 @@ export class PlayComponent implements OnInit {
   valueToChar_(br: number, bc: number, cr: number, cc: number) {
     var value = this.getValue_(br, bc, cr, cc);
     return value == 0 ? '' : value.toString(); 
-  }
+  } //valueToChar_()
 
   /**
    * Function based on view's cell indexes in html code.
@@ -298,7 +304,7 @@ export class PlayComponent implements OnInit {
   getValue_(br: number, bc: number, cr: number, cc: number) {
       return this.board.getValue_(Common.viewToModelRow(br, cr), 
           Common.viewToModelCol(bc, cc));
-  }
+  } // getValue_()
   
   /**
    * Mmanually remove by user double-click.
@@ -316,14 +322,14 @@ export class PlayComponent implements OnInit {
     this.autoSolveMessage = '';
     this.removeCandidate(Common.viewToModelRow(br, cr), 
         Common.viewToModelCol(bc, cc), Common.viewToModelCand(kr, kc));
-  }
+  } // handleCandidateClick_()
   
   /**
    * Function based on view's cell indexes in html code.
    */
   candidatesVisible_(kr: number, kc: number) {
     return this.candidatesVisible[Common.viewToModelCand(kr, kc)];
-  }
+  } // candidatesVisible_()
   
   /**
    * Function based on view's cell indexes in html code.
@@ -334,34 +340,12 @@ export class PlayComponent implements OnInit {
     return this.board.isCandidate_(Common.viewToModelRow(br, cr), 
         Common.viewToModelCol(bc, cc), 
             candidate) ? candidate.toString() : '';
-  }
+  } // candToChar_()
 
   /**
    * Responds to Generate button; makes sudoku puzzle of desired difficulty.
-   * ***** OLD VERSION *****
-   */
-  xgenerate(difficulty: Difficulty) {
-    this.board.setId('OLD');
-    this.board.setDesiredDifficulty(difficulty);
-    this.passCount = '';
-
-    // subscribe to observable sudoku generator
-    this.board.generatePuzzle$.subscribe({
-      next: x => {
-        console.log('got passCount: ' + x);
-        this.passCount = '' + x; 
-      },
-      error: err => console.log(err),
-      complete: () => this.completeGenerate()
-    });
-  } // generate()
-
-  /**
-   * Responds to Generate button; makes sudoku puzzle of desired difficulty.
-   * ***** NEW VERSION *****
    */
   generate(difficulty: Difficulty) {
-    this.board.setId('NEW');
     this.sudokuCreationService.setDesiredDifficulty(difficulty);
     this.passCount = '';
 
@@ -378,25 +362,6 @@ export class PlayComponent implements OnInit {
 
   /**
    * Complete the generation by loading sudoku and starting user execution.
-   * ***** OLD VERSION *****
-   */
-  xcompleteGenerate() {
-
-    // retrieve finished sudoku
-    this.currentPuzzle = this.board.getCurrentSudoku();
-console.log('Sudoku:\n' + this.currentPuzzle.toString());
-    this.actualDifficulty = 
-        Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
-    this.solutionClues = this.createSolutionClues();
-
-    // go to puzzle execution by user
-    this.startUserTimer();
-    this.playState = PlayStates.EXECUTE;
-  } // completeGenerate()
-
-  /**
-   * Complete the generation by loading sudoku and starting user execution.
-   * ***** NEW VERSION *****
    */
   completeGenerate() {
 
@@ -415,10 +380,10 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   } // completeGenerate()
 
   testObservable() {
-    this.board.setDesiredDifficulty(Difficulty.MEDIUM);
+    this.sudokuCreationService.setDesiredDifficulty(Difficulty.MEDIUM);
 
     console.log('just before subscribe');
-    this.board.observable.subscribe({
+    this.sudokuCreationService.observable.subscribe({
       next: x => {
         console.log('got value ' + x); 
         this.passCount = '' + x;
@@ -437,11 +402,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     // // go to puzzle execution by user
     // this.startUserTimer();
     // this.playState = PlayStates.EXECUTE;
-  }
+  } // testObservable()
 
   testComplete() {
     console.log('testComplete() done')
-  }
+  } // testComplete()
 
   // ----- EXECUTE state methods ------
 
