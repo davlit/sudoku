@@ -6,6 +6,7 @@ import { Difficulty } from './difficulty';
 import { Puzzle } from './puzzle';
 import { NakedType }  from './naked.type';
 
+import { Action } from '../action/action';
 import { GuessAction } from '../action/action';
 import { ActionType } from '../action/action.type';
 import { RemoveAction } from '../action/action';
@@ -16,7 +17,7 @@ import { CandidatesHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
 import { HintLog } from '../hint/hintLog';
 
-import { Sudoku } from './sudoku';
+// import { Sudoku } from './sudoku';
 
 import { CELLS } from     '../common/common';
 import { VALUES } from     '../common/common';
@@ -32,14 +33,49 @@ import { Cell, Group, SudokuModel } from      './sudoku.model';
 @Injectable()
 export class SudokuService {
 
+  private static id = 0;
+  static getId() : number {
+    return SudokuService.id;
+  }
+
+  private currentSudoku: Puzzle = null;
+  private sudokuModel: SudokuModel;
+
   /**
    * Inject the data model and logs.
    */
   constructor(
-    private sudokuModel: SudokuModel,
-    private actionLog: ActionLog, 
-    private hintLog: HintLog) {
+      // private sudokuModel: SudokuModel,
+      private actionLog: ActionLog
+  ) {
+// console.log('sudokuService id: ' + SudokuService.getId());
+    SudokuService.id++;
+    this.sudokuModel = new SudokuModel();
+    this.initializeModel();
+// console.log('cp3:\n' + this.toString());    
+// console.log('sudokuService id: ' + SudokuService.getId());
   }
+
+  ngOnInit() {
+    console.log('sudokuService id: ' + SudokuService.getId());
+    console.log('sudokuService id: ' + this.getId());
+  }
+
+  getId() {
+    return SudokuService.id;
+  }
+
+  // initialize() : void {
+  //   for (let c of CELLS) {
+  //     this.initializeCell(this.sudokuModel.cells[c]);
+  //   }
+  //   for (let g of GROUPS) {
+  //     this.initializeGroup(this.sudokuModel.rows[g]);
+  //     this.initializeGroup(this.sudokuModel.cols[g]);
+  //     this.initializeGroup(this.sudokuModel.boxs[g]);
+  //   }
+  
+  // }
 
   /**
    * 
@@ -48,7 +84,7 @@ export class SudokuService {
     cell.value = 0;
     cell.locked = false;
     for (let k of CANDIDATES) {
-      cell.candidates[k] = false;
+      cell.candidates[k] = true;
     }
   }
 
@@ -73,24 +109,35 @@ export class SudokuService {
       this.initializeGroup(this.sudokuModel.cols[g]);
       this.initializeGroup(this.sudokuModel.boxs[g]);
     }
-    this.initializeLogs();
+    this.initializeActionLog();
   }
 
   /**
    * 
    */
-  private initializeLogs() : void {
-    this.hintLog.initialize();
+  initializeActionLog() : void {
     this.actionLog.initialize();
   }
 
+  getCurrentSudoku() {
+    return this.currentSudoku;
+  }
+
   /**
-   * Sets up sudoku model with a set of initial vallues. The initial values
+   * Sets up a sudoku puzzle with a set of initial vallues. The initial values
    * will be an array of 81 numbers each 0..9. A zero indicates a blank or
    * empty cell. E.g.
    * [0,0,2,4,0,0,1,0,3,9,1,0,3,0,0,0,6,0,0, ...]
    */
-  private loadGivenValues(givenValues: number[]) : void {
+  loadProvidedSudoku(givenValues: number[]) : Puzzle {
+    let puzzle = new Puzzle();
+    puzzle.initialValues = givenValues;
+    // this.loadGivenValues(initialValues);
+
+    // TODO do the work: solve puzzle, get stats, flesh out puzzle object
+    // this.completePuzzle(puzzle);   // step 3
+
+
     this.initializeModel();
     for (let c of CELLS) {
       let cell = this.sudokuModel.cells[c];   // cell at [c] in cells array
@@ -103,22 +150,8 @@ export class SudokuService {
       this.setValue(c, givenValue, ActionType.SET_VALUE);
       cell.locked = true;
     } // for
-  } // loadGivenValues()
 
-  /**
-   * Sets up a sudoku puzzle with a set of initial vallues. The initial values
-   * will be an array of 81 numbers each 0..9. A zero indicates a blank or
-   * empty cell. E.g.
-   * [0,0,2,4,0,0,1,0,3,9,1,0,3,0,0,0,6,0,0, ...]
-   */
-  loadProvidedSudoku(initialValues: number[]) : Puzzle {
-    let puzzle = new Puzzle();
-    puzzle.initialValues = initialValues;
-    this.loadGivenValues(initialValues);
-
-    // TODO do the work: solve puzzle, get stats, flesh out puzzle object
-    // this.completePuzzle(puzzle);   // step 3
-
+    this.initializeActionLog();
     return puzzle;
   } // loadProvidedSudoku()
 
@@ -332,8 +365,8 @@ export class SudokuService {
     // let ci = Common.colIdx(c);
     // let bi = Common.boxIdx(c);
     let row = this.sudokuModel.rows[cell.row];
-    let col = this.sudokuModel.rows[cell.col];
-    let box = this.sudokuModel.rows[cell.box];
+    let col = this.sudokuModel.cols[cell.col];
+    let box = this.sudokuModel.boxs[cell.box];
     // this.sudokuModel.rows[cell.row].vOccurrences[oldValue]--;
     // this.sudokuModel.cols[cell.col].vOccurrences[oldValue]--;
     // this.sudokuModel.boxs[cell.box].vOccurrences[oldValue]--;
@@ -427,6 +460,51 @@ export class SudokuService {
     let action = new RemoveAction(ActionType.REMOVE_CANDIDATE, c, k, hint);
     this.actionLog.addEntry(action);
   } // removeCandidate()
+
+  /**
+   * Undoes the last logged action. If the last action resulted from a complex
+   * hint that caused multiple candidate removals e.g. nakedPairs, etc.
+   * - should not have deal with und0 REMOVE_VALUE
+   * - only undo SET_VALUE and REMOVE_CANDIDATE
+   * 
+   * Called by:
+   * - user button press (playComponent.ts) undoLastAction())
+   * - rollbackRound()
+   * - rollbackAllRounds()
+   * 
+   * Undo notes - set value
+   * - remove value
+   * - restore old previous value? Down thru a removeValue action?
+   * - update values count in cell's row, column, and box
+   * - update values used
+   * - conflict ................
+   * - restore candidates in cell
+   * - restore candidates in related CELLS
+   * - remove log entry, don't create new one
+   * 
+   * Undo notes - remove value
+   * - replace prior value
+   * - update values count in cell's row, column, and box
+   * - update values used
+   * - remove candidats from cell
+   * - remove this prior value as candidate in related cells
+   * - remove log entry, don't create new one
+   * 
+   * Undo notes - remove candidate
+   * - restore the candidate
+   * - remove log entry, don't create new one
+   */
+  undoAction(action: Action) : void {
+    let actionType = action.type;
+    switch (actionType) {
+      case (ActionType.SET_VALUE):
+      case (ActionType.GUESS_VALUE):
+        this.removeValue(action.cell);
+        break;
+      case (ActionType.REMOVE_CANDIDATE):
+        this.addCandidate(action.cell, (<RemoveAction> action).candidate);
+    }
+  } // undoAction()
 
   /**
    * Returns an array of cell's candidates where the number of candidates is
@@ -754,38 +832,64 @@ export class SudokuService {
    * Represent the state of a row as a string.
    */
   private rowToString(r: number) : string {
-    return this.groupToString(this.sudokuModel.rows[r], r, 'Row');
+    let s = 'Row' + ' ' + (r + 1) + ': ';
+    return s += this.groupToString(this.sudokuModel.rows[r]);
   } // rowToString()
 
   /**
    * Represent the state of a column as a string.
    */
   private colToString(c: number) : string {
-    return this.groupToString(this.sudokuModel.cols[c], c, 'Col');
+    let s = 'Col' + ' ' + (c + 1) + ': ';
+    return s += this.groupToString(this.sudokuModel.cols[c]);
   } // colToString()
 
   /**
    * Represent the state of a box as a string.
    */
   private boxToString(b: number) : string {
-    return this.groupToString(this.sudokuModel.boxs[b], b, 'Box');
+    let s = 'Box' + ' ' + (b + 1) + ': ';
+    return s += this.groupToString(this.sudokuModel.boxs[b]);
   } // boxToString()
 
   /**
    * Represent the state of a row, column, or box as a string. The "group"
-   * parameter is the individual row, column, or box; he "idx" is the group's
-   * index (0..8); and "label" is 'Row', 'Col', or 'Box'.
+   * parameter is the individual row, column, or box.
    */
-  private groupToString(group : Group, idx : number, label: string) : string {
-    return label + ' ' + (idx + 1) + ': ' + group.toString();
+  private groupToString(group : Group) : string {
+    let s = '';
+    for (let v of VALUES) {
+      s += (group.vOccurrences[v] === 0) ? '.' : group.vOccurrences[v];
+      if (v == 3 || v == 6) {
+        s += ' ';
+      }
+    }
+    s += ' ';
+    for (let i = 0; i < group.cells.length; i++) {
+      s += Common.pad(group.cells[i], 2) + ' ';
+      if (i == 2 || i == 5) {
+        s += ' ';
+      }
+    }
+    return s;
   }
 
   /**
    * Represent the state of a cell as a string.
    */
   private cellToString(c: number) : string {
-    return '' + Common.toRowColString(c) + ': ' 
-        + this.sudokuModel.cells[c].toString();
+    let cell = this.sudokuModel.cells[c];
+    let s = '' + Common.toRowColString(c) + ': '; 
+    s += 'v:' + (cell.value != 0 ? cell.value : '.');
+    s += ' k:';
+    for (let k of CANDIDATES) {
+      s += (cell.candidates[k]) ? k : '.';
+    }
+    s += ' r' + (cell.row + 1) + ' c' + (cell.col + 1) + ' b' + (cell.box + 1);
+    // if (!this.isValid()) {
+    //   s += ' * * *';
+    // }
+    return s;
   }
 
   /**
@@ -880,7 +984,7 @@ export class SudokuService {
   /**
    * 
    */
-  private getNumberOfCandidates(c: number) : number {
+  getNumberOfCandidates(c: number) : number {
     let count = 0;
     let cell = this.sudokuModel.cells[c];
     for (let k of CANDIDATES) {
@@ -918,6 +1022,24 @@ export class SudokuService {
     // add candidate
     this.sudokuModel.cells[c].candidates[k] = true;
   } // addCandidate()
+
+  /**
+   * Used by SudokoCreationService.
+   */
+  removeLastActionLogEntry() : void {
+    this.actionLog.removeLastEntry();
+  }
+
+  /**
+   * Represent the values of the sudoku as an array of 81 values.
+   */
+  cellsToValuesArray() : number[] {
+    let v: number[] = [];
+    for (let c of CELLS) {
+      v.push(this.sudokuModel.cells[c].value);
+    }
+    return v;
+  } // cellsToValuesArray()
 
       
 
@@ -999,12 +1121,34 @@ export class SudokuService {
   //   return true;   
   // } // is symetric()
 
-  // undoLastAction() {
+  /**
+   * 
+   */
+  getNakedCandidates_(r: number, c: number, maxCandidates: NakedType) {
+    return this.findNakedCandidates(Common.cellIdx(r, c), maxCandidates);
+  }
 
-  // }
+  /**
+   * 
+   */
+  getLastAction() {
+    return this.actionLog.getLastEntry();
+  }
 
-  // getActionLogAsString() {
+  /**
+   * Called by user button press (playComponent.ts) undoLastAction())
+   */
+  undoLastAction() : void {    // called by user button
+    let lastAction = this.actionLog.getLastEntry();
+    this.undoAction(lastAction);
+    this.actionLog.removeLastEntry();
+  } // undoLastAction()
 
-  // }
-
+  /**
+   * 
+   */
+  getActionLogAsString() {
+    return this.actionLog.toStringLastFirst();
+  }
+  
 }

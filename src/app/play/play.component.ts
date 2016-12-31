@@ -7,10 +7,12 @@ import { Router } from '@angular/router';
 
 import { Common }           from '../common/common';
 import { Difficulty }       from '../model/difficulty';
-import { Sudoku }           from '../model/sudoku';
+// import { Sudoku }           from '../model/sudoku';
+import { SudokuService }           from '../model/sudoku.service';
 import { SudokuCreationService }           from '../model/sudoku-creation.service';
 import { Puzzle }           from '../model/puzzle';
 import { Hint }             from '../hint/hint';
+import { HintService }      from '../hint/hint.service';
 import { ValueHint }        from '../hint/hint';
 import { CandidatesHint }   from '../hint/hint';
 import { HintType }         from '../hint/hint.type';
@@ -43,7 +45,7 @@ enum AutoSolveStates {
 
 @Component({
   selector: 'play',
-  /** */providers: [SudokuCreationService],
+  /** */providers: [SudokuCreationService, SudokuService, HintService],
   templateUrl: './play.component.html',
   styleUrls: ['./play.component.css'],
   changeDetection: ChangeDetectionStrategy.Default
@@ -54,11 +56,16 @@ export class PlayComponent implements OnInit {
     private router: Router,
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
-    private board: Sudoku,
 
     /** */
-    private sudokuCreationService: SudokuCreationService
-  ) {}
+    private sudokuService: SudokuService,
+    private sudokuCreationService: SudokuCreationService,
+    private hintService: HintService
+  ) {
+// console.log('sudokuService id: ' + SudokuService.getId());
+// console.log('sudokuService id: ' + this.sudokuService.getId());
+// console.log('sudokuService id: ' + sudokuService.getId());
+  }
 
   // -----------------------------------------------------------------------
   // constants
@@ -116,6 +123,16 @@ export class PlayComponent implements OnInit {
 
     this.initializeUserInterface();
     this.changeDetectorRef.detectChanges();
+
+console.log('sudokuService id: ' + SudokuService.getId());
+console.log('sudokuService id: ' + this.sudokuService.getId());
+console.log('sudokuCreationService id: ' + SudokuCreationService.getId());
+console.log('sudokuCreationService id: ' + this.sudokuCreationService.getId());
+console.log('hintService id: ' + HintService.getId());
+console.log('hintService id: ' + this.hintService.getId());
+    // console.log('ss\n' + this.sudokuService.toString());
+    // console.log('scs\n' + this.sudokuCreationService.toString());
+    // console.log('hs\n' + this.hintService.toString());
 
     // test
     // let comboIt = new CombinationIterator([1,2,3], 3);
@@ -242,7 +259,7 @@ export class PlayComponent implements OnInit {
    * Function based on view's cell indexes in html code.
    */
   isCellInvalid_(br: number, bc: number, cr: number, cc: number) {
-    return this.board.isCellInvalid(Common.viewToModelRow(br, cr), Common.viewToModelCol(bc, cc));
+    return this.sudokuService.isCellInvalid_(Common.viewToModelRow(br, cr), Common.viewToModelCol(bc, cc));
   }
 
   /**
@@ -272,7 +289,7 @@ export class PlayComponent implements OnInit {
       case 2:   // middle click
         return;
       case 3:   // right click
-        var nakeds = this.board.getNakedCandidates(r, c, NakedType.SINGLE);
+        var nakeds = this.sudokuService.getNakedCandidates_(r, c, NakedType.SINGLE);
         if (nakeds.length === 1) {
           this.setCellValue(r, c, nakeds[0]);
           this.setSelectedCell(r, c);
@@ -302,7 +319,7 @@ export class PlayComponent implements OnInit {
    * Function based on view's cell indexes in html code.
    */
   getValue_(br: number, bc: number, cr: number, cc: number) {
-      return this.board.getValue_(Common.viewToModelRow(br, cr), 
+      return this.sudokuService.getValue_(Common.viewToModelRow(br, cr), 
           Common.viewToModelCol(bc, cc));
   } // getValue_()
   
@@ -337,7 +354,7 @@ export class PlayComponent implements OnInit {
   candToChar_(br: number, bc: number, cr: number, cc: number, 
           kr: number, kc: number) {
     var candidate = Common.viewToModelCand(kr, kc);
-    return this.board.isCandidate_(Common.viewToModelRow(br, cr), 
+    return this.sudokuService.isCandidate_(Common.viewToModelRow(br, cr), 
         Common.viewToModelCol(bc, cc), 
             candidate) ? candidate.toString() : '';
   } // candToChar_()
@@ -372,7 +389,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
         Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
     this.solutionClues = this.createSolutionClues();
 
-    this.board.loadProvidedSudoku(this.currentPuzzle.initialValues);
+    this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
     
     // go to puzzle execution by user
     this.startUserTimer();
@@ -575,14 +592,14 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.autoSolveMessage = '';
 
     // capture before it's removed from log
-    let lastAction = this.board.getLastAction();
+    let lastAction = this.sudokuService.getLastAction();
 
-    this.board.undoLastAction();
+    this.sudokuService.undoLastAction();
 
     // update values complete
     if (lastAction.type === ActionType.SET_VALUE) {
       let v = (<ValueAction> lastAction).value;
-      this.valuesComplete[v] = this.board.isValueComplete(v);
+      this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     }
 
     // set selected cell to that of last action
@@ -599,10 +616,10 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   restartCurrentPuzzle() {
     this.stopUserTimer();
     this.startUserTimer();
-    this.board.initialize();
+    this.sudokuService.initializeModel();
     var temp = this.actualDifficulty;   // save
     this.initializeUserInterface();
-    this.currentPuzzle = this.board.loadProvidedSudoku(this.currentPuzzle.initialValues);
+    this.currentPuzzle = this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
     this.actualDifficulty = temp;       // restore
     this.playState = PlayStates.EXECUTE;
   }
@@ -611,7 +628,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   startNewPuzzle() {
     this.stopUserTimer();
     this.initializeUserInterface();
-    this.board.initialize();
+    this.sudokuService.initializeModel();
     this.playState = PlayStates.NEW;
   }
 
@@ -620,7 +637,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
   
   private loadTestPuzzle(initialValues: string) : void {
-    this.currentPuzzle = this.board.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
+    this.currentPuzzle = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
     this.playState = PlayStates.EXECUTE;
   }
 
@@ -778,7 +795,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   // -----------------------------------------------------------------------
 
   private setSelectedCell(r: number, c: number) {
-    if (!this.board.isCellInvalid(r, c)) {
+    if (!this.sudokuService.isCellInvalid_(r, c)) {
       this.selectedCell.r = r;
       this.selectedCell.c = c;
       // this.focus('grid');
@@ -792,7 +809,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
   
   private isCellLocked(r: number, c: number) : boolean {
-    return this.board.isCellLocked(r, c);
+    return this.sudokuService.isCellLocked_(r, c);
   }
   
   // ng-dblclick candidate in grid EXECUTION state
@@ -802,13 +819,13 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.autoSolveState = AutoSolveStates.READY;
     this.autoSolveMessage = '';
     if (this.candidatesShowing) {
-      this.board.removeCandidate_(r, c, k);
+      this.sudokuService.removeCandidate_(r, c, k);
     }
     this.refreshActionLog();
   }
   
   private findHint() : void {
-    this.hint = this.board.getHint_();
+    this.hint = this.hintService.getHint(Difficulty.HARDEST);
     if (this.hint) {
       this.hintState = HintStates.ACTIVE
       this.hintsViewed++;
@@ -825,12 +842,12 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   private applyHint() {
     this.hintMessage = '';
     this.hintState = HintStates.READY
-    this.board.applyHint();
+    this.hintService.applyHint();
     this.hintsApplied++;
     if (this.hint.getActionType() === ActionType.SET_VALUE) {
       var value = this.hint.getValue();
-      this.valuesComplete[value] = this.board.isValueComplete(value);
-      if (this.board.isSolved()) {
+      this.valuesComplete[value] = this.sudokuService.isValueComplete(value);
+      if (this.sudokuService.isSolved()) {
         this.handlePuzzleComplete();
       }
     }
@@ -840,19 +857,19 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     
   // can be set by key press, apply hint
   private setCellValue(r: number, c: number, v: number) {
-    this.board.setValue_(r, c, v);
-    this.valuesComplete[v] = this.board.isValueComplete(v);
-    if (this.board.isSolved()) {
+    this.sudokuService.setValue_(r, c, v);
+    this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
+    if (this.sudokuService.isSolved()) {
       this.handlePuzzleComplete();
     }
       this.refreshActionLog();
   }
   
   private removeCellValue(r: number, c: number) {
-    var oldValue = this.board.getValue_(r, c);
+    var oldValue = this.sudokuService.getValue_(r, c);
     if (oldValue >= 1) {
-      this.board.removeValue_(r, c);
-      this.valuesComplete[oldValue] = this.board.isValueComplete(oldValue);
+      this.sudokuService.removeValue_(r, c);
+      this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
       this.refreshActionLog();
     }
   }
@@ -869,7 +886,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
     
   private refreshActionLog() {
-    this.actionLog = this.board.getActionLogAsString();
+    this.actionLog = this.sudokuService.getActionLogAsString();
   }
 
   private startUserTimer() : void {
@@ -887,7 +904,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
 
   private initializeUserInterface() {
-    this.board.initialize();
+    this.sudokuService.initializeModel();
     this.actualDifficulty = null;
     this.selectedCell = {r: 0, c: 0};
 

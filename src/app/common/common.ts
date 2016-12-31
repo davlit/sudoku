@@ -1,7 +1,7 @@
 export const TITLE = 'Sudoku Helper';
 export const MAJOR_VERSION = '0';
-export const VERSION = '12';
-export const SUB_VERSION = '2';
+export const VERSION = '13';
+export const SUB_VERSION = '0';
 export const COPYRIGHT = 
     'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 
@@ -210,10 +210,13 @@ export class Common {
       return typeof args[number] != 'undefined' ? args[number] : match;
     });
   }
-      
-  static pad(num: number, size: number) {
+
+  /**
+   * Right justify, space pad to field size; 
+   */  
+  static pad(num: number, fieldSize: number) {
     let s = num + '';
-    while (s.length < size) {
+    while (s.length < fieldSize) {
       s = ' ' + s;
     }
     return s;

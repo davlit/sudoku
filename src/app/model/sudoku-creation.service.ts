@@ -10,10 +10,9 @@ import { ActionType } from '../action/action.type';
 import { ActionLog } from '../action/actionLog';
 import { ValueHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
-import { HintLog } from '../hint/hintLog';
 
-import { Sudoku } from './sudoku';
 import { SudokuService } from './sudoku.service';
+import { HintService } from '../hint/hint.service';
 
 import { VALUES } from     '../common/common';
 import { CELLS } from      '../common/common';
@@ -21,22 +20,43 @@ import { CELLS } from      '../common/common';
 @Injectable()
 export class SudokuCreationService {
 
-  constructor(
-    private actionLog: ActionLog, 
-    private hintLog: HintLog/*,
-    private sudoku: SudokuService*/) {
+  private static id = 0;
+  static getId() : number {
+    return SudokuCreationService.id;
   }
-  
-  private sudoku = new Sudoku(this.actionLog, this.hintLog);
 
+  private currentSudoku: Puzzle;
   private randomCellIndexes: number[];
   private randomValues: number[];
 
-  currentSudoku: Puzzle;
+  constructor(
+    private actionLog: ActionLog, 
+    private sudokuService: SudokuService,
+    private hintService: HintService
+  ) {
+    SudokuCreationService.id++;
+// console.log('sudokuService id: ' + SudokuService.getId());
+// console.log('sudokuService id: ' + this.sudokuService.getId());
+// console.log('sudokuService id: ' + sudokuService.getId());
+  }
+
+  ngOnInit() {
+console.log('sudokuService id: ' + SudokuService.getId());
+console.log('sudokuService id: ' + this.sudokuService.getId());
+  }
+  
+  getId() {
+    return SudokuCreationService.id;
+  }
+
+  // private sudoku = new Sudoku(this.actionLog, this.hintLog);
+
+  private initializeLogs() {
+    this.sudokuService.initializeActionLog();
+    this.hintService.initializeHintLog();
+  }
 
   setDesiredDifficulty(desiredDifficulty) {
-// console.log('sudoku:\n' + this.sudoku.toString());
-// console.log(this.sudoku.getId() + ' ' + this.sudoku.toOneLineString());
     this.currentSudoku = new Puzzle();
     this.currentSudoku.desiredDifficulty = desiredDifficulty;
   } // setDesiredDifficulty()
@@ -49,7 +69,6 @@ export class SudokuCreationService {
 
     // step 1 - generate random finished sudoku
     this.currentSudoku.completedPuzzle = this.makeRandomSolution();
-// console.log(this.sudoku.getId() + ' ' + this.sudoku.toOneLineString());
 
     let pass = 0;
 
@@ -74,26 +93,25 @@ export class SudokuCreationService {
     } // while not getting desired difficulty
 
     this.currentSudoku.generatePasses = pass;
-    // this.initializeModel(this.currentSudoku.initialValues);
     observer.complete();
   }); // generatePuzzle$
 
-
-observable = new Observable(observer => {
-  setTimeout(() => {
-    observer.next(1);
-  }, 1000);
-  setTimeout(() => {
-    observer.next(2);
-  }, 2000);
-  setTimeout(() => {
-    observer.next(3);
-  }, 3000);
-  setTimeout(() => {
-    observer.next(4);
-    observer.complete();
-  }, 4000);
-}); // observable
+  // testing
+  observable = new Observable(observer => {
+    setTimeout(() => {
+      observer.next(1);
+    }, 1000);
+    setTimeout(() => {
+      observer.next(2);
+    }, 2000);
+    setTimeout(() => {
+      observer.next(3);
+    }, 3000);
+    setTimeout(() => {
+      observer.next(4);
+      observer.complete();
+    }, 4000);
+  }); // observable
 
   /**
    * [Step 1]
@@ -103,23 +121,24 @@ observable = new Observable(observer => {
    */
   private makeRandomSolution() : number[] {
 
-    let start: number = Date.now();
+    let start: number = Date.now();   // for elapsed time
 
-    this.sudoku.initialize();
+    this.sudokuService.initializeModel();
+    this.initializeLogs();
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues = Common.shuffleArray(VALUES.slice());
+    // testing
     // this.randomCellIndexes = Common.RANDOM_CELLS_1;
     // this.randomValues = Common.RANDOM_VALUES_1;
    for (let v of VALUES) {
-      this.sudoku.setValue(this.randomCellIndexes[v], v, ActionType.GUESS_VALUE);
+      this.sudokuService.setValue(this.randomCellIndexes[v], v, ActionType.GUESS_VALUE);
     }
     this.solve();
 
     let elapsed: number = Date.now() - start;
     console.log('Step 1 elapsed: ' + elapsed + 'ms');
 
-// console.log(JSON.stringify(this.sudoku.cellsToValuesArray()));
-    return this.sudoku.cellsToValuesArray();
+    return this.sudokuService.cellsToValuesArray();
   } // makeRandomSolution()
 
   /**
@@ -127,15 +146,14 @@ observable = new Observable(observer => {
    */
   private getStartingValues(puzzle: Puzzle) : void {
 
-    let start: number = Date.now();
+    let start: number = Date.now();   // for elapsed time
 
-    this.sudoku.setAllValues(puzzle.completedPuzzle);
-    // this.actionLog.initialize();
-    // this.hintLog.initialize();
-    this.sudoku.initializeLogs();
+    this.sudokuService.setAllValues(puzzle.completedPuzzle);
+    this.initializeLogs();
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues = Common.shuffleArray(VALUES.slice());
     let randomParingCells = Common.shuffleArray(CELLS.slice(0, 41));
+    // testing
     // this.randomCellIndexes = Common.RANDOM_CELLS_2;
     // this.randomValues = Common.RANDOM_VALUES_2;
     // let randomParingCells = Common.RANDOM_PARING_CELLS_2;
@@ -150,12 +168,12 @@ observable = new Observable(observer => {
       let symC = 80 - c;
   
       // save then remove values of symmetric twins 
-      let savedValue = this.sudoku.getValue(c)
-      let savedSymValue = this.sudoku.getValue(symC);
-      this.sudoku.removeValue(c);
-      this.sudoku.removeValue(symC);
+      let savedValue = this.sudokuService.getValue(c)
+      let savedSymValue = this.sudokuService.getValue(symC);
+      this.sudokuService.removeValue(c);
+      this.sudokuService.removeValue(symC);
       
-      // pare first 9 pairs without solving
+      // pare first 9 pairs without solving (for speed)
       if (++pairsRemoved <= 9) {
         continue NEXT_CELL;
       }
@@ -167,17 +185,17 @@ observable = new Observable(observer => {
         case Difficulty.MEDIUM:
         case Difficulty.HARD:
           let hard: boolean = false;
-          while (this.sudoku.getHint(puzzle.desiredDifficulty)) {
+          while (this.hintService.getHint(puzzle.desiredDifficulty)) {
 
             // count difficulty hard hints
-            if (this.sudoku.getActiveHint().getDifficultyRating() === Difficulty.HARD) {
+            if (this.hintService.getActiveHint().getDifficultyRating() === Difficulty.HARD) {
               hard = true;
             }
 
-            this.sudoku.applyHint();
+            this.hintService.applyHint();
           }
-          let solved = this.sudoku.isSolved();
-          this.sudoku.rollbackAll();
+          let solved = this.sudokuService.isSolved();
+          this.rollbackAll();
           if (solved) {
             if (hard) {
               hardCount++;  // a hard hint was used
@@ -188,16 +206,16 @@ observable = new Observable(observer => {
         // guess when no hints available
         case Difficulty.HARDEST:
           let localSolutionsCount = this.countSolutions();
-          this.sudoku.rollbackAll();
+          this.rollbackAll();
           if (localSolutionsCount <= 1) {
             continue NEXT_CELL;    // don't restore sym cells
           } // if multiple solutions, fall through to restore pared cells
       } // switch
 
-      this.sudoku.setValue(c, savedValue, ActionType.SET_VALUE);
-      this.sudoku.setValue(symC, savedSymValue, ActionType.SET_VALUE);
-      this.sudoku.actionLog.removeLastEntry(); // keep restores out of action log
-      this.sudoku.actionLog.removeLastEntry();
+      this.sudokuService.setValue(c, savedValue, ActionType.SET_VALUE);
+      this.sudokuService.setValue(symC, savedSymValue, ActionType.SET_VALUE);
+      this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
+      this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
     } // for next random symmetric pairs of cells to pare
 
     // TODO
@@ -207,9 +225,8 @@ observable = new Observable(observer => {
         && hardCount === 0) {
       puzzle.initialValues = null;
     } else {
-      puzzle.initialValues = this.sudoku.cellsToValuesArray();
+      puzzle.initialValues = this.sudokuService.cellsToValuesArray();
     }
-// console.log(puzzle.initialValues);
 
     let elapsed: number = Date.now() - start;
     console.log('Step 2 elapsed: ' + elapsed + 'ms');
@@ -225,21 +242,20 @@ observable = new Observable(observer => {
    */
   private completePuzzle(puzzle: Puzzle) : void {
 
-    let start: number = Date.now();
+    let start: number = Date.now();   // for elapsed time
 
-    // this.hintLog.initialize();
-    // this.actionLog.initialize();
-    this.sudoku.initializeLogs();
+    this.initializeLogs();
 
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues =  Common.shuffleArray(VALUES.slice());
+    // testing
     // this.randomCellIndexes = Common.RANDOM_CELLS_3;
     // this.randomValues = Common.RANDOM_VALUES_3;
     
     this.solve();
 
-    puzzle.completedPuzzle = this.sudoku.cellsToValuesArray();
-    puzzle.stats = this.sudoku.getHintCounts();
+    puzzle.completedPuzzle = this.sudokuService.cellsToValuesArray();
+    puzzle.stats = this.hintService.getHintCounts();
     puzzle.actualDifficulty = puzzle.stats.getActualDifficulty();
 
     let elapsed: number = Date.now() - start;
@@ -268,12 +284,12 @@ observable = new Observable(observer => {
    * finally there is no possible solution.
    */
   private solve() : boolean {
-    while (this.sudoku.getHint(Difficulty.HARDEST) != null) {
-      this.sudoku.applyHint();
-      if (this.sudoku.isSolved()) {
+    while (this.hintService.getHint(Difficulty.HARDEST) != null) {
+      this.hintService.applyHint();
+      if (this.sudokuService.isSolved()) {
         return true;		// done
       }
-      if (this.sudoku.isImpossible()) {
+      if (this.sudokuService.isImpossible()) {
         return false;		// no value, no candidate cell exists
       }
     } // while -- no hint, try guess
@@ -286,7 +302,7 @@ observable = new Observable(observer => {
         return true;
       } else {
         // recursive call returned false -> (1) impossible. (2) no guesses left
-        lastGuess = this.sudoku.rollbackToLastGuess();
+        lastGuess = this.rollbackToLastGuess();
       }
     } // while guess()
 
@@ -311,16 +327,14 @@ observable = new Observable(observer => {
    * difficulty rating desired.
    */
   private countSolutions() : number {
-    while (this.sudoku.getHint(Difficulty.HARDEST) != null) {
-      this.sudoku.applyHint();
-      if (this.sudoku.isSolved()) {
-        this.sudoku.rollbackToLastGuess();
-        // this.actionLog.removeLastEntry(); // 1***************************************
+    while (this.hintService.getHint(Difficulty.HARDEST) != null) {
+      this.hintService.applyHint();
+      if (this.sudokuService.isSolved()) {
+        this.rollbackToLastGuess();
         return 1;
       }
-      if (this.sudoku.isImpossible()) {
-        this.sudoku.rollbackToLastGuess();
-        // this.actionLog.removeLastEntry(); // 2***************************************
+      if (this.sudokuService.isImpossible()) {
+        this.rollbackToLastGuess();
         return 0;
       }
     } // while getHint() -- no hint, try guess
@@ -331,58 +345,16 @@ observable = new Observable(observer => {
     while (this.guess(lastGuess)) {	// while guess made
       localSolutionsCount += this.countSolutions(); // recursive call
       if (localSolutionsCount >= 2) {
-        this.sudoku.rollbackToLastGuess();
-        // this.actionLog.removeLastEntry(); // 3***************************************
-
+        this.rollbackToLastGuess();
         return localSolutionsCount;
-      }
-
-        else {
-         lastGuess = this.sudoku.rollbackToLastGuess();
+      } else {
+         lastGuess = this.rollbackToLastGuess();
       }
 
     } // while guess()
-    this.sudoku.rollbackToLastGuess();
-    // this.actionLog.removeLastEntry(); // 4***************************************
+    this.rollbackToLastGuess();
     return localSolutionsCount;
   } // countSolutions()
-
-  // private countSolutions1(difficulty: Difficulty) : number {
-  //   while (this.sudoku.getHint(difficulty) != null) {
-  //     this.sudoku.applyHint();
-  //     if (this.sudoku.isSolved()) {
-  //       this.sudoku.rollbackToLastGuess();
-  //       // this.actionLog.removeLastEntry(); // 1***************************************
-  //       return 1;
-  //     }
-  //     if (this.sudoku.isImpossible()) {
-  //       this.sudoku.rollbackToLastGuess();
-  //       // this.actionLog.removeLastEntry(); // 2***************************************
-  //       return 0;
-  //     }
-  //   } // while getHint() -- no hint, try guess
-
-  //   // now we have to resort to guessing
-  //   let localSolutionsCount = 0;
-  //   let lastGuess: GuessAction = null;
-  //   while (this.guess(lastGuess)) {	// while guess made
-  //     localSolutionsCount += this.countSolutions(); // recursive call
-  //     if (localSolutionsCount >= 2) {
-  //       this.sudoku.rollbackToLastGuess();
-  //       // this.actionLog.removeLastEntry(); // 3***************************************
-
-  //       return localSolutionsCount;
-  //     }
-
-  //       else {
-  //        lastGuess = this.sudoku.rollbackToLastGuess();
-  //     }
-
-  //   } // while guess()
-  //   this.sudoku.rollbackToLastGuess();
-  //   // this.actionLog.removeLastEntry(); // 4***************************************
-  //   return localSolutionsCount;
-  // } // countSolutions1()
 
   /**
    * Makes a guess for a cell value. If a lastGuess is not provided, a cell 
@@ -396,20 +368,19 @@ observable = new Observable(observer => {
     let guessValue: number = null;
     if (lastGuess == null) {
       guessCell = this.findFewestCandidatesCell();
-// console.log('guessCell: ' + guessCell);
-      possibleValues = this.sudoku.getCandidates(guessCell);
+      possibleValues = this.sudokuService.getCandidates(guessCell);
     } else {
       guessCell = lastGuess.cell;
       possibleValues = lastGuess.possibleValues;
-      this.sudoku.actionLog.removeLastEntry(); // remove previous action
+      this.sudokuService.removeLastActionLogEntry(); // remove previous action
       if (possibleValues.length === 0) {
         return false;
       }
     }
     guessValue = possibleValues[0];   // try 1st available candidate
     possibleValues = possibleValues.slice(1);   // remove guess value
-    this.sudoku.hintLog.addEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
-    this.sudoku.setValue(guessCell, guessValue, ActionType.GUESS_VALUE, possibleValues);
+    this.hintService.addHintLogEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
+    this.sudokuService.setValue(guessCell, guessValue, ActionType.GUESS_VALUE, possibleValues);
     return true;
   } // guess()
 
@@ -426,22 +397,15 @@ observable = new Observable(observer => {
     let currentCellCands: number;
     for (let c of this.randomCellIndexes) {
 
-      if (this.sudoku.hasValue(c)) {
+      if (this.sudokuService.hasValue(c)) {
         continue;
       }
 
-      // currentCellCands = this.cells[c].getNumberOfCandidates();
-      currentCellCands = this.sudoku.getNumberOfCandidates(c);
-
-// console.log('currentCellCands: ' + currentCellCands);
-
+      currentCellCands = this.sudokuService.getNumberOfCandidates(c);
       if (currentCellCands === 2) {
         return c;   // can't get lower than 2
       }
 
-      // if (currentCellCands === 0) {
-      //   continue;       // cell has value
-      // }
       if (currentCellCands < minCands) {
         minCands = currentCellCands;
         minCandsCell = c;
@@ -463,14 +427,14 @@ observable = new Observable(observer => {
     // undo entries that are not guesses
     let lastAction = this.actionLog.getLastEntry();
     while (lastAction && lastAction.type != ActionType.GUESS_VALUE) {
-      this.sudoku.undoAction(lastAction);
+      this.sudokuService.undoAction(lastAction);
       this.actionLog.removeLastEntry();
       lastAction = this.actionLog.getLastEntry();
     }
 
     if (this.actionLog.getLastEntry() &&
         this.actionLog.getLastEntry().type === ActionType.GUESS_VALUE) {
-      this.sudoku.undoAction(this.actionLog.getLastEntry());
+      this.sudokuService.undoAction(this.actionLog.getLastEntry());
 
       return <GuessAction> this.actionLog.getLastEntry();   // last GUESS_VALUE action
     }
@@ -482,9 +446,13 @@ observable = new Observable(observer => {
    */
   private rollbackAll() : void {
     while (this.actionLog.getLastEntry()) {
-      this.sudoku.undoAction(this.actionLog.getLastEntry());
+      this.sudokuService.undoAction(this.actionLog.getLastEntry());
       this.actionLog.removeLastEntry();
     }
   } // rollbackAll()
+
+  toString() {
+    return this.sudokuService.toString();
+  }
 
 }

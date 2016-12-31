@@ -11,9 +11,12 @@ import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { PlayComponent } from './play/play.component';
 import { PrintComponent } from './print/print.component';
-import { Sudoku }         from './model/sudoku';
+import { SudokuService }         from './model/sudoku.service';
+import { SudokuCreationService }         from './model/sudoku-creation.service';
+import { SudokuModel }         from './model/sudoku.model';
 import { ActionLog }      from './action/actionLog';
 import { HintLog }        from './hint/hintLog';
+import { HintService }        from './hint/hint.service';
 import { CounterComponent } from './play/counter/counter.component';
 
 @NgModule({
@@ -32,7 +35,7 @@ import { CounterComponent } from './play/counter/counter.component';
     // BusyModule,
     AppRoutingModule
   ],
-  providers: [Sudoku, ActionLog, HintLog],
+  providers: [SudokuService, SudokuCreationService, HintService, ActionLog, HintLog],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

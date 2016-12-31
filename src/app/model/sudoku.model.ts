@@ -1,3 +1,5 @@
+import { Injectable } from '@angular/core';
+
 import { Common } from     '../common/common';
 import { VALUES } from     '../common/common';
 import { CANDIDATES } from '../common/common';
@@ -10,6 +12,7 @@ import { ROW_CELLS } from  '../common/common';
 import { COL_CELLS } from  '../common/common';
 import { BOX_CELLS } from  '../common/common';
 
+// @Injectable()
 export class SudokuModel {
   cells: Cell[]
   rows: Group[];
@@ -44,9 +47,10 @@ export class Cell {
   box: number;
 
   constructor(r: number, c:number, b:number) {
+    this.value = 0;
     this.candidates = new Array(10);
     for (let k of CANDIDATES) {
-      this.candidates[k] = false;
+      this.candidates[k] = true;
     }
     this.row = r;
     this.col = c;

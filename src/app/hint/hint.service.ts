@@ -21,7 +21,7 @@ import { ValueHint } from '../hint/hint';
 import { CandidatesHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
 import { HintLog } from '../hint/hintLog';
-// import { HintCounts } from '../hint/hintCounts';
+import { HintCounts } from '../hint/hintCounts';
 
 // import { VERSION } from    '../common/common';
 // import { VALUES } from     '../common/common';
@@ -42,6 +42,11 @@ import { BOX_CELLS } from  '../common/common';
 @Injectable()
 export class HintService {
 
+  private static id = 0;
+  static getId() : number {
+    return HintService.id;
+  }
+
   private activeHint: Hint;
 
   constructor(
@@ -49,6 +54,31 @@ export class HintService {
     // private activeHint: Hint,
     private hintLog: HintLog
     ) {
+    HintService.id++;
+// console.log('sudokuService id: ' + SudokuService.getId());
+// console.log('sudokuService id: ' + this.sudokuService.getId());
+// console.log('sudokuService id: ' + sudokuService.getId());
+  }
+
+  ngOnInit() {
+console.log('sudokuService id: ' + SudokuService.getId());
+console.log('sudokuService id: ' + this.sudokuService.getId());
+  }
+
+  getId() {
+    return HintService.id;
+  }
+
+  initializeHintLog() : void {
+    this.hintLog.initialize();
+  }
+
+  addHintLogEntry(hint: Hint) : void {
+    this.hintLog.addEntry(hint);
+  }
+
+  getHintCounts() : HintCounts {
+    return this.hintLog.getHintCounts();
   }
 
   getActiveHint() {
@@ -182,12 +212,12 @@ export class HintService {
       }
     }
     for (let c of COLS) {
-      if (this.checkHiddenSinglesGroup(this.sudokuService.getCol[c], HintType.HIDDEN_SINGLE_COL)) {
+      if (this.checkHiddenSinglesGroup(this.sudokuService.getCol(c), HintType.HIDDEN_SINGLE_COL)) {
         return true;
       }
     }
     for (let b of BOXS) {
-      if (this.checkHiddenSinglesGroup(this.sudokuService.getBox[b], HintType.HIDDEN_SINGLE_BOX)) {
+      if (this.checkHiddenSinglesGroup(this.sudokuService.getBox(b), HintType.HIDDEN_SINGLE_BOX)) {
         return true;
       }
     }
@@ -1260,5 +1290,9 @@ export class HintService {
     return false;    	
   } // checkColBoxReductions()
         
+  toString() {
+    return this.sudokuService.toString();
+  }
+
 }
 

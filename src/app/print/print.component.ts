@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Common } from '../common/common';
-import { Sudoku } from '../model/sudoku';
+// import { Sudoku } from '../model/sudoku';
+import { SudokuService } from '../model/sudoku.service';
 import { Puzzle } from '../model/puzzle';
 
 @Component({
@@ -14,13 +15,13 @@ import { Puzzle } from '../model/puzzle';
 export class PrintComponent implements OnInit {
 
   constructor(
-    private board: Sudoku
+    private sudokuService: SudokuService
   ) {}
 
   ngOnInit() {}
 
   getActualDifficulty() {
-    return Puzzle.getDifficultyLabel(this.board.getCurrentSudoku().actualDifficulty);
+    return Puzzle.getDifficultyLabel(this.sudokuService.getCurrentSudoku().actualDifficulty);
   }
 
   /**
@@ -35,7 +36,7 @@ export class PrintComponent implements OnInit {
    * Function based on view's cell indexes in html code.
    */
   getValue_(br: number, bc: number, cr: number, cc: number) {
-      return this.board.getValue_(Common.viewToModelRow(br, cr), 
+      return this.sudokuService.getValue_(Common.viewToModelRow(br, cr), 
           Common.viewToModelCol(bc, cc));
   }
   
@@ -47,7 +48,7 @@ export class PrintComponent implements OnInit {
   }
   
   private isCellLocked(r: number, c: number) : boolean {
-    return this.board.isCellLocked(r, c);
+    return this.sudokuService.isCellLocked_(r, c);
   }
   
   printGrid() {
