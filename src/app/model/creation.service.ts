@@ -10,19 +10,19 @@ import { ActionType } from '../action/action.type';
 import { ActionLog } from '../action/actionLog';
 import { ValueHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
+import { HintService } from '../hint/hint.service';
 
 import { SudokuService } from './sudoku.service';
-import { HintService } from '../hint/hint.service';
 
 import { VALUES } from     '../common/common';
 import { CELLS } from      '../common/common';
 
 @Injectable()
-export class SudokuCreationService {
+export class CreationService {
 
   private static id = 0;
   static getId() : number {
-    return SudokuCreationService.id;
+    return CreationService.id;
   }
 
   private currentSudoku: Puzzle;
@@ -34,7 +34,7 @@ export class SudokuCreationService {
     private sudokuService: SudokuService,
     private hintService: HintService
   ) {
-    SudokuCreationService.id++;
+    CreationService.id++;
 // console.log('sudokuService id: ' + SudokuService.getId());
 // console.log('sudokuService id: ' + this.sudokuService.getId());
 // console.log('sudokuService id: ' + sudokuService.getId());
@@ -46,7 +46,7 @@ console.log('sudokuService id: ' + this.sudokuService.getId());
   }
   
   getId() {
-    return SudokuCreationService.id;
+    return CreationService.id;
   }
 
   // private sudoku = new Sudoku(this.actionLog, this.hintLog);

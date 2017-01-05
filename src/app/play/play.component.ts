@@ -7,9 +7,8 @@ import { Router } from '@angular/router';
 
 import { Common }           from '../common/common';
 import { Difficulty }       from '../model/difficulty';
-// import { Sudoku }           from '../model/sudoku';
 import { SudokuService }           from '../model/sudoku.service';
-import { SudokuCreationService }           from '../model/sudoku-creation.service';
+import { CreationService }           from '../model/creation.service';
 import { Puzzle }           from '../model/puzzle';
 import { Hint }             from '../hint/hint';
 import { HintService }      from '../hint/hint.service';
@@ -45,7 +44,7 @@ enum AutoSolveStates {
 
 @Component({
   selector: 'play',
-  /** */providers: [SudokuCreationService, SudokuService, HintService],
+  /** */providers: [CreationService, SudokuService, HintService],
   templateUrl: './play.component.html',
   styleUrls: ['./play.component.css'],
   changeDetection: ChangeDetectionStrategy.Default
@@ -59,7 +58,7 @@ export class PlayComponent implements OnInit {
 
     /** */
     private sudokuService: SudokuService,
-    private sudokuCreationService: SudokuCreationService,
+    private creationService: CreationService,
     private hintService: HintService
   ) {
 // console.log('sudokuService id: ' + SudokuService.getId());
@@ -126,12 +125,12 @@ export class PlayComponent implements OnInit {
 
 console.log('sudokuService id: ' + SudokuService.getId());
 console.log('sudokuService id: ' + this.sudokuService.getId());
-console.log('sudokuCreationService id: ' + SudokuCreationService.getId());
-console.log('sudokuCreationService id: ' + this.sudokuCreationService.getId());
+console.log('creationService id: ' + CreationService.getId());
+console.log('creationService id: ' + this.creationService.getId());
 console.log('hintService id: ' + HintService.getId());
 console.log('hintService id: ' + this.hintService.getId());
     // console.log('ss\n' + this.sudokuService.toString());
-    // console.log('scs\n' + this.sudokuCreationService.toString());
+    // console.log('scs\n' + this.creationService.toString());
     // console.log('hs\n' + this.hintService.toString());
 
     // test
@@ -222,10 +221,11 @@ console.log('hintService id: ' + this.hintService.getId());
         this.removeCellValue(r, c);
       }
 
-      this.hintState = HintStates.READY;
-      this.hintMessage = '';
-      this.autoSolveState = AutoSolveStates.READY;
-      this.autoSolveMessage = '';
+      this.initializeHintStates();
+      // this.hintState = HintStates.READY;
+      // this.hintMessage = '';
+      // this.autoSolveState = AutoSolveStates.READY;
+      // this.autoSolveMessage = '';
       
       // step selected cell right (wrap to next row) during entry
       if (this.playState === PlayStates.ENTRY) {
@@ -239,7 +239,7 @@ console.log('hintService id: ' + this.hintService.getId());
       }
     } // if value 0..9
   } // handleKeyPress()
-  
+
   /**
    * Function based on view's cell indexes in html code.
    */
@@ -333,10 +333,11 @@ console.log('hintService id: ' + this.hintService.getId());
         && this.playState != PlayStates.EXECUTE) {
       return;
     }
-    this.hintState = HintStates.READY;
-    this.hintMessage = '';
-    this.autoSolveState = AutoSolveStates.READY;
-    this.autoSolveMessage = '';
+    this.initializeHintStates();
+    // this.hintState = HintStates.READY;
+    // this.hintMessage = '';
+    // this.autoSolveState = AutoSolveStates.READY;
+    // this.autoSolveMessage = '';
     this.removeCandidate(Common.viewToModelRow(br, cr), 
         Common.viewToModelCol(bc, cc), Common.viewToModelCand(kr, kc));
   } // handleCandidateClick_()
@@ -360,14 +361,56 @@ console.log('hintService id: ' + this.hintService.getId());
   } // candToChar_()
 
   /**
+   * 
+   */
+  isAnySelectedCell() {
+    return this.selectedCell.r != 0;
+  } // isAnySelectedCell()
+
+  /**
+   * Function based on view's cell indexes in html code.
+   */
+  choiceToChar_(vr: number, vc: number) : string {
+    var choice = (vr * 3) + vc + 1;
+    return '' + choice;
+  } // choiceToChar_()
+
+  /**
+   * 
+   */
+  handleChoiceClick_(vr: number, vc: number) : void {
+    var choice = (vr * 3) + vc + 1;
+    this.initializeHintStates();
+
+    // get currently selected cell's row and column number
+    var r = this.selectedCell.r;
+    var c = this.selectedCell.c;
+    
+    this.setCellValue(r, c, choice);
+  } // handleChoiceClick_()
+
+  /**
+   * 
+   */
+  handleChoiceClearClick_() {
+    this.initializeHintStates();
+
+    // get currently selected cell's row and column number
+    var r = this.selectedCell.r;
+    var c = this.selectedCell.c;
+    
+    this.removeCellValue(r, c);
+  } // handleChoiceClearClick_()
+
+  /**
    * Responds to Generate button; makes sudoku puzzle of desired difficulty.
    */
   generate(difficulty: Difficulty) {
-    this.sudokuCreationService.setDesiredDifficulty(difficulty);
+    this.creationService.setDesiredDifficulty(difficulty);
     this.passCount = '';
 
     // subscribe to observable sudoku generator
-    this.sudokuCreationService.generatePuzzle$.subscribe({
+    this.creationService.generatePuzzle$.subscribe({
       next: x => {
         console.log('got passCount: ' + x);
         this.passCount = '' + x; 
@@ -383,7 +426,7 @@ console.log('hintService id: ' + this.hintService.getId());
   completeGenerate() {
 
     // retrieve finished sudoku
-    this.currentPuzzle = this.sudokuCreationService.getCurrentSudoku();
+    this.currentPuzzle = this.creationService.getCurrentSudoku();
 console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.actualDifficulty = 
         Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
@@ -397,10 +440,10 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   } // completeGenerate()
 
   testObservable() {
-    this.sudokuCreationService.setDesiredDifficulty(Difficulty.MEDIUM);
+    this.creationService.setDesiredDifficulty(Difficulty.MEDIUM);
 
     console.log('just before subscribe');
-    this.sudokuCreationService.observable.subscribe({
+    this.creationService.observable.subscribe({
       next: x => {
         console.log('got value ' + x); 
         this.passCount = '' + x;
@@ -586,10 +629,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * button 'Undo Last Action' EXECUTION state
    */
   undoLastAction() : void {
-    this.hintState = HintStates.READY;
-    this.hintMessage = '';
-    this.autoSolveState = AutoSolveStates.READY;
-    this.autoSolveMessage = '';
+    this.initializeHintStates();
+    // this.hintState = HintStates.READY;
+    // this.hintMessage = '';
+    // this.autoSolveState = AutoSolveStates.READY;
+    // this.autoSolveMessage = '';
 
     // capture before it's removed from log
     let lastAction = this.sudokuService.getLastAction();
@@ -794,6 +838,13 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   // private methods
   // -----------------------------------------------------------------------
 
+  private initializeHintStates() {
+    this.hintState = HintStates.READY;
+    this.hintMessage = '';
+    this.autoSolveState = AutoSolveStates.READY;
+    this.autoSolveMessage = '';
+  }
+
   private setSelectedCell(r: number, c: number) {
     if (!this.sudokuService.isCellInvalid_(r, c)) {
       this.selectedCell.r = r;
@@ -814,10 +865,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   
   // ng-dblclick candidate in grid EXECUTION state
   private removeCandidate(r: number, c: number, k: number) {
-    this.hintState = HintStates.READY;
-    this.hintMessage = '';
-    this.autoSolveState = AutoSolveStates.READY;
-    this.autoSolveMessage = '';
+    this.initializeHintStates();
+    // this.hintState = HintStates.READY;
+    // this.hintMessage = '';
+    // this.autoSolveState = AutoSolveStates.READY;
+    // this.autoSolveMessage = '';
     if (this.candidatesShowing) {
       this.sudokuService.removeCandidate_(r, c, k);
     }
@@ -918,10 +970,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.playState = PlayStates.NEW;
     // this.generating = false;
     this.hint = null;
-    this.hintState = HintStates.READY;
-    this.hintMessage = '';
-    this.autoSolveState = AutoSolveStates.READY;
-    this.autoSolveMessage = '';
+    this.initializeHintStates();
+    // this.hintState = HintStates.READY;
+    // this.hintMessage = '';
+    // this.autoSolveState = AutoSolveStates.READY;
+    // this.autoSolveMessage = '';
     this.actionLog = '';
     this.desiredDifficulty = this.DEFAULT_DIFFICULTY;
 

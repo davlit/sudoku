@@ -123,10 +123,14 @@ s: sudoku, b: box, v: value, k: candidate
 
       <!--<div [ngBusy]="busy"></div>-->
       
-      <p><span class="metalabel">Difficulty:</span>&nbsp;{{actualDifficulty}}</p>
+      <!--<p>-->
+        <span class="metalabel">Difficulty:</span>&nbsp;{{actualDifficulty}}
+        &nbsp;&nbsp;&nbsp;
+        <span class="metalabel">Elapsed time:</span>&nbsp;{{elapsedTime}}
+      <!--</p>-->
 
       <p>
-        <span class="metalabel">All or Selected Candidates:</span><br/>
+        <!--<span class="metalabel">All or Selected Candidates:</span><br/>-->
         <button (click)="toggleCandidates()">
           <span [hidden]="!candidatesShowing">Hide Candidates</span>
           <span [hidden]="candidatesShowing">Show Candidates</span>
@@ -151,10 +155,6 @@ s: sudoku, b: box, v: value, k: candidate
       </table>
 
       <p>
-        <span class="metalabel">Elapsed time:</span> {{elapsedTime}}
-      </p>
-
-      <p>
         <span class="metalabel">Hint:</span>
         <button *ngIf="hintButton()" (click)="handleHintClick()">
             {{hintButtonLabel()}}</button>
@@ -169,26 +169,42 @@ s: sudoku, b: box, v: value, k: candidate
         <span>{{autoSolveMessage}}</span>
       </p>
 
-      <p><span class="metalabel">Action Log</span>&nbsp;(last on top)<span class="metalabel">:</span>&nbsp;&nbsp;
+      <div class="val-table" *ngIf="isAnySelectedCell()">
+        <div class="val-row" *ngFor="let vr of [0,1,2]">
+          <div class="val-cell" *ngFor="let vc of [0,1,2]"
+              (mousedown)="handleChoiceClick_(vr, vc)">
+            <span class="val-val">{{choiceToChar_(vr, vc)}}</span>
+          </div>
+        </div>
+        <div class="clear-row">
+          <div class="clear-cell"
+              (mousedown)="handleChoiceClearClick_()">
+            <span class="clear-val">Clear</span>
+          </div>
+        </div>
+      </div>
+
+      <p><span class="metalabel">Action Log</span>&nbsp;(lastest on top)<span class="metalabel">:</span>&nbsp;&nbsp;
         <button [hidden]="actionLog === ''" 
                 (click)="undoLastAction()">Undo Last Action</button><br/>
-        <textarea [ngModel]="actionLog" rows="10" cols="50"></textarea>
+        <textarea [ngModel]="actionLog" rows="10" cols="55"></textarea>
       </p>
 
       <p>
-        <span class="metalabel">Restarts:</span>
-        <button (click)="restartCurrentPuzzle()">Restart This Puzzle</button>
-        <button (click)="startNewPuzzle()">Start New Puzzle</button>
+        <!--<span class="metalabel">Restarts:</span>-->
+        <button (click)="restartCurrentPuzzle()">Restart This Sudoku</button>
+        <button (click)="startNewPuzzle()">New Sudoku</button>
+        <button (click)="printGrid()">Print Sudoku</button>
       </p>
 
       <p>
         <span class="metalabel">Solution Clues:</span><br/>
-        <textarea [ngModel]="solutionClues" rows="5" cols="50"></textarea>
+        <textarea [ngModel]="solutionClues" rows="5" cols="55"></textarea>
       </p>
 
-      <p>
+      <!--<p>
         <button (click)="printGrid()">Print Sudoku</button>
-      </p>
+      </p>-->
 
     </div>  <!-- *ngSwitchCase="PlayStates.EXECUTE" -->
 
@@ -209,7 +225,7 @@ s: sudoku, b: box, v: value, k: candidate
       </p>
 
       <p><span class="metalabel">Action Log:</span><br/>
-        <textarea [ngModel]="actionLog" rows="30" cols="50"></textarea>
+        <textarea [ngModel]="actionLog" rows="30" cols="55"></textarea>
       </p>
     </div>  <!-- *ngSwitchCase="playStates.SOLVED" -->
 

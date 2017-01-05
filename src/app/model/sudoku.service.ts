@@ -1,8 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 
-import { Common } from '../common/common';
-import { Difficulty } from './difficulty';
 import { Puzzle } from './puzzle';
 import { NakedType }  from './naked.type';
 
@@ -12,23 +9,22 @@ import { ActionType } from '../action/action.type';
 import { RemoveAction } from '../action/action';
 import { ValueAction } from '../action/action';
 import { ActionLog } from '../action/actionLog';
-import { ValueHint } from '../hint/hint';
+import { ValueHint } from      '../hint/hint';
 import { CandidatesHint } from '../hint/hint';
-import { HintType } from '../hint/hint.type';
-import { HintLog } from '../hint/hintLog';
 
-// import { Sudoku } from './sudoku';
-
-import { CELLS } from     '../common/common';
+import { Common } from     '../common/common';
+import { CELLS } from      '../common/common';
 import { VALUES } from     '../common/common';
-import { CANDIDATES } from     '../common/common';
+import { CANDIDATES } from '../common/common';
 import { GROUPS } from     '../common/common';
-import { ROWS } from     '../common/common';
-import { COLS } from     '../common/common';
-import { BOXS } from     '../common/common';
-import { ROW_CELLS } from     '../common/common';
+import { ROWS } from       '../common/common';
+import { COLS } from       '../common/common';
+import { BOXS } from       '../common/common';
+import { ROW_CELLS } from  '../common/common';
 
-import { Cell, Group, SudokuModel } from      './sudoku.model';
+import { SudokuModel } from      './sudoku.model';
+import { Cell } from      './sudoku.model';
+import { Group } from      './sudoku.model';
 
 @Injectable()
 export class SudokuService {
@@ -74,31 +70,10 @@ export class SudokuService {
   //     this.initializeGroup(this.sudokuModel.cols[g]);
   //     this.initializeGroup(this.sudokuModel.boxs[g]);
   //   }
-  
   // }
 
   /**
-   * 
-   */
-  private initializeCell(cell: Cell) : void {
-    cell.value = 0;
-    cell.locked = false;
-    for (let k of CANDIDATES) {
-      cell.candidates[k] = true;
-    }
-  }
-
-  /**
-   * 
-   */
-  private initializeGroup(group: Group) : void {
-    for (let v of VALUES) {
-      group.vOccurrences[v] = 0;
-    }
-  }
-
-  /**
-   * Initialize every cell, row, column, and box.
+   * Initialize the entire sudoku.
    */
   initializeModel() : void {
     for (let c of CELLS) {
@@ -113,12 +88,35 @@ export class SudokuService {
   }
 
   /**
+   * Initialize a cell.
+   */
+  private initializeCell(cell: Cell) : void {
+    cell.value = 0;
+    cell.locked = false;
+    for (let k of CANDIDATES) {
+      cell.candidates[k] = true;
+    }
+  } // initializeCell()
+
+  /**
+   * Initialize a group (row, column, or box).
+   */
+  private initializeGroup(group: Group) : void {
+    for (let v of VALUES) {
+      group.vOccurrences[v] = 0;
+    }
+  } // initializeGroup()
+
+  /**
    * 
    */
   initializeActionLog() : void {
     this.actionLog.initialize();
   }
 
+  /**
+   * 
+   */
   getCurrentSudoku() {
     return this.currentSudoku;
   }
@@ -136,7 +134,6 @@ export class SudokuService {
 
     // TODO do the work: solve puzzle, get stats, flesh out puzzle object
     // this.completePuzzle(puzzle);   // step 3
-
 
     this.initializeModel();
     for (let c of CELLS) {
@@ -210,9 +207,18 @@ export class SudokuService {
   } // setValue_()
 
   /**
-   * Sets givenValue of a cell to given givenValue. In the specified cell, all candidates
-   * are removed. The candidate, equal to the givenValue being set, is removed from 
+   * Sets value of a cell to the given value. In the specified cell, all candidates
+   * are removed. The candidate, equal to the value being set, is removed from 
    * every cell that shares the row, column, and box of the given cell.
+   * 
+   * If the cell is locked or already has the new value, no action will be 
+   * taken. If the cell has some other value, that old value will be removed
+   * first. The new value will be removed as a candidate where it appears in 
+   * the cell's row, column, and box.
+   * 
+   * 
+   * 
+   * 
    * 
    * Set given givenValue in given cell.
    * - will not affect a locked cell
@@ -241,12 +247,9 @@ export class SudokuService {
    * - restore candidates in related CELLS
    * - remove log entry, don't create new one
    */     
-  setValue(idx: number, newValue: number, actionType: ActionType, 
+  setValue(c: number, newValue: number, actionType: ActionType, 
       guessPossibles? : number[], hint?: ValueHint) : void {
-
-    let cell = this.sudokuModel.cells[idx];
-
-    // cannot change locked cell
+    let cell = this.sudokuModel.cells[c];
     if (cell.locked) {
       return;		// can't change locked cell
     }
@@ -256,17 +259,14 @@ export class SudokuService {
       if (cell.value === newValue) {
         return;	// same as existing givenValue, nothing to do
       }
-      this.removeValue(idx);
+      this.removeValue(c);
     }
 
-    // set givenValue, update groups [and givenValues used?]; log action
+    // set new value, remove candidates
     cell.value = newValue;   
     this.removeCandidates(cell);
 
     // increment occurrences in groups
-    // this.sudokuModel.rows[Common.rowIdx(idx)].vOccurrences[newValue]++;
-    // this.sudokuModel.cols[Common.colIdx(idx)].vOccurrences[newValue]++;
-    // this.sudokuModel.boxs[Common.boxIdx(idx)].vOccurrences[newValue]++;
     this.sudokuModel.rows[cell.row].vOccurrences[newValue]++;
     this.sudokuModel.cols[cell.col].vOccurrences[newValue]++;
     this.sudokuModel.boxs[cell.box].vOccurrences[newValue]++;
@@ -275,17 +275,17 @@ export class SudokuService {
     let action: ValueAction;
     switch (actionType) {
       case ActionType.SET_VALUE:
-        action = new ValueAction(ActionType.SET_VALUE, idx, newValue, hint);
+        action = new ValueAction(ActionType.SET_VALUE, c, newValue, hint);
         break;
       case ActionType.GUESS_VALUE:
-        action = new GuessAction(ActionType.GUESS_VALUE, idx, newValue,
+        action = new GuessAction(ActionType.GUESS_VALUE, c, newValue,
             guessPossibles, hint);
         break;
     } // switch
     this.actionLog.addEntry(action);
 
-    // remove candidate (this givenValue) from related cells
-    for (let rc of Common.getRelatedCells(idx)) {
+    // remove candidate (this new value) from related cells
+    for (let rc of Common.getRelatedCells(c)) {
       if (this.sudokuModel.cells[rc].value != 0) {
         continue;
       }
@@ -582,8 +582,8 @@ export class SudokuService {
    */
   isCellValid(c: number) : boolean {
     if (   this.isGroupValid(this.sudokuModel.rows[Common.rowIdx(c)])
-        && this.isGroupValid(this.sudokuModel.rows[Common.rowIdx(c)]) 
-        && this.isGroupValid(this.sudokuModel.rows[Common.rowIdx(c)])) {
+        && this.isGroupValid(this.sudokuModel.cols[Common.colIdx(c)]) 
+        && this.isGroupValid(this.sudokuModel.boxs[Common.boxIdx(c)])) {
       return true;
     }
     return false;

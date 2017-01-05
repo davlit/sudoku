@@ -1,6 +1,7 @@
 .sGrid {    /* 1 */
   display: table;
   border: 2px solid black;
+  background-color: #ffebcc;
 }
 .bRow {     /* 3/grid */
   display: table-row;
@@ -18,7 +19,7 @@
   float: left;
   height: 66px;
   width:  66px;
-  border: 1px solid lightgray;
+  border: 1px solid #bfbfbf;
   margin: -1px -1px -1px -1px;
   text-align: center;
   font-size: 40px;
@@ -85,5 +86,54 @@ td.dim {
 }*/
 textarea {
   font-family: monospace;
-  font-size: 11px;
+  font-size: 9px;
+  background-color: #ffebcc;
 }
+
+.val-table {
+  display: table;
+  width: auto;
+  text-align: center;
+  font-size: 15px;
+  background-color: #ffebcc;
+  border: 2px solid black;
+  background-color: #ffebcc;
+  /*border-spacing: 5px;*/
+  /*cellspacing:poor IE support for  this*/
+  /* border-collapse: separate;*/
+}
+.val-row {
+  display: table-row;
+  /*width: auto;*/
+}
+.val-cell {
+  float: left;  /*fix for  buggy browsers*/
+  display: table-column;
+  height: 30px;
+  width:  40px;
+  border: 1px solid black;
+  margin: -1px -1px -1px -1px;
+}
+.val-val {
+  line-height: 30px;
+  cursor: default;
+}
+.clear-row{
+  display: table-row;
+  /*width: auto;*/
+}
+.clear-cell{
+  /*float: left;  /*fix for  buggy browsers*/
+  display: table-cell;
+  width: auto;
+  height: 30px;
+  text-align: center;
+  border-top: 1px solid black;
+  margin: -1px -1px -1px -1px;
+}
+.clear-val {
+  line-height: 30px;
+  text-align: center;
+  cursor: default;
+}
+

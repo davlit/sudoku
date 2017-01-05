@@ -55,7 +55,7 @@ export class ValueAction extends BaseValueAction {
 
   toString() {
     let s = super.toString() 
-        + Common.formatString('Set value {0} in {1},{2}',
+        + Common.formatString('Set {0} in {1},{2}',
         [this.value, Common.rowNr(this.cell), Common.colNr(this.cell)]);
     if (this.hint) {
       s += ' (' + this.hint.toString() + ')';
@@ -83,7 +83,7 @@ export class GuessAction extends BaseValueAction {
   toString() : string {
     let s = super.toString()
         + Common.formatString(
-        'Guess value {0} in {1},{2} with possibles {3}',
+        'Guess {0} in {1},{2} with possibles {3}',
         [this.value, Common.rowNr(this.cell), Common.colNr(this.cell),
            JSON.stringify(this._possibleValues)]);
     if (this.hint) {

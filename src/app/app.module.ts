@@ -12,7 +12,7 @@ import { HelpComponent } from './help/help.component';
 import { PlayComponent } from './play/play.component';
 import { PrintComponent } from './print/print.component';
 import { SudokuService }         from './model/sudoku.service';
-import { SudokuCreationService }         from './model/sudoku-creation.service';
+import { CreationService }         from './model/creation.service';
 import { SudokuModel }         from './model/sudoku.model';
 import { ActionLog }      from './action/actionLog';
 import { HintLog }        from './hint/hintLog';
@@ -34,8 +34,8 @@ import { CounterComponent } from './play/counter/counter.component';
     HttpModule,
     // BusyModule,
     AppRoutingModule
-  ],
-  providers: [SudokuService, SudokuCreationService, HintService, ActionLog, HintLog],
+ ],
+  providers: [SudokuService, CreationService, HintService, ActionLog, HintLog],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
