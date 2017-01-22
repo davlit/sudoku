@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Common } from '../common/common';
@@ -10,6 +10,7 @@ import { ActionType } from '../action/action.type';
 import { ActionLog } from '../action/actionLog';
 import { ValueHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
+import { CacheService } from './cache.service';
 import { HintService } from '../hint/hint.service';
 
 import { SudokuService } from './sudoku.service';
@@ -25,76 +26,80 @@ export class CreationService {
     return CreationService.id;
   }
 
-  private currentSudoku: Puzzle;
   private randomCellIndexes: number[];
   private randomValues: number[];
+  private cacheService: CacheService;
 
   constructor(
     private actionLog: ActionLog, 
     private sudokuService: SudokuService,
-    private hintService: HintService
+    private hintService: HintService,
+    injector: Injector
   ) {
-    CreationService.id++;
-// console.log('sudokuService id: ' + SudokuService.getId());
-// console.log('sudokuService id: ' + this.sudokuService.getId());
-// console.log('sudokuService id: ' + sudokuService.getId());
+    setTimeout(() => this.cacheService = injector.get(CacheService)); // avoid cicular
+
+    CreationService.id++;   // testing
   }
 
-  ngOnInit() {
+  ngOnInit() {    // testing
 console.log('sudokuService id: ' + SudokuService.getId());
 console.log('sudokuService id: ' + this.sudokuService.getId());
   }
   
+  // testing
   getId() {
     return CreationService.id;
   }
-
-  // private sudoku = new Sudoku(this.actionLog, this.hintLog);
 
   private initializeLogs() {
     this.sudokuService.initializeActionLog();
     this.hintService.initializeHintLog();
   }
 
-  setDesiredDifficulty(desiredDifficulty) {
-    this.currentSudoku = new Puzzle();
-    this.currentSudoku.desiredDifficulty = desiredDifficulty;
-  } // setDesiredDifficulty()
+  getSudoku(difficulty: Difficulty) : Puzzle {
 
-  getCurrentSudoku() {
-    return this.currentSudoku;
-  } // getCurrentSudoku{}
+    // try cache first
+    let sudoku : Puzzle = this.cacheService.getSudoku(difficulty);
+    if (sudoku) {
+      return sudoku;
+    }
 
-  generatePuzzle$ = new Observable(observer => {
+    // nothing from cache
+    return this.createSudoku(difficulty);
+  } // getSudoku()
+
+  createSudoku(difficulty: Difficulty) : Puzzle {
+
+    let sudoku = new Puzzle();
+    sudoku.desiredDifficulty = difficulty;
 
     // step 1 - generate random finished sudoku
-    this.currentSudoku.completedPuzzle = this.makeRandomSolution();
+    sudoku.completedPuzzle = this.makeRandomSolution();
 
     let pass = 0;
 
     // loop until we get sudoku of desired difficulty
-    let desiredDifficulty = this.currentSudoku.desiredDifficulty;
-    while (this.currentSudoku.actualDifficulty != desiredDifficulty) {
+    let desiredDifficulty = sudoku.desiredDifficulty;
+    while (sudoku.actualDifficulty != desiredDifficulty) {
       pass++;
-      observer.next(pass);
 
       // step 2 - create starting values by paring cells
-      this.getStartingValues(this.currentSudoku);
+      this.getStartingValues(sudoku);
 
-      if (this.currentSudoku.initialValues === null) {
+      if (sudoku.initialValues === null) {
         continue;   // desired difficulty has not been attained
       }
 
       // step 3 - solve puzzle to get stats and actual difficulty
-      this.completePuzzle(this.currentSudoku);
+      this.completePuzzle(sudoku);
 
-      console.log('Diff: ' + this.currentSudoku.actualDifficulty);
+      console.log('Diff: ' + sudoku.actualDifficulty);
 
     } // while not getting desired difficulty
 
-    this.currentSudoku.generatePasses = pass;
-    observer.complete();
-  }); // generatePuzzle$
+    sudoku.generatePasses = pass;
+    return sudoku;
+  } // createSudoku()
 
   // testing
   observable = new Observable(observer => {
@@ -136,7 +141,7 @@ console.log('sudokuService id: ' + this.sudokuService.getId());
     this.solve();
 
     let elapsed: number = Date.now() - start;
-    console.log('Step 1 elapsed: ' + elapsed + 'ms');
+    // console.log('Step 1 elapsed: ' + elapsed + 'ms');
 
     return this.sudokuService.cellsToValuesArray();
   } // makeRandomSolution()
@@ -229,7 +234,7 @@ console.log('sudokuService id: ' + this.sudokuService.getId());
     }
 
     let elapsed: number = Date.now() - start;
-    console.log('Step 2 elapsed: ' + elapsed + 'ms');
+    // console.log('Step 2 elapsed: ' + elapsed + 'ms');
 
   } // getStartingValues() [step 2 - no guesses]
   
@@ -259,7 +264,7 @@ console.log('sudokuService id: ' + this.sudokuService.getId());
     puzzle.actualDifficulty = puzzle.stats.getActualDifficulty();
 
     let elapsed: number = Date.now() - start;
-    console.log('Step 3 elapsed: ' + elapsed + 'ms');
+    // console.log('Step 3 elapsed: ' + elapsed + 'ms');
 
   } // completePuzzle() [step 3]
 

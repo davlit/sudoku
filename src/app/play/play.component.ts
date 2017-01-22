@@ -7,14 +7,15 @@ import { Router } from '@angular/router';
 
 import { Common }           from '../common/common';
 import { Difficulty }       from '../model/difficulty';
-import { SudokuService }           from '../model/sudoku.service';
-import { CreationService }           from '../model/creation.service';
+import { SudokuService }    from '../model/sudoku.service';
+import { CreationService }  from '../model/creation.service';
 import { Puzzle }           from '../model/puzzle';
 import { Hint }             from '../hint/hint';
 import { HintService }      from '../hint/hint.service';
 import { ValueHint }        from '../hint/hint';
 import { CandidatesHint }   from '../hint/hint';
 import { HintType }         from '../hint/hint.type';
+import { HintCounts }       from '../hint/hintCounts';
 import { Log }              from '../common/log';
 import { ActionType }       from '../action/action.type';
 import { Action }           from '../action/action';
@@ -60,6 +61,7 @@ export class PlayComponent implements OnInit {
     private sudokuService: SudokuService,
     private creationService: CreationService,
     private hintService: HintService
+    // private localStorageService: LocalStorageService
   ) {
 // console.log('sudokuService id: ' + SudokuService.getId());
 // console.log('sudokuService id: ' + this.sudokuService.getId());
@@ -402,71 +404,95 @@ console.log('hintService id: ' + this.hintService.getId());
     this.removeCellValue(r, c);
   } // handleChoiceClearClick_()
 
+//   /**
+//    * Responds to Generate button; makes sudoku puzzle of desired difficulty.
+//    */
+//   generate(difficulty: Difficulty) {
+//     this.creationService.setDesiredDifficulty(difficulty);
+//     this.passCount = '';
+
+//     // subscribe to observable sudoku generator
+//     this.creationService.generatePuzzle$.subscribe({
+//       next: x => {
+//         console.log('got passCount: ' + x);
+//         this.passCount = '' + x; 
+//       },
+//       error: err => console.log(err),
+//       complete: () => this.completeGenerate()
+//     });
+//   } // generate()
+
+//   /**
+//    * Complete the generation by loading sudoku and starting user execution.
+//    */
+//   completeGenerate() {
+
+//     // retrieve finished sudoku
+//     this.currentPuzzle = this.creationService.getCurrentSudoku();
+// console.log('Sudoku:\n' + this.currentPuzzle.toString());
+
+//     // test
+//     this.localStorageService.set('puzzleKey', this.currentPuzzle);
+
+//     this.actualDifficulty = 
+//         Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
+//     this.solutionClues = this.createSolutionClues();
+
+//     this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
+    
+//     // go to puzzle execution by user
+//     this.startUserTimer();
+//     this.playState = PlayStates.EXECUTE;
+//   } // completeGenerate()
+
   /**
    * Responds to Generate button; makes sudoku puzzle of desired difficulty.
    */
   generate(difficulty: Difficulty) {
-    this.creationService.setDesiredDifficulty(difficulty);
-    this.passCount = '';
-
-    // subscribe to observable sudoku generator
-    this.creationService.generatePuzzle$.subscribe({
-      next: x => {
-        console.log('got passCount: ' + x);
-        this.passCount = '' + x; 
-      },
-      error: err => console.log(err),
-      complete: () => this.completeGenerate()
-    });
-  } // generate()
-
-  /**
-   * Complete the generation by loading sudoku and starting user execution.
-   */
-  completeGenerate() {
-
-    // retrieve finished sudoku
-    this.currentPuzzle = this.creationService.getCurrentSudoku();
-console.log('Sudoku:\n' + this.currentPuzzle.toString());
+    // this.currentPuzzle = this.creationService.createSudoku(difficulty);
+    this.currentPuzzle = this.creationService.getSudoku(difficulty);
+// console.log('this.currentPuzzle: ' + this.currentPuzzle); 
     this.actualDifficulty = 
         Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
     this.solutionClues = this.createSolutionClues();
 
     this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
     
+console.log('Sudoku:\n' + this.currentPuzzle.toString());
+
     // go to puzzle execution by user
     this.startUserTimer();
     this.playState = PlayStates.EXECUTE;
-  } // completeGenerate()
+  } // generate() 
 
-  testObservable() {
-    this.creationService.setDesiredDifficulty(Difficulty.MEDIUM);
+  // testObservable() {
+  //   this.creationService.setDesiredDifficulty(Difficulty.MEDIUM);
 
-    console.log('just before subscribe');
-    this.creationService.observable.subscribe({
-      next: x => {
-        console.log('got value ' + x); 
-        this.passCount = '' + x;
-      },
-      error: err => console.error('something wrong occurred: ' + err),
-      // complete: () => console.log('done'),
-      complete: () => this.testComplete(),
-    });
-    console.log('just after subscribe');   
+  //   console.log('just before subscribe');
+  //   this.creationService.observable.subscribe({
+  //     next: x => {
+  //       console.log('got value ' + x); 
+  //       this.passCount = '' + x;
+  //     },
+  //     error: err => console.error('something wrong occurred: ' + err),
+  //     // complete: () => console.log('done'),
+  //     complete: () => this.testComplete(),
+  //   });
+  //   console.log('just after subscribe');   
 
-    // this.currentPuzzle = this.board.getCurrentSudoku();
-    // this.actualDifficulty = 
-    //     Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
-    // this.solutionClues = this.createSolutionClues();
+  //   // this.currentPuzzle = this.board.getCurrentSudoku();
+  //   // this.actualDifficulty = 
+  //   //     Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
+  //   // this.solutionClues = this.createSolutionClues();
 
-    // // go to puzzle execution by user
-    // this.startUserTimer();
-    // this.playState = PlayStates.EXECUTE;
-  } // testObservable()
+  //   // // go to puzzle execution by user
+  //   // this.startUserTimer();
+  //   // this.playState = PlayStates.EXECUTE;
+  // } // testObservable()
 
-  testComplete() {
-    console.log('testComplete() done')
-  } // testComplete()
+  // testComplete() {
+  //   console.log('testComplete() done')
+  // } // testComplete()
 
   // ----- EXECUTE state methods ------
 
@@ -474,7 +500,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * Using puzzle statistics, prepare a solution clues string;
    */
   createSolutionClues() : string {
-    let stats = this.currentPuzzle.stats;
+// console.log(JSON.stringify(this.currentPuzzle));
+    let stats : HintCounts = <HintCounts> this.currentPuzzle.stats;
     let s: string = '';
 
     if (stats.getNakedPairs() > 0) {

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 
 import { SudokuService } from '../model/sudoku.service';
 // import { Group } from '../model/group';

@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
 // import { BusyModule } from 'angular2-busy';
 
 import { AppComponent } from './app.component';
@@ -13,6 +12,7 @@ import { PlayComponent } from './play/play.component';
 import { PrintComponent } from './print/print.component';
 import { SudokuService }         from './model/sudoku.service';
 import { CreationService }         from './model/creation.service';
+import { CacheService }         from './model/cache.service';
 import { SudokuModel }         from './model/sudoku.model';
 import { ActionLog }      from './action/actionLog';
 import { HintLog }        from './hint/hintLog';
@@ -31,11 +31,10 @@ import { CounterComponent } from './play/counter/counter.component';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
     // BusyModule,
     AppRoutingModule
  ],
-  providers: [SudokuService, CreationService, HintService, ActionLog, HintLog],
+  providers: [SudokuService, CreationService, HintService, CacheService, ActionLog, HintLog],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -16,9 +16,36 @@ export class Puzzle {
     this._completedPuzzle = null;
     this._desiredDifficulty = null;
     this._actualDifficulty = null;
+    this._actualDifficulty = null;
     this._solutionsCount = null;
     this._stats = null;
   }
+
+  serialize() : string {
+    return JSON.stringify({
+      "_initialValues": this._initialValues,
+      "_completedPuzzle": this._completedPuzzle,
+      "_desiredDifficulty": this._desiredDifficulty,
+      "_actualDifficulty": this._actualDifficulty,
+      "_generatePasses": this._generatePasses,
+      "_solutionsCount": this._solutionsCount,
+      "_stats": this._stats.serialize()
+    });
+  } // serialize()
+
+  static deserialize(puzzleData) : Puzzle {
+// console.log(puzzleData.getStats());
+    let data = JSON.parse(puzzleData);
+    let puzzle = new Puzzle();
+    puzzle._initialValues = data._initialValues;
+    puzzle._completedPuzzle = data._completedPuzzle;
+    puzzle._desiredDifficulty = data._desiredDifficulty;
+    puzzle._actualDifficulty = data._actualDifficulty;
+    puzzle._generatePasses = data._generatePasses;
+    puzzle._solutionsCount = data._solutionsCount;
+    puzzle._stats = HintCounts.deserialize(data._stats);
+    return puzzle;
+  } // deserialize()
 
   get initialValues() : number[] {
     return this._initialValues;

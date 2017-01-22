@@ -43,6 +43,92 @@ export class HintCounts {
 
   guesses: number = 0;
 
+  serialize() : string {
+    return JSON.stringify({
+      "nakedSingles": this.nakedSingles,
+
+      "hiddenSinglesRow": this.hiddenSinglesRow,
+      "hiddenSinglesCol": this.hiddenSinglesCol,
+      "hiddenSinglesBox": this.hiddenSinglesBox,
+
+      "nakedPairsRow": this.nakedPairsRow,
+      "nakedPairsCol": this.nakedPairsCol,
+      "nakedPairsBox": this.nakedPairsBox,
+
+      "pointingRows": this.pointingRows,
+      "pointingCols": this.pointingCols,
+
+      "rowBoxReductions": this.rowBoxReductions,
+      "colBoxReductions": this.colBoxReductions,
+
+      "nakedTriplesRow": this.nakedTriplesRow,
+      "nakedTriplesCol": this.nakedTriplesCol,
+      "nakedTriplesBox": this.nakedTriplesBox,
+
+      "nakedQuadsRow": this.nakedQuadsRow,
+      "nakedQuadsCol": this.nakedQuadsCol,
+      "nakedQuadsBox": this.nakedQuadsBox,
+
+      "hiddenPairsRow": this.hiddenPairsRow,
+      "hiddenPairsCol": this.hiddenPairsCol,
+      "hiddenPairsBox": this.hiddenPairsBox,
+
+      "hiddenTriplesRow": this.hiddenTriplesRow,
+      "hiddenTriplesCol": this.hiddenTriplesCol,
+      "hiddenTriplesBox": this.hiddenTriplesBox,
+
+      "hiddenQuadsRow": this.hiddenQuadsRow,
+      "hiddenQuadsCol": this.hiddenQuadsCol,
+      "hiddenQuadsBox": this.hiddenQuadsBox,
+
+      "guesses": this.guesses
+    });
+  }
+
+  static deserialize(hintCountsData) : HintCounts {
+// console.log('hintCountsData: ' + hintCountsData);
+    let data = JSON.parse(hintCountsData);
+    let hintCounts = new HintCounts();
+    hintCounts.nakedSingles = data.nakedSingles;
+
+    hintCounts.hiddenSinglesRow = data.hiddenSinglesRow;
+    hintCounts.hiddenSinglesCol = data.hiddenSinglesCol;
+    hintCounts.hiddenSinglesBox = data.hiddenSinglesBox;
+
+    hintCounts.nakedPairsRow = data.nakedPairsRow;
+    hintCounts.nakedPairsCol = data.nakedPairsCol;
+    hintCounts.nakedPairsBox = data.nakedPairsBox;
+
+    hintCounts.pointingRows = data.pointingRows;
+    hintCounts.pointingCols = data.pointingCols;
+
+    hintCounts.rowBoxReductions = data.rowBoxReductions;
+    hintCounts.colBoxReductions = data.colBoxReductions;
+
+    hintCounts.nakedTriplesRow = data.nakedTriplesRow;
+    hintCounts.nakedTriplesCol = data.nakedTriplesCol;
+    hintCounts.nakedTriplesBox = data.nakedTriplesBox;
+
+    hintCounts.nakedQuadsRow = data.nakedQuadsRow;
+    hintCounts.nakedQuadsCol = data.nakedQuadsCol;
+    hintCounts.nakedQuadsBox = data.nakedQuadsBox;
+
+    hintCounts.hiddenPairsRow = data.hiddenPairsRow;
+    hintCounts.hiddenPairsCol = data.hiddenPairsCol;
+    hintCounts.hiddenPairsBox = data.hiddenPairsBox;
+
+    hintCounts.hiddenTriplesRow = data.hiddenTriplesRow;
+    hintCounts.hiddenTriplesCol = data.hiddenTriplesCol;
+    hintCounts.hiddenTriplesBox = data.hiddenTriplesBox;
+
+    hintCounts.hiddenQuadsRow = data.hiddenQuadsRow;
+    hintCounts.hiddenQuadsCol = data.hiddenQuadsCol;
+    hintCounts.hiddenQuadsBox = data.hiddenQuadsBox;
+
+    hintCounts.guesses = data.guesses;
+    return hintCounts;
+  }
+
   incrementHintCount(hintType: HintType) {
     switch (hintType) {
       case HintType.NAKED_SINGLE:
