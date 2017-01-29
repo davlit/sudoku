@@ -21,11 +21,6 @@ import { CELLS } from      '../common/common';
 @Injectable()
 export class CreationService {
 
-  private static id = 0;
-  static getId() : number {
-    return CreationService.id;
-  }
-
   private randomCellIndexes: number[];
   private randomValues: number[];
   private cacheService: CacheService;
@@ -37,18 +32,6 @@ export class CreationService {
     injector: Injector
   ) {
     setTimeout(() => this.cacheService = injector.get(CacheService)); // avoid cicular
-
-    CreationService.id++;   // testing
-  }
-
-  ngOnInit() {    // testing
-console.log('sudokuService id: ' + SudokuService.getId());
-console.log('sudokuService id: ' + this.sudokuService.getId());
-  }
-  
-  // testing
-  getId() {
-    return CreationService.id;
   }
 
   private initializeLogs() {

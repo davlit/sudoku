@@ -35,42 +35,16 @@ export class SudokuService {
   }
 
   private currentSudoku: Puzzle = null;
-  private sudokuModel: SudokuModel;
 
   /**
    * Inject the data model and logs.
    */
   constructor(
-      // private sudokuModel: SudokuModel,
+      private sudokuModel: SudokuModel,
       private actionLog: ActionLog
   ) {
-// console.log('sudokuService id: ' + SudokuService.getId());
-    SudokuService.id++;
-    this.sudokuModel = new SudokuModel();
     this.initializeModel();
-// console.log('cp3:\n' + this.toString());    
-// console.log('sudokuService id: ' + SudokuService.getId());
   }
-
-  ngOnInit() {
-    console.log('sudokuService id: ' + SudokuService.getId());
-    console.log('sudokuService id: ' + this.getId());
-  }
-
-  getId() {
-    return SudokuService.id;
-  }
-
-  // initialize() : void {
-  //   for (let c of CELLS) {
-  //     this.initializeCell(this.sudokuModel.cells[c]);
-  //   }
-  //   for (let g of GROUPS) {
-  //     this.initializeGroup(this.sudokuModel.rows[g]);
-  //     this.initializeGroup(this.sudokuModel.cols[g]);
-  //     this.initializeGroup(this.sudokuModel.boxs[g]);
-  //   }
-  // }
 
   /**
    * Initialize the entire sudoku.

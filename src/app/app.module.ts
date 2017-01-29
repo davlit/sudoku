@@ -35,7 +35,8 @@ import { CounterComponent } from './play/counter/counter.component';
     AppRoutingModule
   ],
   providers: [
-    SudokuService, 
+    SudokuService,
+    SudokuModel, 
     CreationService, 
     HintService, 
     CacheService, 

@@ -12,7 +12,7 @@ import { ROW_CELLS } from  '../common/common';
 import { COL_CELLS } from  '../common/common';
 import { BOX_CELLS } from  '../common/common';
 
-// @Injectable()
+@Injectable()
 export class SudokuModel {
   cells: Cell[]
   rows: Group[];
@@ -36,7 +36,7 @@ export class SudokuModel {
           Common.rowIdx(c), Common.colIdx(c), Common.boxIdx(c));
     }
   }
-}
+} // class SudokuModel
 
 export class Cell {
   value: number;
@@ -57,7 +57,7 @@ export class Cell {
     this.box = b;
   }
 
-}
+} // class Cell
 
 export class Group {
   vOccurrences: number[];
@@ -71,4 +71,4 @@ export class Group {
     this.cells = groupCells;
   }
 
-}
+} // class Group
