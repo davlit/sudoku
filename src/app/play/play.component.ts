@@ -45,7 +45,7 @@ enum AutoSolveStates {
 
 @Component({
   selector: 'play',
-  /** */providers: [CreationService, SudokuService, HintService],
+  // providers: [CreationService, SudokuService, HintService],
   templateUrl: './play.component.html',
   styleUrls: ['./play.component.css'],
   changeDetection: ChangeDetectionStrategy.Default
@@ -124,16 +124,6 @@ export class PlayComponent implements OnInit {
 
     this.initializeUserInterface();
     this.changeDetectorRef.detectChanges();
-
-console.log('sudokuService id: ' + SudokuService.getId());
-console.log('sudokuService id: ' + this.sudokuService.getId());
-console.log('creationService id: ' + CreationService.getId());
-console.log('creationService id: ' + this.creationService.getId());
-console.log('hintService id: ' + HintService.getId());
-console.log('hintService id: ' + this.hintService.getId());
-    // console.log('ss\n' + this.sudokuService.toString());
-    // console.log('scs\n' + this.creationService.toString());
-    // console.log('hs\n' + this.hintService.toString());
 
     // test
     // let comboIt = new CombinationIterator([1,2,3], 3);

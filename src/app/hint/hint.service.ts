@@ -1,31 +1,19 @@
 import { Injectable } from '@angular/core';
 
 import { SudokuService } from '../model/sudoku.service';
-// import { Group } from '../model/group';
 import { Group } from '../model/sudoku.model';
-// import { Cell }  from './cell';
 import { Common } from '../common/common';
 import { CombinationIterator } from '../common/combination.iterator';
 import { NakedType }  from '../model/naked.type';
 import { Difficulty }  from '../model/difficulty';
-// import { Puzzle }  from './puzzle';
-// import { Action } from '../action/action';
-// import { ValueAction } from '../action/action';
-// import { GuessAction } from '../action/action';
-// import { RemoveAction } from '../action/action';
 import { ActionType } from '../action/action.type';
-// import { ActionLog } from '../action/actionLog';
 import { Hint } from '../hint/hint';
 import { ValueHint } from '../hint/hint';
 import { CandidatesHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
 import { HintLog } from '../hint/hintLog';
 import { HintCounts } from '../hint/hintCounts';
-
-// import { VERSION } from    '../common/common';
-// import { VALUES } from     '../common/common';
 import { CANDIDATES } from '../common/common';
-// import { GROUPS } from     '../common/common';
 import { ROWS } from       '../common/common';
 import { COLS } from       '../common/common';
 import { BOXS } from       '../common/common';
@@ -41,32 +29,12 @@ import { BOX_CELLS } from  '../common/common';
 @Injectable()
 export class HintService {
 
-  private static id = 0;
-  static getId() : number {
-    return HintService.id;
-  }
-
   private activeHint: Hint;
 
   constructor(
     private sudokuService: SudokuService,
-    // private activeHint: Hint,
     private hintLog: HintLog
-    ) {
-    HintService.id++;
-// console.log('sudokuService id: ' + SudokuService.getId());
-// console.log('sudokuService id: ' + this.sudokuService.getId());
-// console.log('sudokuService id: ' + sudokuService.getId());
-  }
-
-  ngOnInit() {
-console.log('sudokuService id: ' + SudokuService.getId());
-console.log('sudokuService id: ' + this.sudokuService.getId());
-  }
-
-  getId() {
-    return HintService.id;
-  }
+    ) {}
 
   initializeHintLog() : void {
     this.hintLog.initialize();
@@ -158,7 +126,6 @@ console.log('sudokuService id: ' + this.sudokuService.getId());
    * Apply hint toward solution.
    */
   applyGivenHint(hint: Hint) : void {
-    // let args = hint.removals;
     if (hint == null) {
       return;   // no hunt to apply
     }
@@ -1289,9 +1256,5 @@ console.log('sudokuService id: ' + this.sudokuService.getId());
     return false;    	
   } // checkColBoxReductions()
         
-  toString() {
-    return this.sudokuService.toString();
-  }
-
 }
 
