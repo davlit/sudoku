@@ -72,90 +72,21 @@ naked pairs   => 4+ open cells
 naked triples => 5+ open cells
 naked quads   => 6+ open cells
 
-Elapsed time feature
---------------------
-play.component.html 
-        <span class="metalabel">Elapsed time:</span> {{elapsedTime}}<br/>
-        <span class="metalabel">Elapsed time:</span> {{elapsedTime}}<br/>
-play.component.ts
-  elapsedTime: string;
-  timerSubscription: Subscription;
-  private startUserTimer() : void {
-    let elapsedSeconds = 0;
-    let timerObservable = Observable.timer(1, 1000);
-    this.timerSubscription = timerObservable.subscribe(
-        t => {
-          elapsedSeconds++;
-          this.elapsedTime = Common.toElapsedTimeString(elapsedSeconds);
-        });
-  }
-  private stopUserTimer() : void {
-    this.timerSubscription.unsubscribe();
-  }
+WebWorker Scheme
+================
+UI side
+-------
+PlayComponent
+HintService
+SudokuService
+  SudokuModel
+CacheService
+  localStorage
 
-Generate function
------------------
-play.component.ts
-play.component.ts
-  generate(difficulty: Difficulty) {
-    this.board.setDesiredDifficulty(difficulty);
-
-    this.pass = 0;
-
-    // subscribe to observable sudoku generator
-    /*this.busy =*/ this.board.generatePuzzle$
-    .catch(err => Observable.of(err))
-    .subscribe(
-      pass => { this.pass++; this.changeDetectorRef.markForCheck(); },
-      err => console.log(err),
-      () => console.log('Completed')
-    );
-
-    // retrieve finished sudoku
-    this.currentPuzzle = this.board.getCurrentSudoku();
-console.log('Sudoku:\n' + this.currentPuzzle.toString());
-    this.actualDifficulty = 
-        Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
-    this.solutionClues = this.createSolutionClues();
-
-    // go to puzzle execution by user
-    this.startUserTimer();
-    this.playState = PlayStates.EXECUTE;
-  } // generate()
-sudoku.ts
-  generatePuzzle$ = new Observable(observer => {
-
-    // step 1 - generate random finished sudoku
-    this.currentSudoku.completedPuzzle = this.makeRandomSolution();
-
-    let pass = 0;
-
-    // loop until we get sudoku of desired difficulty
-    let desiredDifficulty = this.currentSudoku.desiredDifficulty;
-    while (this.currentSudoku.actualDifficulty != desiredDifficulty) {
-      pass++;
-      observer.next(pass);
-
-      // step 2 - create starting values by paring cells
-      this.getStartingValues(this.currentSudoku);
-
-      if (this.currentSudoku.initialValues === null) {
-        continue;   // desired difficulty has not been attained
-      }
-
-      // step 3 - solve puzzle to get stats and actual difficulty
-      this.completePuzzle(this.currentSudoku);
-
-      console.log('Diff: ' + this.currentSudoku.actualDifficulty);
-
-    } // while not getting desired difficulty
-
-    this.currentSudoku.generatePasses = pass;
-    this.initializeModel(this.currentSudoku.initialValues);
-    observer.complete();
-  });
-
+Web worker side
+---------------
+CreationService
+HintService
+SudokuService
+  SudokuModel
   
-
-
-

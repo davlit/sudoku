@@ -33,8 +33,15 @@ import { CounterComponent } from './play/counter/counter.component';
     FormsModule,
     // BusyModule,
     AppRoutingModule
- ],
-  providers: [SudokuService, CreationService, HintService, CacheService, ActionLog, HintLog],
+  ],
+  providers: [
+    SudokuService, 
+    CreationService, 
+    HintService, 
+    CacheService, 
+    ActionLog, 
+    HintLog
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
