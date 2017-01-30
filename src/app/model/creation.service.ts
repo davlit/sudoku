@@ -1,4 +1,4 @@
-import { Injectable, Injector } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Common } from '../common/common';
@@ -10,7 +10,6 @@ import { ActionType } from '../action/action.type';
 import { ActionLog } from '../action/actionLog';
 import { ValueHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
-import { CacheService } from './cache.service';
 import { HintService } from '../hint/hint.service';
 
 import { SudokuService } from './sudoku.service';
@@ -23,34 +22,24 @@ export class CreationService {
 
   private randomCellIndexes: number[];
   private randomValues: number[];
-  private cacheService: CacheService;
 
   constructor(
     private actionLog: ActionLog, 
     private sudokuService: SudokuService,
-    private hintService: HintService,
-    injector: Injector
-  ) {
-    setTimeout(() => this.cacheService = injector.get(CacheService)); // avoid cicular
-  }
+    private hintService: HintService
+  ) {}
 
+  /**
+   * 
+   */
   private initializeLogs() {
     this.sudokuService.initializeActionLog();
     this.hintService.initializeHintLog();
   }
 
-  getSudoku(difficulty: Difficulty) : Puzzle {
-
-    // try cache first
-    let sudoku : Puzzle = this.cacheService.getSudoku(difficulty);
-    if (sudoku) {
-      return sudoku;
-    }
-
-    // nothing from cache
-    return this.createSudoku(difficulty);
-  } // getSudoku()
-
+  /**
+   * 
+   */
   createSudoku(difficulty: Difficulty) : Puzzle {
 
     let sudoku = new Puzzle();
