@@ -3,6 +3,7 @@ import { Injectable, Injector } from '@angular/core';
 import { Difficulty }       from './difficulty';
 import { Puzzle }           from './puzzle';
 import { CreationService }  from './creation.service';
+import { WebWorkerClient }  from './web-worker-client';
 
 const KEYS: string[][] = [['e0', 'e1', 'e2'],
                           ['m0', 'm1', 'm2'],
@@ -18,47 +19,54 @@ export class CacheService {
 
   constructor (
     private creationService: CreationService
+    // private webWorkerClient: WebWorkerClient
   ) {}
 
   /**
-   * Get a sudoku from the cache. If none available, return null.
+   * Get a sudoku from the cache. If none available, create one.
    */  
   getSudoku(difficulty: Difficulty) : Puzzle {
     let keys = this.cacheKeys(difficulty);
 console.log(Puzzle.getDifficultyLabel(difficulty) + ' keys: ' 
         + JSON.stringify(keys));
-    if (keys.length == 0) {
-      return null
+    let sudoku: string = null;
+    if (keys.length > 0) {
+      sudoku = this.retrieve(keys[0]);
+    } else {
+      sudoku = this.creationService.createSudoku(difficulty);
     }
-    return this.retrieve(keys[0]);
+    return Puzzle.deserialize(sudoku);
   } // getSudoku()
 
   /**
-   * Retrieve sudoku specified by key from the cache. The also removes the
-   * sudoku from the cache.
+   * Get a list of cache keys for cached sudokus.
    */
-  retrieve(key: string) {
-    let sudoku: Puzzle = Puzzle.deserialize(localStorage.getItem(key));
-    if (sudoku) {
-      localStorage.removeItem(key);
+  allCacheKeys() : string {
+    let list = '';
+    for (let i = 0; i < localStorage.length; i++) {
+      list += localStorage.key(i) + ' ';
     }
-    return sudoku;
-  } // retrieve()
+    return list;
+  } // allCacheKeys()
 
   /**
    * Replenish the cache by creating and cacheing sudokus.
    */
   replenishCache() : void {
+console.log('Replenishment - begin');    
     let sudoku: Puzzle;
     for (let i = 0; i < KEYS.length; i++) {
     // for (let i = 0; i < 1; i++) {        // testing
       for (let j = 0; j < KEYS[i]. length; j++) {
         if (!localStorage.getItem(KEYS[i][j])) {
           localStorage.setItem(KEYS[i][j], 
-              this.creationService.createSudoku(DIFFICULTIES[i]).serialize());
+              // this.creationService.createSudoku(DIFFICULTIES[i]).serialize());
+          this.creationService.createSudoku(DIFFICULTIES[i]));
+          // this.webWorkerClient.createSerializedSudoku(DIFFICULTIES[i]));
         }
       }
     }
+console.log('Replenishment - end');    
   } // replenishCache()
 
   /**
@@ -74,21 +82,26 @@ console.log(Puzzle.getDifficultyLabel(difficulty) + ' keys: '
     }
   } // viewCache()
 
+  // -------------------------------------------------------------------------
+  //  Private methods
+  // -------------------------------------------------------------------------
+
   /**
-   * Get a list of cache keys for cached sudokus.
+   * Retrieve sudoku specified by key from the cache. The also removes the
+   * sudoku from the cache.
    */
-  allCacheKeys() : string {
-    let list = '';
-    for (let i = 0; i < localStorage.length; i++) {
-      list += localStorage.key(i) + ' ';
+  private retrieve(key: string) {
+    let sudoku: string = localStorage.getItem(key);
+    if (sudoku) {
+      localStorage.removeItem(key);
     }
-    return list;
-  } // allCacheKeys()
+    return sudoku;
+  } // retrieve()
 
   /**
    * Get the available keys for caches of the specified difficulty.
    */
-  cacheKeys(difficulty: Difficulty) : string[] {
+  private cacheKeys(difficulty: Difficulty) : string[] {
     let keys = [];
     let key = '';
     let ch = '';
@@ -124,7 +137,7 @@ console.log(Puzzle.getDifficultyLabel(difficulty) + ' keys: '
   /**
    * Empty the cache.
    */
-  clearCache() : void {
+  private clearCache() : void {
     localStorage.clear()
   } // clearCache()
 

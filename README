@@ -93,4 +93,85 @@ HintService
 SudokuService
   SudokuModel
   ActionLog
-  
+
+Shared
+------ 
+HintService
+  HintLog
+SudokuService
+  SudokuModel
+  ActionLog
+
+app.module
+----------
+@NgModule({
+  declarations: [
+    AppComponent,
+    HomeComponent,
+    HelpComponent,
+    PlayComponent,
+    PrintComponent,
+    CounterComponent
+  ],
+  imports: [    
+    BrowserModule,    @angular
+    FormsModule,      @angular
+    AppRoutingModule, @angular
+    CreationModule,
+    SharedModule
+  ],
+  providers: [
+    CreationService, 
+    CacheService, 
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+creation.module
+---------------
+@NgModule({
+  imports: [
+    SharedModule
+  ],
+  providers: [
+    CreationService
+  ]
+})
+export class CreationModule { }
+
+shared.module
+-------------
+@NgModule({
+  providers: [
+    SudokuService,
+      SudokuModel, 
+      ActionLog, 
+    HintService, 
+      HintLog
+  ]
+})
+export class SharedModule { }
+
+
+CreationService -- Worker ---- CacheService -- PlayComponent -- user
+                                 localStorage
+user button 'Generate'
+PlayComponent generate()
+CacheService 
+  retrieves sudoku from cache (localStorage)
+  requests replacement sudoku from Worker
+    (worker creates sudoku in background)
+  worker delivers replacement sudoku
+  stores replacement sudoku in cache(locaStorage)
+
+
+on startup
+CacheService
+  look for 'holes' in cache (localStorage)
+  loop over 'hole'
+    request sudoku from Worker
+      (worker creates sudoku in background)
+    worker delivers replacement sudoku
+    stores replacement sudoku in cache(locaStorage)
+    

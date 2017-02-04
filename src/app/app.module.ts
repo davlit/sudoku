@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-// import { BusyModule } from 'angular2-busy';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
@@ -10,14 +9,13 @@ import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { PlayComponent } from './play/play.component';
 import { PrintComponent } from './print/print.component';
-import { SudokuService }         from './model/sudoku.service';
 import { CreationService }         from './model/creation.service';
 import { CacheService }         from './model/cache.service';
-import { SudokuModel }         from './model/sudoku.model';
-import { ActionLog }      from './action/actionLog';
-import { HintLog }        from './hint/hintLog';
-import { HintService }        from './hint/hint.service';
+import { WebWorkerClient }         from './model/web-worker-client';
 import { CounterComponent } from './play/counter/counter.component';
+
+import { CreationModule } from './creation.module';
+import { SharedModule } from './shared.module';
 
 @NgModule({
   declarations: [
@@ -28,20 +26,17 @@ import { CounterComponent } from './play/counter/counter.component';
     PrintComponent,
     CounterComponent
   ],
-  imports: [
+  imports: [    
     BrowserModule,
     FormsModule,
-    // BusyModule,
-    AppRoutingModule
+    AppRoutingModule,
+    CreationModule,
+    SharedModule
   ],
   providers: [
-    SudokuService,
-    SudokuModel, 
-    CreationService, 
-    HintService, 
     CacheService, 
-    ActionLog, 
-    HintLog
+    CreationService, 
+    WebWorkerClient
   ],
   bootstrap: [AppComponent]
 })

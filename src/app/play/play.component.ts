@@ -8,7 +8,6 @@ import { Router } from '@angular/router';
 import { Common }           from '../common/common';
 import { Difficulty }       from '../model/difficulty';
 import { SudokuService }    from '../model/sudoku.service';
-import { CreationService }  from '../model/creation.service';
 import { CacheService }     from '../model/cache.service';
 import { Puzzle }           from '../model/puzzle';
 import { Hint }             from '../hint/hint';
@@ -46,7 +45,6 @@ enum AutoSolveStates {
 
 @Component({
   selector: 'play',
-  // providers: [CreationService, SudokuService, HintService],
   templateUrl: './play.component.html',
   styleUrls: ['./play.component.css'],
   changeDetection: ChangeDetectionStrategy.Default
@@ -60,7 +58,6 @@ export class PlayComponent implements OnInit {
 
     /** */
     private sudokuService: SudokuService,
-    private creationService: CreationService,
     private hintService: HintService,
     private cacheService: CacheService
   ) {}
@@ -395,11 +392,7 @@ export class PlayComponent implements OnInit {
    * Responds to Generate button; makes sudoku puzzle of desired difficulty.
    */
   generate(difficulty: Difficulty) {
-
-    // if avail in cache, retrieve else create
-    let sudoku : Puzzle = this.cacheService.getSudoku(difficulty);
-    this.currentPuzzle = 
-        sudoku ? sudoku : this.creationService.createSudoku(difficulty);
+    this.currentPuzzle = this.cacheService.getSudoku(difficulty);
 
     // bind metadata for ui, load sudoku for user execution
     this.actualDifficulty = 

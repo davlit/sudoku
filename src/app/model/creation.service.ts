@@ -40,7 +40,8 @@ export class CreationService {
   /**
    * 
    */
-  createSudoku(difficulty: Difficulty) : Puzzle {
+  // createSudoku(difficulty: Difficulty) : Puzzle {
+  createSudoku(difficulty: Difficulty) : string {
 
     let sudoku = new Puzzle();
     sudoku.desiredDifficulty = difficulty;
@@ -56,6 +57,7 @@ export class CreationService {
       pass++;
 
       // step 2 - create starting values by paring cells
+console.log('Pass: ' + pass);
       this.getStartingValues(sudoku);
 
       if (sudoku.initialValues === null) {
@@ -70,7 +72,7 @@ export class CreationService {
     } // while not getting desired difficulty
 
     sudoku.generatePasses = pass;
-    return sudoku;
+    return sudoku.serialize();
   } // createSudoku()
 
   // testing
