@@ -78,10 +78,10 @@ UI side
 -------
 PlayComponent
 HintService
-  HintLog
+  HintLogService
 SudokuService
   SudokuModel
-  ActionLog
+  ActionLogService
 CacheService
   localStorage
 
@@ -89,18 +89,18 @@ Web worker side
 ---------------
 CreationService
 HintService
-  HintLog
+  HintLogService
 SudokuService
   SudokuModel
-  ActionLog
+  ActionLogService
 
 Shared
 ------ 
 HintService
-  HintLog
+  HintLogService
 SudokuService
   SudokuModel
-  ActionLog
+  ActionLogService
 
 app.module
 ----------
@@ -146,9 +146,9 @@ shared.module
   providers: [
     SudokuService,
       SudokuModel, 
-      ActionLog, 
+      ActionLogService, 
     HintService, 
-      HintLog
+      HintLogService
   ]
 })
 export class SharedModule { }
@@ -174,4 +174,23 @@ CacheService
       (worker creates sudoku in background)
     worker delivers replacement sudoku
     stores replacement sudoku in cache(locaStorage)
-    
+
+Modules
+module          declarations        imports             providers           bootstrap
+-------------------------------------------------------------------------------------
+AppModule       AppComponent,       CreationModule,     CacheService,       AppComponent
+                HomeComponent,      SharedModule        WebWorkerClient,
+                HelpComponent,                          
+                PlayComponent,
+                PrintComponent,
+                CounterComponent
+
+CreationModule                      SharedModule        CreationService
+
+SharedModule                                            SudokuService,
+                                                        SudokuModel, 
+                                                        ActionLogService, 
+                                                        HintService, 
+                                                        HintLogService
+
+

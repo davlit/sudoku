@@ -24,13 +24,13 @@ class Worker {
       return Promise.resolve(result);
     }
     return Promise.resolve('');
-  }
+  } // makeSudoku()
 
 } // class Worker
 
 @NgModule({
   declarations: [Worker],
-  imports: [WorkerAppModule], 
+  imports: [WorkerAppModule],   // from @angular
   bootstrap: [Worker]
 })
 class WorkerModule {

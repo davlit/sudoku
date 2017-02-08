@@ -19,7 +19,7 @@ export class WebWorkerClient {
   }
 
   createSerializedSudoku(difficulty: Difficulty) : string {
-    let serializedSudoku: string = null;
+    let serializedSudoku: string = undefined;
     bootstrapWorkerUi(this.loaderScript, []).then((ref: any) => {
       let brokerFactory: ClientMessageBrokerFactory = 
           ref.injector.get(ClientMessageBrokerFactory);
@@ -28,7 +28,7 @@ export class WebWorkerClient {
       let fnArgs: FnArg[] = [new FnArg(difficulty, PRIMITIVE)];
       let uiArguments: UiArguments = new UiArguments(
           'creationService.createSudoku', fnArgs);
-      let serializedSudoku: any = null;
+      let serializedSudoku: any = undefined;
       broker.runOnService(uiArguments, PRIMITIVE).then(result => {serializedSudoku = result});
     }); // bootstrapWorkerUi().then()
     return serializedSudoku;

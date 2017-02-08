@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Common } from './common';
 
 @Injectable()
-export abstract class Log {
+export abstract class LogService {
   
   private _log: any[] = [];
   
@@ -22,7 +22,7 @@ export abstract class Log {
   }
 
   getLastEntry() : any {
-    return this._log.length > 0 ? this._log[this._log.length - 1] : null;
+    return this._log.length > 0 ? this._log[this._log.length - 1] : undefined;
   }
 
   getAllEntries() : any[] {

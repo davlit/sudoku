@@ -12,13 +12,13 @@ export class Puzzle {
   private _stats: HintCounts;
 
   constructor() {
-    this._initialValues = null;
-    this._completedPuzzle = null;
-    this._desiredDifficulty = null;
-    this._actualDifficulty = null;
-    this._actualDifficulty = null;
-    this._solutionsCount = null;
-    this._stats = null;
+    this._initialValues = undefined;
+    this._completedPuzzle = undefined;
+    this._desiredDifficulty = undefined;
+    this._actualDifficulty = undefined;
+    this._actualDifficulty = undefined;
+    this._solutionsCount = undefined;
+    this._stats = undefined;
   }
 
   serialize() : string {

@@ -8,7 +8,7 @@ import { GuessAction } from '../action/action';
 import { ActionType } from '../action/action.type';
 import { RemoveAction } from '../action/action';
 import { ValueAction } from '../action/action';
-import { ActionLog } from '../action/actionLog';
+import { ActionLogService } from '../action/action-log.service';
 import { ValueHint } from      '../hint/hint';
 import { CandidatesHint } from '../hint/hint';
 
@@ -34,14 +34,14 @@ export class SudokuService {
     return SudokuService.id;
   }
 
-  private currentSudoku: Puzzle = null;
+  private currentSudoku: Puzzle = undefined;
 
   /**
    * Inject the data model and logs.
    */
   constructor(
       private sudokuModel: SudokuModel,
-      private actionLog: ActionLog
+      private actionLog: ActionLogService
   ) {
     this.initializeModel();
   }
@@ -393,7 +393,7 @@ export class SudokuService {
    * Removes given candidate from cell at given row and column (1..9).
    */
   removeCandidate_(r: number, c: number, k: number) : void {
-    this.removeCandidate(Common.cellIdx(r, c), k, null);  // user action
+    this.removeCandidate(Common.cellIdx(r, c), k, undefined);  // user action
   } // removeCandidate_()
 
   /**

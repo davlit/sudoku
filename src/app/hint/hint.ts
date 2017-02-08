@@ -142,7 +142,7 @@ export class CandidatesHint extends Hint {
   }
   
   getValue() : number {
-    return null;
+    return undefined;
   }
 
   getActionType() : ActionType {

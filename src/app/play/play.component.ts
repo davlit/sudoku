@@ -16,7 +16,6 @@ import { ValueHint }        from '../hint/hint';
 import { CandidatesHint }   from '../hint/hint';
 import { HintType }         from '../hint/hint.type';
 import { HintCounts }       from '../hint/hintCounts';
-import { Log }              from '../common/log';
 import { ActionType }       from '../action/action.type';
 import { Action }           from '../action/action';
 import { ValueAction }      from '../action/action';
@@ -208,10 +207,6 @@ export class PlayComponent implements OnInit {
       }
 
       this.initializeHintStates();
-      // this.hintState = HintStates.READY;
-      // this.hintMessage = '';
-      // this.autoSolveState = AutoSolveStates.READY;
-      // this.autoSolveMessage = '';
       
       // step selected cell right (wrap to next row) during entry
       if (this.playState === PlayStates.ENTRY) {
@@ -280,12 +275,6 @@ export class PlayComponent implements OnInit {
           this.setCellValue(r, c, nakeds[0]);
           this.setSelectedCell(r, c);
         }
-        // new code for sudoku.service
-        // var candidates = this.board.getCandidates_(r, c);
-        // if (candidates.length === 1) {
-        //   this.setCellValue(r, c, candidates[0]);
-        //   this.setSelectedCell(r, c);
-        // }
         return;
       default:
         alert("you have a strange mouse");
@@ -320,10 +309,6 @@ export class PlayComponent implements OnInit {
       return;
     }
     this.initializeHintStates();
-    // this.hintState = HintStates.READY;
-    // this.hintMessage = '';
-    // this.autoSolveState = AutoSolveStates.READY;
-    // this.autoSolveMessage = '';
     this.removeCandidate(Common.viewToModelRow(br, cr), 
         Common.viewToModelCol(bc, cc), Common.viewToModelCand(kr, kc));
   } // handleCandidateClick_()
@@ -570,10 +555,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    */
   undoLastAction() : void {
     this.initializeHintStates();
-    // this.hintState = HintStates.READY;
-    // this.hintMessage = '';
-    // this.autoSolveState = AutoSolveStates.READY;
-    // this.autoSolveMessage = '';
 
     // capture before it's removed from log
     let lastAction = this.sudokuService.getLastAction();
@@ -806,10 +787,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   // ng-dblclick candidate in grid EXECUTION state
   private removeCandidate(r: number, c: number, k: number) {
     this.initializeHintStates();
-    // this.hintState = HintStates.READY;
-    // this.hintMessage = '';
-    // this.autoSolveState = AutoSolveStates.READY;
-    // this.autoSolveMessage = '';
     if (this.candidatesShowing) {
       this.sudokuService.removeCandidate_(r, c, k);
     }
@@ -844,7 +821,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       }
     }
     this.refreshActionLog();
-    this.hint = null;
+    this.hint = undefined;
   } // applyHint()
     
   // can be set by key press, apply hint
@@ -897,7 +874,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
   private initializeUserInterface() {
     this.sudokuService.initializeModel();
-    this.actualDifficulty = null;
+    this.actualDifficulty = undefined;
     this.selectedCell = {r: 0, c: 0};
 
     this.candidatesShowing = false;       // master switch
@@ -906,15 +883,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.valuesComplete[v] = false;
     }
 
-    this.passCount = null;
+    this.passCount = undefined;
     this.playState = PlayStates.NEW;
     // this.generating = false;
-    this.hint = null;
+    this.hint = undefined;
     this.initializeHintStates();
-    // this.hintState = HintStates.READY;
-    // this.hintMessage = '';
-    // this.autoSolveState = AutoSolveStates.READY;
-    // this.autoSolveMessage = '';
     this.actionLog = '';
     this.desiredDifficulty = this.DEFAULT_DIFFICULTY;
 
@@ -923,7 +896,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.hintsApplied = 0;
   } // initializeUserInterface()
   
-}
+} // class PlayComponent
 
 
 

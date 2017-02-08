@@ -233,7 +233,7 @@ export class Cell {
         return k;
       }
     }
-    return null;
+    return undefined;
   }
   
   /**

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 
-import { Log } from '../common/log';
+import { LogService } from '../common/log.service';
 import { Action } from './action';
 
 @Injectable()
-export class ActionLog extends Log {
+export class ActionLogService extends LogService {
   
   addEntry(entry: Action) : void {
     super.addEntry(entry);

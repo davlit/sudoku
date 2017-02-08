@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
 import { SudokuService }         from './model/sudoku.service';
 import { SudokuModel }         from './model/sudoku.model';
-import { ActionLog }      from './action/actionLog';
+import { ActionLogService }      from './action/action-log.service';
 import { HintService }        from './hint/hint.service';
-import { HintLog }        from './hint/hintLog';
+import { HintLogService }        from './hint/hint-log.service';
 
 @NgModule({
   providers: [
     SudokuService,
       SudokuModel, 
-      ActionLog, 
+      ActionLogService, 
     HintService, 
-      HintLog
+      HintLogService
   ]
 })
 export class SharedModule { }

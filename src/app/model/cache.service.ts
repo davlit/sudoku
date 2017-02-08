@@ -29,7 +29,7 @@ export class CacheService {
     let keys = this.cacheKeys(difficulty);
 console.log(Puzzle.getDifficultyLabel(difficulty) + ' keys: ' 
         + JSON.stringify(keys));
-    let sudoku: string = null;
+    let sudoku: string = undefined;
     if (keys.length > 0) {
       sudoku = this.retrieve(keys[0]);
     } else {
@@ -72,7 +72,7 @@ console.log('Replenishment - end');
   /**
    * Display cached sudokus on the console.
    */
-  viewCache() : void {
+  keysToConsole() : void {
     let sudoku: Puzzle;
     for (let i = 0; i < KEYS.length; i++) {
       for (let j = 0; j < KEYS[i]. length; j++) {
@@ -80,7 +80,7 @@ console.log('Replenishment - end');
         console.log(JSON.stringify(localStorage.getItem(KEYS[i][j])));
       }
     }
-  } // viewCache()
+  } // keysToConsole()
 
   // -------------------------------------------------------------------------
   //  Private methods

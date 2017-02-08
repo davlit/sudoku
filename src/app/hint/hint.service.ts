@@ -11,7 +11,7 @@ import { Hint } from '../hint/hint';
 import { ValueHint } from '../hint/hint';
 import { CandidatesHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
-import { HintLog } from '../hint/hintLog';
+import { HintLogService } from '../hint/hint-log.service';
 import { HintCounts } from '../hint/hintCounts';
 import { CANDIDATES } from '../common/common';
 import { ROWS } from       '../common/common';
@@ -33,7 +33,7 @@ export class HintService {
 
   constructor(
     private sudokuService: SudokuService,
-    private hintLog: HintLog
+    private hintLog: HintLogService
     ) {}
 
   initializeHintLog() : void {
@@ -58,7 +58,7 @@ export class HintService {
    * sought for a hint. Similarly for MEDIUM and HARD.
    */
   getHint(maxDifficulty : Difficulty) : Hint {
-    this.activeHint = null;
+    this.activeHint = undefined;
     
     // first, easy techniques
     if (   this.checkNakedSingles()
@@ -66,7 +66,7 @@ export class HintService {
       return this.activeHint;
     }
     if (maxDifficulty === Difficulty.EASY) {
-      return null;  // no hints using easy techniques
+      return undefined;  // no hints using easy techniques
     }
 
     // next, medium techniques
@@ -77,7 +77,7 @@ export class HintService {
       return this.activeHint;
     }
     if (maxDifficulty === Difficulty.MEDIUM) {
-      return null;  // no hints using easy and medium techniques
+      return undefined;  // no hints using easy and medium techniques
     }
 
     // finally, hard techniques
@@ -89,7 +89,7 @@ export class HintService {
         ) {
       return this.activeHint;
     }
-    return null;  // no hints using any techniques without guessing
+    return undefined;  // no hints using any techniques without guessing
   } // getHint()
 
   /**
@@ -97,7 +97,7 @@ export class HintService {
    */
   applyHint() : void {
     // let args = hint.removals;
-    if (this.activeHint == null) {
+    if (this.activeHint == undefined) {
       return;   // no hunt to apply
     }
     this.hintLog.addEntry(this.activeHint);
@@ -109,7 +109,7 @@ export class HintService {
       case HintType.HIDDEN_SINGLE_COL:
       case HintType.HIDDEN_SINGLE_BOX:
         let vHint: ValueHint = <ValueHint> this.activeHint;
-        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, null, 
+        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
             vHint);
         break;
       default:
@@ -119,14 +119,14 @@ export class HintService {
           this.sudokuService.removeCandidate(removal.c, removal.k, kHint);
         }
     } // switch
-    this.activeHint = null;
+    this.activeHint = undefined;
   } // applyHint()
 
   /**
    * Apply hint toward solution.
    */
   applyGivenHint(hint: Hint) : void {
-    if (hint == null) {
+    if (hint == undefined) {
       return;   // no hunt to apply
     }
     this.hintLog.addEntry(hint);
@@ -138,7 +138,7 @@ export class HintService {
       case HintType.HIDDEN_SINGLE_COL:
       case HintType.HIDDEN_SINGLE_BOX:
         let vHint: ValueHint = <ValueHint> hint;
-        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, null, 
+        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
             vHint);
         break;
       default:
@@ -148,7 +148,7 @@ export class HintService {
           this.sudokuService.removeCandidate(removal.c, removal.k, kHint);
         }
     } // switch
-    hint = null;
+    hint = undefined;
   } // applyHint()
 
   /**

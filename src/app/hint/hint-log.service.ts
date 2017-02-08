@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 
-import { Log } from '../common/log';
+import { LogService } from '../common/log.service';
 import { Hint } from './hint';
 import { HintType } from './hint.type';
 import { HintCounts } from './hintCounts';
 
 @Injectable()
-export class HintLog extends Log {
+export class HintLogService extends LogService {
   
   addEntry(entry: Hint) : void {
     super.addEntry(entry);

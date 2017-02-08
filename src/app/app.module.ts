@@ -35,7 +35,6 @@ import { SharedModule } from './shared.module';
   ],
   providers: [
     CacheService, 
-    CreationService, 
     WebWorkerClient
   ],
   bootstrap: [AppComponent]

@@ -7,7 +7,7 @@ import { Puzzle } from './puzzle';
 
 import { GuessAction } from '../action/action';
 import { ActionType } from '../action/action.type';
-import { ActionLog } from '../action/actionLog';
+import { ActionLogService } from '../action/action-log.service';
 import { ValueHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
 import { HintService } from '../hint/hint.service';
@@ -24,7 +24,7 @@ export class CreationService {
   private randomValues: number[];
 
   constructor(
-    private actionLog: ActionLog, 
+    private actionLog: ActionLogService, 
     private sudokuService: SudokuService,
     private hintService: HintService
   ) {}
@@ -60,7 +60,7 @@ export class CreationService {
 console.log('Pass: ' + pass);
       this.getStartingValues(sudoku);
 
-      if (sudoku.initialValues === null) {
+      if (sudoku.initialValues === undefined) {
         continue;   // desired difficulty has not been attained
       }
 
@@ -202,7 +202,7 @@ console.log('Pass: ' + pass);
     // is not being attained, so no use going on to step 3
     if (puzzle.desiredDifficulty === Difficulty.HARD
         && hardCount === 0) {
-      puzzle.initialValues = null;
+      puzzle.initialValues = undefined;
     } else {
       puzzle.initialValues = this.sudokuService.cellsToValuesArray();
     }
@@ -263,7 +263,7 @@ console.log('Pass: ' + pass);
    * finally there is no possible solution.
    */
   private solve() : boolean {
-    while (this.hintService.getHint(Difficulty.HARDEST) != null) {
+    while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
       this.hintService.applyHint();
       if (this.sudokuService.isSolved()) {
         return true;		// done
@@ -274,7 +274,7 @@ console.log('Pass: ' + pass);
     } // while -- no hint, try guess
 
     // now we have to resort to guessing
-    let lastGuess: GuessAction = null;
+    let lastGuess: GuessAction = undefined;
     while (this.guess(lastGuess)) {	// while guess made
       if (this.solve()) {		// recursive call -- try new hint
         // recursive call returned true -> solved!
@@ -306,7 +306,7 @@ console.log('Pass: ' + pass);
    * difficulty rating desired.
    */
   private countSolutions() : number {
-    while (this.hintService.getHint(Difficulty.HARDEST) != null) {
+    while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
       this.hintService.applyHint();
       if (this.sudokuService.isSolved()) {
         this.rollbackToLastGuess();
@@ -320,7 +320,7 @@ console.log('Pass: ' + pass);
 
     // now we have to resort to guessing
     let localSolutionsCount = 0;
-    let lastGuess: GuessAction = null;
+    let lastGuess: GuessAction = undefined;
     while (this.guess(lastGuess)) {	// while guess made
       localSolutionsCount += this.countSolutions(); // recursive call
       if (localSolutionsCount >= 2) {
@@ -342,10 +342,10 @@ console.log('Pass: ' + pass);
    * next available candidate is used. 
    */
   private guess(lastGuess: GuessAction) : boolean {
-    let guessCell: number = null;
+    let guessCell: number = undefined;
     let possibleValues: number[] = [];
-    let guessValue: number = null;
-    if (lastGuess == null) {
+    let guessValue: number = undefined;
+    if (lastGuess == undefined) {
       guessCell = this.findFewestCandidatesCell();
       possibleValues = this.sudokuService.getCandidates(guessCell);
     } else {
@@ -417,7 +417,7 @@ console.log('Pass: ' + pass);
 
       return <GuessAction> this.actionLog.getLastEntry();   // last GUESS_VALUE action
     }
-    return null;
+    return undefined;
   } // rollbackToLastGuess()
 
   /**
