@@ -22,6 +22,7 @@
     "@angular/platform-webworker": "~2.4.3",
     "@angular/platform-webworker-dynamic": "~2.4.3",
     "@angular/router": "~3.1.0",
+    "angular2-web-worker": "0.0.5",
     "angular2-busy": "^1.0.2",
     "bootstrap": "^3.3.7",
     "core-js": "^2.4.1",

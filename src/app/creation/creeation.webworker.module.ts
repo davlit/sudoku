@@ -5,13 +5,13 @@ import { ServiceMessageBrokerFactory } from '@angular/platform-webworker';
 import { PRIMITIVE }                   from '@angular/platform-webworker';
 import { platformWorkerAppDynamic    } from '@angular/platform-webworker-dynamic';
 
-import { Difficulty } from './difficulty';
+import { Difficulty } from '../model/difficulty';
 
 const SUDOKU_CHANNEL = "SUDOKU";
 
 @Component({
 })
-class Worker {
+class CreationWebWorkerService {
 
   constructor(private _serviceBrokerFactory: ServiceMessageBrokerFactory) {
     let broker = _serviceBrokerFactory.createMessageBroker(SUDOKU_CHANNEL, false);
@@ -26,14 +26,14 @@ class Worker {
     return Promise.resolve('');
   } // makeSudoku()
 
-} // class Worker
+} // class CreationWebWorkerService
 
 @NgModule({
   declarations: [Worker],
   imports: [WorkerAppModule],   // from @angular
   bootstrap: [Worker]
 })
-class WorkerModule {
+class CreationWebWorkerModule {
 }
 
 platformWorkerAppDynamic().bootstrapModule(WorkerModule);

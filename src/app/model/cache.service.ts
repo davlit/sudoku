@@ -2,8 +2,9 @@ import { Injectable, Injector } from '@angular/core';
 
 import { Difficulty }       from './difficulty';
 import { Puzzle }           from './puzzle';
-import { CreationService }  from './creation.service';
-import { WebWorkerClient }  from './web-worker-client';
+import { CreationService }  from '../creation/creation.service';
+// import { WebWorkerClient }  from './web-worker-client';
+// import { WebWorkerService } from 'angular2-web-worker';
 
 const KEYS: string[][] = [['e0', 'e1', 'e2'],
                           ['m0', 'm1', 'm2'],
@@ -18,8 +19,9 @@ const DIFFICULTIES = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD, Diffi
 export class CacheService {
 
   constructor (
-    private creationService: CreationService
+    private creationService: CreationService,
     // private webWorkerClient: WebWorkerClient
+    // private _webWorkerService: WebWorkerService
   ) {}
 
   /**
@@ -59,10 +61,21 @@ console.log('Replenishment - begin');
     // for (let i = 0; i < 1; i++) {        // testing
       for (let j = 0; j < KEYS[i]. length; j++) {
         if (!localStorage.getItem(KEYS[i][j])) {
-          localStorage.setItem(KEYS[i][j], 
-              // this.creationService.createSudoku(DIFFICULTIES[i]).serialize());
-          this.creationService.createSudoku(DIFFICULTIES[i]));
-          // this.webWorkerClient.createSerializedSudoku(DIFFICULTIES[i]));
+          // key is not in localStorage
+          // create a sudoku
+          let sudoku: string = this.creationService.createSudoku(DIFFICULTIES[i]);
+
+          // let sudoku: string = undefined;
+          // let promise: Promise<string> = this._webWorkerService.run(
+          //     this.creationService.createSudoku, DIFFICULTIES[i]);
+          // promise.then((response: any) => {
+          //   sudoku = response;
+          //   localStorage.setItem(KEYS[i][j], sudoku);
+          // });
+
+
+
+          localStorage.setItem(KEYS[i][j], sudoku);
         }
       }
     }

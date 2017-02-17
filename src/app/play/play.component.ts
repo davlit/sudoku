@@ -145,12 +145,12 @@ export class PlayComponent implements OnInit {
       
     // console.log('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
     
-    var keyCode = keyEvent.keyCode;
-    var value = 0;
+    let keyCode = keyEvent.keyCode;
+    let value = 0;
 
     // get currently selected cell's row and column number
-    var r = this.selectedCell.r;
-    var c = this.selectedCell.c;
+    let r = this.selectedCell.r;
+    let c = this.selectedCell.c;
     
     // no key action if no cell selected
     if (r == 0 && c == 0) {
@@ -252,8 +252,8 @@ export class PlayComponent implements OnInit {
         && this.playState != PlayStates.EXECUTE) {
       return;
     }
-    var r = Common.viewToModelRow(br, cr);
-    var c = Common.viewToModelCol(bc, cc);
+    let r = Common.viewToModelRow(br, cr);
+    let c = Common.viewToModelCol(bc, cc);
     
     if (this.isCellLocked(r, c)) {
       return;         // can't accept click on locked cell
@@ -270,7 +270,7 @@ export class PlayComponent implements OnInit {
       case 2:   // middle click
         return;
       case 3:   // right click
-        var nakeds = this.sudokuService.getNakedCandidates_(r, c, NakedType.SINGLE);
+        let nakeds = this.sudokuService.getNakedCandidates_(r, c, NakedType.SINGLE);
         if (nakeds.length === 1) {
           this.setCellValue(r, c, nakeds[0]);
           this.setSelectedCell(r, c);
@@ -286,7 +286,7 @@ export class PlayComponent implements OnInit {
    * Function based on view's cell indexes in html code.
    */
   valueToChar_(br: number, bc: number, cr: number, cc: number) {
-    var value = this.getValue_(br, bc, cr, cc);
+    let value = this.getValue_(br, bc, cr, cc);
     return value == 0 ? '' : value.toString(); 
   } //valueToChar_()
 
@@ -325,7 +325,7 @@ export class PlayComponent implements OnInit {
    */
   candToChar_(br: number, bc: number, cr: number, cc: number, 
           kr: number, kc: number) {
-    var candidate = Common.viewToModelCand(kr, kc);
+    let candidate = Common.viewToModelCand(kr, kc);
     return this.sudokuService.isCandidate_(Common.viewToModelRow(br, cr), 
         Common.viewToModelCol(bc, cc), 
             candidate) ? candidate.toString() : '';
@@ -342,20 +342,29 @@ export class PlayComponent implements OnInit {
    * Function based on view's cell indexes in html code.
    */
   choiceToChar_(vr: number, vc: number) : string {
-    var choice = (vr * 3) + vc + 1;
-    return '' + choice;
+    return '' + this.valueCoordsToValue(vr, vc);
   } // choiceToChar_()
 
   /**
    * 
    */
+  isValueComplete_(vr: number, vc: number) : boolean {
+    return this.valuesComplete[this.valueCoordsToValue(vr, vc)];
+  }
+
+  /**
+   * 
+   */
   handleChoiceClick_(vr: number, vc: number) : void {
-    var choice = (vr * 3) + vc + 1;
+    let choice = this.valueCoordsToValue(vr, vc);
+    if (this.valuesComplete[choice]) {
+      return;
+    }
     this.initializeHintStates();
 
     // get currently selected cell's row and column number
-    var r = this.selectedCell.r;
-    var c = this.selectedCell.c;
+    let r = this.selectedCell.r;
+    let c = this.selectedCell.c;
     
     this.setCellValue(r, c, choice);
   } // handleChoiceClick_()
@@ -367,8 +376,8 @@ export class PlayComponent implements OnInit {
     this.initializeHintStates();
 
     // get currently selected cell's row and column number
-    var r = this.selectedCell.r;
-    var c = this.selectedCell.c;
+    let r = this.selectedCell.r;
+    let c = this.selectedCell.c;
     
     this.removeCellValue(r, c);
   } // handleChoiceClearClick_()
@@ -442,7 +451,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
   // button '1' .. '9' EXECUTION state
   candidateVisible(kand: number) {
-    for (var k = 1; k <= 9; k++) {
+    for (let k = 1; k <= 9; k++) {
       this.candidatesVisible[k] = false;
     }
     this.candidatesVisible[kand] = true;
@@ -450,7 +459,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
   // button 'All' EXECUTION state
   allCandidatesVisible() {
-    for (var k = 1; k <= 9; k++) {
+    for (let k = 1; k <= 9; k++) {
       this.candidatesVisible[k] = true;
     }
   }
@@ -582,7 +591,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.stopUserTimer();
     this.startUserTimer();
     this.sudokuService.initializeModel();
-    var temp = this.actualDifficulty;   // save
+    let temp = this.actualDifficulty;   // save
     this.initializeUserInterface();
     this.currentPuzzle = this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
     this.actualDifficulty = temp;       // restore
@@ -747,8 +756,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
     // TODO embed this in handleCellClick
   setGuessCell_(event: any, br: number, bc: number, cr: number, cc: number) {
-    var r = Common.viewToModelRow(br, cr);
-    var c = Common.viewToModelCol(bc, cc);
+    let r = Common.viewToModelRow(br, cr);
+    let c = Common.viewToModelCol(bc, cc);
     
     console.log('setGuessCell_() r,c:' + r + ',' + c);
 
@@ -758,6 +767,15 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   // -----------------------------------------------------------------------
   // private methods
   // -----------------------------------------------------------------------
+
+  /**
+   * The for choosing a value is 3x3. Row and column coords are 0,1,2.
+   * Row/column values are 1..9. Row 0 has values 1,2,3. Row 2 has 7,8,9.
+   */
+  private valueCoordsToValue(r: number, c: number) : number {
+    return (r * 3) + c + 1;
+  }
+
 
   private initializeHintStates() {
     this.hintState = HintStates.READY;
@@ -814,7 +832,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.hintService.applyHint();
     this.hintsApplied++;
     if (this.hint.getActionType() === ActionType.SET_VALUE) {
-      var value = this.hint.getValue();
+      let value = this.hint.getValue();
       this.valuesComplete[value] = this.sudokuService.isValueComplete(value);
       if (this.sudokuService.isSolved()) {
         this.handlePuzzleComplete();
@@ -835,7 +853,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
   
   private removeCellValue(r: number, c: number) {
-    var oldValue = this.sudokuService.getValue_(r, c);
+    let oldValue = this.sudokuService.getValue_(r, c);
     if (oldValue >= 1) {
       this.sudokuService.removeValue_(r, c);
       this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
@@ -878,7 +896,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.selectedCell = {r: 0, c: 0};
 
     this.candidatesShowing = false;       // master switch
-    for (var v = 1; v <= 9; v++) {
+    for (let v = 1; v <= 9; v++) {
       this.candidatesVisible[v] = true;
       this.valuesComplete[v] = false;
     }

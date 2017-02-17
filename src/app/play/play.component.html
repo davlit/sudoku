@@ -144,7 +144,7 @@ s: sudoku, b: box, v: value, k: candidate
         </span>
       </p>
 
-      <table>
+      <!--<table>
         <tr>
           <td><span class="metalabel">Incomplete values:</span></td>
           <td *ngFor="let v of [1,2,3,4,5,6,7,8,9]" class="valStatus" 
@@ -152,7 +152,7 @@ s: sudoku, b: box, v: value, k: candidate
             &nbsp;{{v}}
           </td>
         </tr>
-      </table>
+      </table>-->
 
       <p>
         <span class="metalabel">Hint:</span>
@@ -169,11 +169,14 @@ s: sudoku, b: box, v: value, k: candidate
         <span>{{autoSolveMessage}}</span>
       </p>
 
+      <span class="metalabel">Value for Selected Cell:</span>
       <div class="val-table" *ngIf="isAnySelectedCell()">
         <div class="val-row" *ngFor="let vr of [0,1,2]">
           <div class="val-cell" *ngFor="let vc of [0,1,2]"
               (mousedown)="handleChoiceClick_(vr, vc)">
-            <span class="val-val">{{choiceToChar_(vr, vc)}}</span>
+            <span class="val-val" [ngClass]="{'dim': isValueComplete_(vr, vc)}">
+              {{choiceToChar_(vr, vc)}}
+            </span>
           </div>
         </div>
         <div class="clear-row">
@@ -183,6 +186,7 @@ s: sudoku, b: box, v: value, k: candidate
           </div>
         </div>
       </div>
+      <br/>  
 
       <p><span class="metalabel">Action Log</span>&nbsp;(lastest on top)<span class="metalabel">:</span>&nbsp;&nbsp;
         <button [hidden]="actionLog === ''" 

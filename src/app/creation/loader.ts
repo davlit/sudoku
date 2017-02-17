@@ -7,4 +7,4 @@ importScripts(
   '../config.js'
 );
 
-System.import('./web-worker-app.js');
+System.import('./creation.webworker.module.js');

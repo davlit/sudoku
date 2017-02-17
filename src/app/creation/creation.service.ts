@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Common } from '../common/common';
-import { Difficulty } from './difficulty';
-import { Puzzle } from './puzzle';
+import { Difficulty } from '../model/difficulty';
+import { Puzzle } from '../model/puzzle';
 
 import { GuessAction } from '../action/action';
 import { ActionType } from '../action/action.type';
@@ -12,7 +12,7 @@ import { ValueHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
 import { HintService } from '../hint/hint.service';
 
-import { SudokuService } from './sudoku.service';
+import { SudokuService } from '../model/sudoku.service';
 
 import { VALUES } from     '../common/common';
 import { CELLS } from      '../common/common';
@@ -76,21 +76,21 @@ console.log('Pass: ' + pass);
   } // createSudoku()
 
   // testing
-  observable = new Observable(observer => {
-    setTimeout(() => {
-      observer.next(1);
-    }, 1000);
-    setTimeout(() => {
-      observer.next(2);
-    }, 2000);
-    setTimeout(() => {
-      observer.next(3);
-    }, 3000);
-    setTimeout(() => {
-      observer.next(4);
-      observer.complete();
-    }, 4000);
-  }); // observable
+  // observable = new Observable(observer => {
+  //   setTimeout(() => {
+  //     observer.next(1);
+  //   }, 1000);
+  //   setTimeout(() => {
+  //     observer.next(2);
+  //   }, 2000);
+  //   setTimeout(() => {
+  //     observer.next(3);
+  //   }, 3000);
+  //   setTimeout(() => {
+  //     observer.next(4);
+  //     observer.complete();
+  //   }, 4000);
+  // }); // observable
 
   /**
    * [Step 1]
@@ -370,7 +370,7 @@ console.log('Pass: ' + pass);
    * naked single. Most of the time the fewest candidate cell will have only
    * two candidates. The cells are searched randomly.
    */
-  findFewestCandidatesCell() : number {
+  private findFewestCandidatesCell() : number {
     let minCands = 10;
     let minCandsCell: number = -1;
     let currentCellCands: number;
@@ -429,9 +429,5 @@ console.log('Pass: ' + pass);
       this.actionLog.removeLastEntry();
     }
   } // rollbackAll()
-
-  toString() {
-    return this.sudokuService.toString();
-  }
 
 }

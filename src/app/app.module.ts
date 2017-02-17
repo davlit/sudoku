@@ -9,12 +9,12 @@ import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { PlayComponent } from './play/play.component';
 import { PrintComponent } from './print/print.component';
-import { CreationService }         from './model/creation.service';
+import { CreationModule }  from './creation/creation.module';
+import { CreationService } from './creation/creation.service';
 import { CacheService }         from './model/cache.service';
 import { WebWorkerClient }         from './model/web-worker-client';
 import { CounterComponent } from './play/counter/counter.component';
 
-import { CreationModule } from './creation.module';
 import { SharedModule } from './shared.module';
 
 @NgModule({
