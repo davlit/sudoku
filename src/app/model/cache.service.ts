@@ -3,8 +3,19 @@ import { Injectable, Injector } from '@angular/core';
 import { Difficulty }       from './difficulty';
 import { Puzzle }           from './puzzle';
 import { CreationService }  from '../creation/creation.service';
+import { Result }           from './result';
+
+// for web worker
+import { ActionLogService }           from '../action/action-log.service';
+import { HintLogService }           from '../hint/hint-log.service';
+import { HintService }           from '../hint/hint.service';
+// import { SudokuModel }           from '../model/sudoku.model';
+import { SudokuService }           from '../model/sudoku.service';
+
 // import { WebWorkerClient }  from './web-worker-client';
-// import { WebWorkerService } from 'angular2-web-worker';
+
+// webWorker element
+import { WebWorkerService } from 'angular2-web-worker';
 
 const KEYS: string[][] = [['e0', 'e1', 'e2'],
                           ['m0', 'm1', 'm2'],
@@ -18,25 +29,57 @@ const DIFFICULTIES = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD, Diffi
 @Injectable()
 export class CacheService {
 
+  // webWorker element
+  // private promises: Promise<any>[] = [];
+  // private webWorkerResults: any[] = [];
+  private promise: Promise<any> = undefined;
+  private webWorkerResult: Result = undefined;
+  private _webWorkerService = new WebWorkerService();
+
+  // private wwActionLog = new ActionLogService();
+  // private wwSudokuService = new SudokuService(this.wwActionLog);
+  // private wwHintService = new HintService(this.wwSudokuService, 
+  //     new HintLogService());
+  // private wwCreationService = new CreationService(this.wwActionLog, 
+  //     this.wwSudokuService, this.wwHintService)
+  // private wwCreationService: CreationService;
+
   constructor (
-    private creationService: CreationService,
+    private creationService: CreationService
     // private webWorkerClient: WebWorkerClient
-    // private _webWorkerService: WebWorkerService
-  ) {}
+
+    // webWorker element
+    // private _webWorkerService: WebWorkerService) {
+    ) {
+      // let wwActionLog = new ActionLogService();
+      // let wwSudokuService = new SudokuService(wwActionLog);
+      // let wwHintService = new HintService(
+      //     wwSudokuService, 
+      //     new HintLogService());
+      // this.wwCreationService = new CreationService(
+      //     wwActionLog, 
+      //     wwSudokuService, 
+      //     wwHintService)
+  }
+  
 
   /**
    * Get a sudoku from the cache. If none available, create one.
    */  
   getSudoku(difficulty: Difficulty) : Puzzle {
     let keys = this.cacheKeys(difficulty);
-console.log(Puzzle.getDifficultyLabel(difficulty) + ' keys: ' 
+console.info(Puzzle.getDifficultyLabel(difficulty) + ' keys: ' 
         + JSON.stringify(keys));
     let sudoku: string = undefined;
     if (keys.length > 0) {
       sudoku = this.retrieve(keys[0]);
     } else {
-      sudoku = this.creationService.createSudoku(difficulty);
+      sudoku = this.creationService.createSudokuZ(difficulty);
     }
+
+    // replace any sudoku pulled from cache
+    this.startWebWorkerCreation(difficulty, keys[0]);      
+
     return Puzzle.deserialize(sudoku);
   } // getSudoku()
 
@@ -55,7 +98,7 @@ console.log(Puzzle.getDifficultyLabel(difficulty) + ' keys: '
    * Replenish the cache by creating and cacheing sudokus.
    */
   replenishCache() : void {
-console.log('Replenishment - begin');    
+console.info('Replenishment - begin');    
     let sudoku: Puzzle;
     for (let i = 0; i < KEYS.length; i++) {
     // for (let i = 0; i < 1; i++) {        // testing
@@ -63,7 +106,8 @@ console.log('Replenishment - begin');
         if (!localStorage.getItem(KEYS[i][j])) {
           // key is not in localStorage
           // create a sudoku
-          let sudoku: string = this.creationService.createSudoku(DIFFICULTIES[i]);
+          let sudoku: string = this.creationService.createSudokuZ(DIFFICULTIES[i]);
+console.info('Sudoku string: ' + sudoku);
 
           // let sudoku: string = undefined;
           // let promise: Promise<string> = this._webWorkerService.run(
@@ -79,9 +123,65 @@ console.log('Replenishment - begin');
         }
       }
     }
-console.log('Replenishment - end');    
+console.info('Replenishment - end');    
   } // replenishCache()
 
+  replenishCache1() : String {
+    return 'Cache replenished';
+  }
+
+  // webWorker element
+  // startWebWorkerCacheReplenishment() {
+  //   this.stopWebWorkerCacheReplenishment();
+  //   this.webWorkerReplenishCache();
+  // }
+  
+  // webWorker element
+  // private stopWebWorkerCacheReplenishment() {
+  //   // this.promises.forEach(promise => {
+  //   //     this._webWorkerService.terminate(promise);
+  //   // });
+  //   // this.promises.length = 0;
+  //   // this.webWorkerResults.length = 0;
+  //   this._webWorkerService.terminate(this.promise);
+  //   this.promise = undefined;
+  //   this.webWorkerResult = undefined;
+  // }
+
+  // webWorker element
+  private webWorkerReplenishCache() {
+
+    // (1) works
+    this.replenishCache();
+
+    // (1a)
+
+
+    // (2) new
+    // const promise = this._webWorkerService.run(this.replenishCache(), undefined);
+    // const promise = this._webWorkerService.run(this.replenishCache());
+    // const result = new Result(undefined, undefined, true);
+    // this.webWorkerResults.push(result);
+    // this.promises.push(promise);
+    
+    // // promise.then(function (response: any) {
+    // promise.then((response: any) => {
+    //   result.result = response;
+    //   result.loading = false;
+    // });
+
+    // (3) new new
+    // this.promise = this._webWorkerService.run(this.replenishCache);
+    // this.webWorkerResult = new Result(undefined, undefined, true);
+    // this.promise.then((response: any) => {
+    //   this.webWorkerResult.result = response;
+    //   this.webWorkerResult.loading = false;
+    // });
+    // this.promise.catch((err) => {
+    //     console.error('I get called:', err.message); // I get called: 'Something awful happened'
+    // });
+  }
+    
   /**
    * Display cached sudokus on the console.
    */
@@ -89,8 +189,8 @@ console.log('Replenishment - end');
     let sudoku: Puzzle;
     for (let i = 0; i < KEYS.length; i++) {
       for (let j = 0; j < KEYS[i]. length; j++) {
-        console.log(KEYS[i][j]);
-        console.log(JSON.stringify(localStorage.getItem(KEYS[i][j])));
+        console.info(KEYS[i][j]);
+        console.info(JSON.stringify(localStorage.getItem(KEYS[i][j])));
       }
     }
   } // keysToConsole()
@@ -110,6 +210,91 @@ console.log('Replenishment - end');
     }
     return sudoku;
   } // retrieve()
+
+  private startWebWorkerCreation(difficulty, localStorageKey) {
+console.info('wwStarting startWebWorkerCreation()');
+console.info('wwCache: ' + this.allCacheKeys());
+    this.stopWebWorkerCreation();
+    this.webWorkerCreateY(difficulty, localStorageKey);
+  }
+
+  private stopWebWorkerCreation() {
+console.info('wwStarting stopWebWorkerCreation()');
+    if (this.promise) {
+      this._webWorkerService.terminate(this.promise);
+      this.promise = undefined;
+    }
+    this.webWorkerResult = undefined;
+console.info('wwEnding stopWebWorkerCreation()');
+  }
+
+  private webWorkerCreateY(difficulty: Difficulty, localStorageKey: string) {
+console.info('wwStarting webWorkerCreate()');
+    const localPromise = this._webWorkerService.run(this.createSudokuX, difficulty);
+    // const localPromise = this._webWorkerService.run(this.fib, 44);
+    const result = new Result(difficulty, undefined, true);
+    this.webWorkerResult = result;
+    this.promise = localPromise;
+
+    localPromise.then((response: any) => {
+console.info('wwCache: response: ' + response);
+      let creationResponse = response;
+console.info('wwCache: creationResponse: ' + creationResponse);
+      // this.webWorkerResult = new Result(difficulty, '', false);
+      // this.webWorkerResult.sudoku = response;
+      // response.sudoku = response;
+      // response.result.running = false;
+      // localStorage.setItem(localStorageKey, response.result.sudoku);
+      localStorage.setItem(localStorageKey, creationResponse);
+console.info('wwCache: ' + this.allCacheKeys());
+    });
+    localPromise.catch((err) => {
+      console.error('wwCache: ', err.message);
+    });
+  }
+
+  private createSudokuX(difficulty: Difficulty) : string {
+console.info('wwStarting cacheSvc.createSudoku()');
+console.info('cacheSvc.createSudoku() cp1');
+    // let sudokuModel = new SudokuModel();
+    // let sudokuService = new SudokuService(sudokuModel, new ActionLogService());
+    // let actionLog = new ActionLogService();
+console.info('cacheSvc.createSudoku() cp2');
+    // let sudokuService = new SudokuService(this.actionLog);
+console.info('cacheSvc.createSudoku() cp3');
+    // let creationService = new CreationService(
+    //   new ActionLogService(), 
+    //   sudokuService, 
+    //   new HintService(sudokuService, new HintLogService()));
+      let wwActionLog = new ActionLogService();
+      let wwSudokuService = new SudokuService(wwActionLog);
+      let wwHintService = new HintService(
+          wwSudokuService, 
+          new HintLogService());
+      let wwCreationService = new CreationService(
+          wwActionLog, 
+          wwSudokuService, 
+          wwHintService)
+console.info('cacheSvc.createSudoku() cp4');
+
+    let sudoku: string = wwCreationService.createSudokuZ(difficulty);
+console.info('cacheSvc.createSudoku() cp5');
+// let sudoku: string = '{"_initialValues":[4,9,0,0,0,0,0,6,7,0,2,0,3,0,7,0,0,0,0,0,7,0,8,0,0,0,0,0,0,0,0,0,2,0,4,0,7,8,4,0,0,0,2,1,6,0,5,0,7,0,0,0,0,0,0,0,0,0,9,0,6,0,0,0,0,0,4,0,8,0,3,0,9,3,0,0,0,0,0,5,4],"_completedPuzzle":[4,9,3,5,2,1,8,6,7,8,2,6,3,4,7,5,9,1,5,1,7,6,8,9,4,2,3,3,6,9,8,1,2,7,4,5,7,8,4,9,3,5,2,1,6,1,5,2,7,6,4,3,8,9,2,4,5,1,9,3,6,7,8,6,7,1,4,5,8,9,3,2,9,3,8,2,7,6,1,5,4],"_desiredDifficulty":0,"_actualDifficulty":0,"_generatePasses":1,"_stats":"{"nakedSingles":36,\"hiddenSinglesRow\":12,\"hiddenSinglesCol\":4,\"hiddenSinglesBox\":1,\"nakedPairsRow\":0,\"nakedPairsCol\":0,\"nakedPairsBox\":0,\"pointingRows\":0,\"pointingCols\":0,\"rowBoxReductions\":0,\"colBoxReductions\":0,\"nakedTriplesRow\":0,\"nakedTriplesCol\":0,\"nakedTriplesBox\":0,\"nakedQuadsRow\":0,\"nakedQuadsCol\":0,\"nakedQuadsBox\":0,\"hiddenPairsRow\":0,\"hiddenPairsCol\":0,\"hiddenPairsBox\":0,\"hiddenTriplesRow\":0,\"hiddenTriplesCol\":0,\"hiddenTriplesBox\":0,\"hiddenQuadsRow\":0,\"hiddenQuadsCol\":0,\"hiddenQuadsBox\":0,\"guesses\":0}"}';
+  // let actionLogService = new ActionLogService(); 
+console.info('wwEnding cacheSvc.createSudoku()');
+    return sudoku;
+  }
+
+  private fib(n: number) {
+console.log('fib() start ' + n);
+    const fib = (n: number): number => {
+      if (n < 2) return 1;
+      return fib(n - 1) + fib(n - 2);
+    };
+    
+    return fib(n);
+    // return n + 1;
+  }
 
   /**
    * Get the available keys for caches of the specified difficulty.

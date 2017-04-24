@@ -26,8 +26,8 @@ export class CreationService {
   constructor(
     private actionLog: ActionLogService, 
     private sudokuService: SudokuService,
-    private hintService: HintService
-  ) {}
+    private hintService: HintService) {
+  }
 
   /**
    * 
@@ -41,7 +41,9 @@ export class CreationService {
    * 
    */
   // createSudoku(difficulty: Difficulty) : Puzzle {
-  createSudoku(difficulty: Difficulty) : string {
+  // createSudoku(difficulty: Difficulty) : string {
+  createSudokuZ(difficulty: Difficulty) : string {
+console.info('wwStarting creationSvc.createSudoku()');
 
     let sudoku = new Puzzle();
     sudoku.desiredDifficulty = difficulty;
@@ -74,23 +76,6 @@ console.log('Pass: ' + pass);
     sudoku.generatePasses = pass;
     return sudoku.serialize();
   } // createSudoku()
-
-  // testing
-  // observable = new Observable(observer => {
-  //   setTimeout(() => {
-  //     observer.next(1);
-  //   }, 1000);
-  //   setTimeout(() => {
-  //     observer.next(2);
-  //   }, 2000);
-  //   setTimeout(() => {
-  //     observer.next(3);
-  //   }, 3000);
-  //   setTimeout(() => {
-  //     observer.next(4);
-  //     observer.complete();
-  //   }, 4000);
-  // }); // observable
 
   /**
    * [Step 1]

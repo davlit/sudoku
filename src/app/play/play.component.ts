@@ -383,7 +383,8 @@ export class PlayComponent implements OnInit {
   } // handleChoiceClearClick_()
 
   /**
-   * Responds to Generate button; makes sudoku puzzle of desired difficulty.
+   * Responds to Generate button. Gets sudoku puzzle of desired difficulty
+   * from cache. Loads sudoku and switches to Play state.
    */
   generate(difficulty: Difficulty) {
     this.currentPuzzle = this.cacheService.getSudoku(difficulty);

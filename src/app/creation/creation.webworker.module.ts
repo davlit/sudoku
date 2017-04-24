@@ -36,4 +36,4 @@ class CreationWebWorkerService {
 class CreationWebWorkerModule {
 }
 
-platformWorkerAppDynamic().bootstrapModule(WorkerModule);
+platformWorkerAppDynamic().bootstrapModule(WorkerAppModule);

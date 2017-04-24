@@ -21,30 +21,24 @@ import { ROWS } from       '../common/common';
 import { COLS } from       '../common/common';
 import { BOXS } from       '../common/common';
 import { ROW_CELLS } from  '../common/common';
-
-import { SudokuModel } from      './sudoku.model';
-import { Cell } from      './sudoku.model';
-import { Group } from      './sudoku.model';
+import { COL_CELLS } from  '../common/common';
+import { BOX_CELLS } from  '../common/common';
 
 @Injectable()
 export class SudokuService {
 
-  private static id = 0;
-  static getId() : number {
-    return SudokuService.id;
-  }
-
   private currentSudoku: Puzzle = undefined;
+  private sudokuModel: SudokuModel = undefined;
 
   /**
    * Inject the data model and logs.
    */
   constructor(
-      private sudokuModel: SudokuModel,
       private actionLog: ActionLogService
   ) {
+    this.sudokuModel = new SudokuModel();
     this.initializeModel();
-  }
+  } // constructor()
 
   /**
    * Initialize the entire sudoku.
@@ -59,7 +53,7 @@ export class SudokuService {
       this.initializeGroup(this.sudokuModel.boxs[g]);
     }
     this.initializeActionLog();
-  }
+  } // initializeModel()
 
   /**
    * Initialize a cell.
@@ -104,7 +98,6 @@ export class SudokuService {
   loadProvidedSudoku(givenValues: number[]) : Puzzle {
     let puzzle = new Puzzle();
     puzzle.initialValues = givenValues;
-    // this.loadGivenValues(initialValues);
 
     // TODO do the work: solve puzzle, get stats, flesh out puzzle object
     // this.completePuzzle(puzzle);   // step 3
@@ -314,7 +307,6 @@ export class SudokuService {
     let cell = this.sudokuModel.cells[c];
     
     // cannot change locked cell
-    // if (this.isCellLocked(c)) {
     if (cell.locked) {
       return;
     }
@@ -326,34 +318,16 @@ export class SudokuService {
       return;			// nothing to remove
     }
 
-    // remove givenValue, update groups and givenValues used; log action
-    // this.sudokuModel.cells[c].value = 0;
-    // let ri = Common.rowIdx(c);
-    // let ci = Common.colIdx(c);
-    // let bi = Common.boxIdx(c);
-    // this.sudokuModel.rows[ri].vOccurrences[oldValue]--;
-    // this.sudokuModel.cols[ci].vOccurrences[oldValue]--;
-    // this.sudokuModel.boxs[bi].vOccurrences[oldValue]--;
     cell.value = 0;
-    // let ri = Common.rowIdx(c);
-    // let ci = Common.colIdx(c);
-    // let bi = Common.boxIdx(c);
     let row = this.sudokuModel.rows[cell.row];
     let col = this.sudokuModel.cols[cell.col];
     let box = this.sudokuModel.boxs[cell.box];
-    // this.sudokuModel.rows[cell.row].vOccurrences[oldValue]--;
-    // this.sudokuModel.cols[cell.col].vOccurrences[oldValue]--;
-    // this.sudokuModel.boxs[cell.box].vOccurrences[oldValue]--;
     row.vOccurrences[oldValue]--;
     col.vOccurrences[oldValue]--;
     box.vOccurrences[oldValue]--;
-    // this.givenValuesSet[oldValue]--;
 
     // add applicable candidates to cell
     for (let v of VALUES) {
-      // if (   this.sudokuModel.rows[ri].vOccurrences[oldValue] > 0
-      //     || this.sudokuModel.cols[ci].vOccurrences[oldValue] > 0
-      //     || this.sudokuModel.boxs[bi].vOccurrences[oldValue] > 0) {
       if (   row.vOccurrences[oldValue] > 0
           || col.vOccurrences[oldValue] > 0
           || box.vOccurrences[oldValue] > 0) {
@@ -368,9 +342,6 @@ export class SudokuService {
       let rcRow = this.sudokuModel.rows[relatedCell.row];
       let rcCol = this.sudokuModel.cols[relatedCell.col];
       let rcBox = this.sudokuModel.boxs[relatedCell.box];
-      // if (   this.sudokuModel.rows[Common.rowIdx(rc)].vOccurrences[oldValue] > 0
-      //     || this.sudokuModel.cols[Common.colIdx(rc)].vOccurrences[oldValue] > 0
-      //     || this.sudokuModel.boxs[Common.boxIdx(rc)].vOccurrences[oldValue] > 0) {
       if (   rcRow.vOccurrences[oldValue] > 0
           || rcCol.vOccurrences[oldValue] > 0
           || rcBox.vOccurrences[oldValue] > 0) {
@@ -415,21 +386,7 @@ export class SudokuService {
    * - restore the candidate
    * - remove log entry, don't create new one
    */
-  removeCandidate(c: number, k: number,
-      hint: CandidatesHint) : void {
-
-    // cannot remove last candidate until a givenValue is set
-    // if no candidates, nothing to remove
-    // if (this.cells[idx].getNumberOfCandidates() <= 1) {
-    //   console.log('idx, k: ' + this.toRowColString(idx) + ' ' + k);
-    //   console.error('Cannot remove candidate')
-    //   console.log('Hint: ' + hint.toString());
-    //   console.log('Row:\n' + this.toStringRow(Common.rowIdx(idx)));
-    //   console.log('Action log:\n' + this.actionLog.toStringFirstFirst());
-    //   return;
-    // }
-
-    // remove candidate
+  removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
     let action = new RemoveAction(ActionType.REMOVE_CANDIDATE, c, k, hint);
     this.actionLog.addEntry(action);
@@ -535,13 +492,6 @@ export class SudokuService {
    * 
    */
   isStateValid() {
-    // for (let g of GROUPS) {
-    //   if (   !this.sudokuModel.rows[g].isGroupStateValid()
-    //       || !this.sudokuModel.cols[g].isGroupStateValid()
-    //       || !this.sudokuModel.boxs[g].isGroupStateValid()) {
-    //     return false;
-    //   }
-    // }
     for (let c of CELLS) {
       if (!this.isCellValid(c)) {
         return false;
@@ -1015,86 +965,6 @@ export class SudokuService {
     return v;
   } // cellsToValuesArray()
 
-      
-
-    
-
-
-
-
-// ===========================================================================
-// ===========================================================================
-
-  // /**
-  //  * Sets all cells' candidates based on surrounding givenValues. This will 
-  //  * overwrite any candidate removals that resulted from naked pairs, etc.
-  //  */
-  // private refreshAllCellsCandidates() : void {
-  //   for (let c of CELLS) {
-  //     this.refreshCellCandidates(c);
-  //   }
-  // } // refreshAllCellsCandidates()
-
-  // /**
-  //  * Sets a cell's candidates based on surrounding givenValues. This will overwrite
-  //  * any candidate removals that resulted from naked pairs, etc.
-  //  */
-  // private refreshCellCandidates(idx: number) : void {
-  //   let cell = this.cells[idx];
-  //   if (cell.hasValue()) {
-  //     cell.unsetAllCandidates();  // extra safeguard; also in cell set givenValue
-  //     return;
-  //   }
-  //   cell.initializeCandidates();   // set all candidates
-  //   for (let relatedCell of Sudoku.getRelatedCells(idx)) {
-  //     let rcValue = this.cells[relatedCell].getValue();
-  //     if (rcValue > 0) {
-  //       cell.removeCandidate(rcValue); // remove selected
-  //     }
-  //   }
-  //   if (cell.getNumberOfCandidates() === 0) {
-  //     console.error('Invalid cell: ' + cell.toString());
-  //   }
-  // } // refreshCellCandidates()
-
-  // /**
-  //  * Count the occurrences of each candidate in a group (row, column, or box).
-  //  * Return an array of the counts. The array is 10 numbers each element
-  //  * being the count of the corresponding candidate. The zero-th element is
-  //  * not used. E.g. [0, 0,0,2, 3,0,0, 0,2,0] means candidate [3] occurs twice,
-  //  * [4] 3 times, [8] twice, and all other candidate are absent in the group. 
-  //  */
-  // private getCandidateCounts(group: Group) : number[] {
-  //   let kCounts: number[] = [0,   0, 0, 0,   0, 0, 0,   0, 0, 0];
-  //   for (let k of VALUES) {
-  //     if (group.containsValue(k)) {
-  //       continue;   // next candidate
-  //     }
-  //     for (let c of group.groupCells) {
-  //       if (this.sudokuModel.cells[c].hasValue()) {
-  //         continue;   // next cell in group
-  //       }
-  //       if (this.sudokuModel.cells[c].isCandidate(k)) {
-  //         kCounts[k]++;
-  //       }
-  //     } // for cells in group
-  //   } // for candidates
-  //   return kCounts;
-  // } // getCandidateCounts()
-      
-  // /**
-  //  * Are the puzzle's cell givenValues 180deg rotationally symmetric?
-  //  */
-  // private isSymmetric() : boolean {
-  //   for (let c of (CELLS.slice(0, 41))) {
-  //     if ((this.sudokuModel.cells[c].hasValue() && !this.sudokuModel.cells[80 - c].hasValue())
-  //         || (!this.sudokuModel.cells[c].hasValue() && this.sudokuModel.cells[80 - c].hasValue())) {
-  //       return false;
-  //     }
-  //   }
-  //   return true;   
-  // } // is symetric()
-
   /**
    * 
    */
@@ -1126,3 +996,64 @@ export class SudokuService {
   }
   
 }
+
+class SudokuModel {
+  cells: Cell[]
+  rows: Group[];
+  cols: Group[];
+  boxs: Group[];
+  
+  constructor() {
+console.info('SudokuModel constructor() cp1-1');
+    this.cells = new Array(81);
+    this.rows = new Array(9);
+    this.cols = new Array(9);
+    this.boxs = new Array(9);
+
+    for (let g of GROUPS) {
+      this.rows[g] = new Group(ROW_CELLS[g]);
+      this.cols[g] = new Group(COL_CELLS[g]);
+      this.boxs[g] = new Group(BOX_CELLS[g]);
+    }
+
+    for (let c of CELLS) {
+      this.cells[c] = new Cell(
+          Common.rowIdx(c), Common.colIdx(c), Common.boxIdx(c));
+    }
+  }
+} // class SudokuModel
+
+class Cell {
+  value: number;
+  candidates: boolean[];
+  locked: boolean;
+  row: number;
+  col: number;
+  box: number;
+
+  constructor(r: number, c:number, b:number) {
+    this.value = 0;
+    this.candidates = new Array(10);
+    for (let k of CANDIDATES) {
+      this.candidates[k] = true;
+    }
+    this.row = r;
+    this.col = c;
+    this.box = b;
+  }
+
+} // class Cell
+
+export class Group {
+  vOccurrences: number[];
+  cells: number[]
+
+  constructor(groupCells: number[]) {
+    this.vOccurrences = new Array(10);
+    for (let v of VALUES) {
+      this.vOccurrences[v] = 0;
+    }
+    this.cells = groupCells;
+  }
+
+} // class Group

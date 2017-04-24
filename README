@@ -193,4 +193,122 @@ SharedModule                                            SudokuService,
                                                         HintService, 
                                                         HintLogService
 
+---------------------------
+app.AppComponent
+  ngOnInit
+    this.cacheService.replenishCache()
+      for each empty cache keys
+        let sudoku: string = this.creationService.createSudoku(DIFFICULTIES[i]); XXX
+        localStorage.setItem(KEYS[i][j], sudoku);
+
+    // spawn web worker 
+    // arg: n: number
+    // ret:                                                           
+    private webWorkerCalculate(n: number) {
+console.log('webWorkerCalculate() start, pass fib to wwSvc' + n);
+        const promise = this._webWorkerService.run(this.fib, n);
+        const result = new Result(n, 0, true);
+        this.webWorkerResults.push(result);
+        this.promises.push(promise);
+        
+        // promise.then(function (response: any) {
+        promise.then((response: any) => {
+            result.result = response;
+            result.loading = false;
+        });
+console.log('                     finish ' + n);
+    }
+    
+    // Background fn (CPU intense)
+    // arg: n: number
+    // ret: fib(n): number
+    private fib(n: number) {
+console.log('fib() start ' + n);
+        const fib = (n: number): number => {
+            if (n < 2) return 1;
+            return fib(n - 1) + fib(n - 2);
+        };
+        
+        return fib(n);
+        // return n + 1;
+    }
+------------------
+  // spawn web worker 
+  // arg: n: number
+  // ret:                                                           
+
+
+  // CPU intense
+  // arg: difficulty: Difficulty
+  // ret: sudoku.serialize(): String
+  createSudoku(difficulty: Difficulty) : string {
+
+    let sudoku = new Puzzle();
+    sudoku.desiredDifficulty = difficulty;
+
+    // step 1 - generate random finished sudoku
+    sudoku.completedPuzzle = this.makeRandomSolution();
+
+    let pass = 0;
+
+    // loop until we get sudoku of desired difficulty
+    let desiredDifficulty = sudoku.desiredDifficulty;
+    while (sudoku.actualDifficulty != desiredDifficulty) {
+      pass++;
+
+      // step 2 - create starting values by paring cells
+console.log('Pass: ' + pass);
+      this.getStartingValues(sudoku);
+
+      if (sudoku.initialValues === undefined) {
+        continue;   // desired difficulty has not been attained
+      }
+
+      // step 3 - solve puzzle to get stats and actual difficulty
+      this.completePuzzle(sudoku);
+
+      console.log('Diff: ' + sudoku.actualDifficulty);
+
+    } // while not getting desired difficulty
+
+    sudoku.generatePasses = pass;
+    return sudoku.serialize();
+  } // createSudoku()
+
+const sudoku: string = '{"_initialValues":[4,9,0,0,0,0,0,6,7,0,2,0,3,0,7,0,0,0,0,0,7,0,8,0,0,0,0,0,0,0,0,0,2,0,4,0,7,8,4,0,0,0,2,1,6,0,5,0,7,0,0,0,0,0,0,0,0,0,9,0,6,0,0,0,0,0,4,0,8,0,3,0,9,3,0,0,0,0,0,5,4],"_completedPuzzle":[4,9,3,5,2,1,8,6,7,8,2,6,3,4,7,5,9,1,5,1,7,6,8,9,4,2,3,3,6,9,8,1,2,7,4,5,7,8,4,9,3,5,2,1,6,1,5,2,7,6,4,3,8,9,2,4,5,1,9,3,6,7,8,6,7,1,4,5,8,9,3,2,9,3,8,2,7,6,1,5,4],"_desiredDifficulty":0,"_actualDifficulty":0,"_generatePasses":1,"_stats":"{\"nakedSingles\":36,\"hiddenSinglesRow\":12,\"hiddenSinglesCol\":4,\"hiddenSinglesBox\":1,\"nakedPairsRow\":0,\"nakedPairsCol\":0,\"nakedPairsBox\":0,\"pointingRows\":0,\"pointingCols\":0,\"rowBoxReductions\":0,\"colBoxReductions\":0,\"nakedTriplesRow\":0,\"nakedTriplesCol\":0,\"nakedTriplesBox\":0,\"nakedQuadsRow\":0,\"nakedQuadsCol\":0,\"nakedQuadsBox\":0,\"hiddenPairsRow\":0,\"hiddenPairsCol\":0,\"hiddenPairsBox\":0,\"hiddenTriplesRow\":0,\"hiddenTriplesCol\":0,\"hiddenTriplesBox\":0,\"hiddenQuadsRow\":0,\"hiddenQuadsCol\":0,\"hiddenQuadsBox\":0,\"guesses\":0}"}';
+
+{"_initialValues":[4,9,0,0,0,0,0,6,7,0,2,0,3,0,7,0,0,0,0,0,7,0,8,0,0,0,0,0,0,0,0,0,2,0,4,0,7,8,4,0,0,0,2,1,6,0,5,0,7,0,0,0,0,0,0,0,0,0,9,0,6,0,0,0,0,0,4,0,8,0,3,0,9,3,0,0,0,0,0,5,4],
+"_completedPuzzle":[4,9,3,5,2,1,8,6,7,8,2,6,3,4,7,5,9,1,5,1,7,6,8,9,4,2,3,3,6,9,8,1,2,7,4,5,7,8,4,9,3,5,2,1,6,1,5,2,7,6,4,3,8,9,2,4,5,1,9,3,6,7,8,6,7,1,4,5,8,9,3,2,9,3,8,2,7,6,1,5,4],
+"_desiredDifficulty":0,
+"_actualDifficulty":0,
+"_generatePasses":1,
+"_stats":"{
+	\"nakedSingles\":36,
+	\"hiddenSinglesRow\":12,
+	\"hiddenSinglesCol\":4,
+	\"hiddenSinglesBox\":1,
+	\"nakedPairsRow\":0,
+	\"nakedPairsCol\":0,
+	\"nakedPairsBox\":0,
+	\"pointingRows\":0,
+	\"pointingCols\":0,
+	\"rowBoxReductions\":0,
+	\"colBoxReductions\":0,
+	\"nakedTriplesRow\":0,
+	\"nakedTriplesCol\":0,
+	\"nakedTriplesBox\":0,
+	\"nakedQuadsRow\":0,
+	\"nakedQuadsCol\":0,
+	\"nakedQuadsBox\":0,
+	\"hiddenPairsRow\":0,
+	\"hiddenPairsCol\":0,
+	\"hiddenPairsBox\":0,
+	\"hiddenTriplesRow\":0,
+	\"hiddenTriplesCol\":0,
+	\"hiddenTriplesBox\":0,
+	\"hiddenQuadsRow\":0,
+	\"hiddenQuadsCol\":0,
+	\"hiddenQuadsBox\":0,
+	\"guesses\":0}"
+}
 
