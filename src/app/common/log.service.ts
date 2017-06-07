@@ -1,8 +1,5 @@
-import { Injectable } from '@angular/core';
-
 import { Common } from './common';
 
-@Injectable()
 export abstract class LogService {
   
   private _log: any[] = [];

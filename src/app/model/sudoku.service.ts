@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+// import { Injectable } from '@angular/core';
 
 import { Puzzle } from './puzzle';
 import { NakedType }  from './naked.type';
@@ -24,26 +24,30 @@ import { ROW_CELLS } from  '../common/common';
 import { COL_CELLS } from  '../common/common';
 import { BOX_CELLS } from  '../common/common';
 
-@Injectable()
+// @Injectable()
 export class SudokuService {
 
   private currentSudoku: Puzzle = undefined;
   private sudokuModel: SudokuModel = undefined;
+  private actionLog: ActionLogService = undefined;
 
   /**
    * Inject the data model and logs.
    */
   constructor(
-      private actionLog: ActionLogService
+      // this.actionLog: ActionLogService,
+    actionLog: ActionLogService
   ) {
     this.sudokuModel = new SudokuModel();
+    // this.actionLog = new ActionLogService();
+    this.actionLog = actionLog;
     this.initializeModel();
   } // constructor()
 
   /**
    * Initialize the entire sudoku.
    */
-  initializeModel() : void {
+  public initializeModel() : void {
     for (let c of CELLS) {
       this.initializeCell(this.sudokuModel.cells[c]);
     }
@@ -78,14 +82,14 @@ export class SudokuService {
   /**
    * 
    */
-  initializeActionLog() : void {
+  public initializeActionLog() : void {
     this.actionLog.initialize();
   }
 
   /**
    * 
    */
-  getCurrentSudoku() {
+  public getCurrentSudoku() {
     return this.currentSudoku;
   }
 
@@ -95,7 +99,7 @@ export class SudokuService {
    * empty cell. E.g.
    * [0,0,2,4,0,0,1,0,3,9,1,0,3,0,0,0,6,0,0, ...]
    */
-  loadProvidedSudoku(givenValues: number[]) : Puzzle {
+  public loadProvidedSudoku(givenValues: number[]) : Puzzle {
     let puzzle = new Puzzle();
     puzzle.initialValues = givenValues;
 
@@ -122,7 +126,7 @@ export class SudokuService {
   /**
    * Sets a given value in every cell and set all groups to complete.
    */
-  setAllValues(values: number[]) {
+  public setAllValues(values: number[]) {
     for (let c of CELLS) {    // c is 0..80
       let cell = this.sudokuModel.cells[c];   // cell at [c] in cells array
       cell.locked = false;
@@ -136,40 +140,40 @@ export class SudokuService {
         this.sudokuModel.boxs[g].vOccurrences[v] = 1;
       }
     }
-  }
+  } // setAllValues()
 
   /**
    * 
    */
-  isCellLocked_(r: number, c: number) : boolean {
+  public isCellLocked_(r: number, c: number) : boolean {
     return this.isCellLocked(Common.cellIdx(r, c));
   }
 
   /**
    * 
    */
-  isCellLocked(c: number) {
+  private isCellLocked(c: number) {
     return this.sudokuModel.cells[c].locked;
   }
   
   /**
    * Gets givenValue in cell at given row and column (1..9).
    */
-  getValue_(r: number, c: number) : number {
+  public getValue_(r: number, c: number) : number {
     return this.getValue(Common.cellIdx(r, c));
   } // getValue_()
 
   /**
    * Return givenValue of cell. Zero means no givenValue;
    */
-  getValue(c: number) : number {
+  public getValue(c: number) : number {
     return this.sudokuModel.cells[c].value;
   };
 
   /**
    * Sets givenValue in cell at given row and column (1..9).
    */
-  setValue_(r: number, c: number, newValue: number) : void {
+  public setValue_(r: number, c: number, newValue: number) : void {
     this.setValue(Common.cellIdx(r, c), newValue, ActionType.SET_VALUE);       
   } // setValue_()
 
@@ -214,7 +218,7 @@ export class SudokuService {
    * - restore candidates in related CELLS
    * - remove log entry, don't create new one
    */     
-  setValue(c: number, newValue: number, actionType: ActionType, 
+  public setValue(c: number, newValue: number, actionType: ActionType, 
       guessPossibles? : number[], hint?: ValueHint) : void {
     let cell = this.sudokuModel.cells[c];
     if (cell.locked) {
@@ -263,7 +267,7 @@ export class SudokuService {
   /**
    * Removes givenValue in cell at given row and column (1..9).
    */
-  removeValue_(r: number, c: number) : void {
+  public removeValue_(r: number, c: number) : void {
     this.removeValue(Common.cellIdx(r, c));       
   } // removeValue_()
 
@@ -302,7 +306,7 @@ export class SudokuService {
    * 
    * - conflict ................
    */
-  removeValue(c: number) : void {
+  public removeValue(c: number) : void {
 
     let cell = this.sudokuModel.cells[c];
     
@@ -363,7 +367,7 @@ export class SudokuService {
   /**
    * Removes given candidate from cell at given row and column (1..9).
    */
-  removeCandidate_(r: number, c: number, k: number) : void {
+  public removeCandidate_(r: number, c: number, k: number) : void {
     this.removeCandidate(Common.cellIdx(r, c), k, undefined);  // user action
   } // removeCandidate_()
 
@@ -386,7 +390,7 @@ export class SudokuService {
    * - restore the candidate
    * - remove log entry, don't create new one
    */
-  removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
+  public removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
     let action = new RemoveAction(ActionType.REMOVE_CANDIDATE, c, k, hint);
     this.actionLog.addEntry(action);
@@ -425,7 +429,7 @@ export class SudokuService {
    * - restore the candidate
    * - remove log entry, don't create new one
    */
-  undoAction(action: Action) : void {
+  public undoAction(action: Action) : void {
     let actionType = action.type;
     switch (actionType) {
       case (ActionType.SET_VALUE):
@@ -443,7 +447,7 @@ export class SudokuService {
    * naked type. For NakedType.SINGLE, PAIR, TRIPLE, QUAD the number of 
    * candidates in the array are 1, 1..2, 1..3, and 1..4.
    */
-  findNakedCandidates(c: number, nakedType: NakedType) : number[] {
+  public findNakedCandidates(c: number, nakedType: NakedType) : number[] {
     let maxCandidates = 0;
     switch (nakedType) {
       case NakedType.SINGLE:
@@ -491,7 +495,8 @@ export class SudokuService {
   /**
    * 
    */
-  isStateValid() {
+  // private isStateValid() {
+  public isStateValid() {
     for (let c of CELLS) {
       if (!this.isCellValid(c)) {
         return false;
@@ -504,7 +509,7 @@ export class SudokuService {
    * A cell is valid if its row, column, and box are all valid. In other words,
    * no value occurs more than once in the cell's row, column, and box.
    */
-  isCellValid(c: number) : boolean {
+  private isCellValid(c: number) : boolean {
     if (   this.isGroupValid(this.sudokuModel.rows[Common.rowIdx(c)])
         && this.isGroupValid(this.sudokuModel.cols[Common.colIdx(c)]) 
         && this.isGroupValid(this.sudokuModel.boxs[Common.boxIdx(c)])) {
@@ -530,7 +535,7 @@ export class SudokuService {
    * Return true if every cell is in a valid state, and
    * if every row, column, and box in a valid state.
    */
-  isSolutionPossible() : boolean {
+  private isSolutionPossible() : boolean {
     for (let c of CELLS) {
       if (!this.isCellStateValid(c)) {
         return false;
@@ -553,7 +558,7 @@ export class SudokuService {
   /**
    * 
    */
-  isImpossible() : boolean {
+  public isImpossible() : boolean {
     return !this.isSolutionPossible();
   } // isImpossible()
 
@@ -561,7 +566,7 @@ export class SudokuService {
    * Determines if sudoku is fully solved. If every row's every value is used
    * once and only once, the sudoku is completely solved.
    */
-  isSolved() : boolean {
+  public isSolved() : boolean {
     for (let r of ROWS) {
       for (let v of VALUES) {
         if (this.sudokuModel.rows[r].vOccurrences[v] != 1) {
@@ -575,42 +580,42 @@ export class SudokuService {
   /**
    * Returns true if cell has a value;
    */
-  hasValue(c: number) : boolean {
+  public hasValue(c: number) : boolean {
     return this.sudokuModel.cells[c].value > 0; 
   } // hasValue()
 
   /**
    * 
    */
-  getRow(r: number) : Group {
+  public getRow(r: number) : Group {
     return this.sudokuModel.rows[r];
   }
 
   /**
    * 
    */
-  getCol(c: number) : Group {
+  public getCol(c: number) : Group {
     return this.sudokuModel.cols[c];
   }
 
   /**
    * 
    */
-  getBox(b: number) : Group {
+  public getBox(b: number) : Group {
     return this.sudokuModel.boxs[b];
   }
 
   /**
    * Returns true if cell has a value;
    */
-  groupContainsValue(group: Group, v: number) : boolean {
+  private groupContainsValue(group: Group, v: number) : boolean {
     return group.vOccurrences[v] === 1;
   } // groupContainsValue()
 
   /**
    * Returns true if cell has a value;
    */
-  containsValue(group: Group, v: number) : boolean {
+  public containsValue(group: Group, v: number) : boolean {
     return group.vOccurrences[v] === 1;
   } // groupContainsValue()
 
@@ -621,7 +626,7 @@ export class SudokuService {
    * cannot have any candidates. Within a group (row, column, or box),
    *    value cells + candidate cells = 9.
    */
-  valueCellsCount(group: Group) : number {
+  private valueCellsCount(group: Group) : number {
     let count = 0;
     for (let v of VALUES) {
       if (group.vOccurrences[v] > 0) {
@@ -637,7 +642,7 @@ export class SudokuService {
    * cannot have any candidates. Within a group (row, column, or box),
    *    value cells + candidate cells = 9.
    */
-  candidateCellsCount(group: Group) : number {
+  public candidateCellsCount(group: Group) : number {
     let count = 0;
     for (let v of VALUES) {
       if (group.vOccurrences[v] === 0) {
@@ -667,7 +672,7 @@ export class SudokuService {
    * not used. E.g. [0, 0,0,2, 3,0,0, 0,2,0] means candidate [3] occurs twice,
    * [4] 3 times, [8] twice, and all other candidate are absent in the group. 
    */
-  getCandidateCounts(group: Group) : number[] {
+  public getCandidateCounts(group: Group) : number[] {
     let kCounts: number[] = [0,   0, 0, 0,   0, 0, 0,   0, 0, 0];
     for (let k of VALUES) {
       if (this.groupContainsValue(group, k)) {
@@ -700,7 +705,7 @@ export class SudokuService {
   /**
    * Represent the values of the sudoku as an array of 81 values.
    */
-  cellValuesToArray() : number[] {
+  private cellValuesToArray() : number[] {
     let valuesArray: number[] = [];
     for (let c of CELLS) {
       valuesArray.push(this.sudokuModel.cells[c].value);
@@ -711,7 +716,7 @@ export class SudokuService {
   /**
    * Represent the givenValues of the sudoku as a single-line string.
    */
-  toOneLineString() : string {
+  private toOneLineString() : string {
     let s = '';
     let v: number;
     for (let c of CELLS) {
@@ -724,14 +729,15 @@ export class SudokuService {
   /**
    * Represent the givenValues of the sudoku as a grid string.
    */
-  toGridString() : string {
+  private toGridString() : string {
     return this.arrayToGridString(this.cellValuesToArray());
   } // toGridString()
 
   /**
    * Represent a givenValues array of sudoku cell givenValues as a grid string.
    */
-  private arrayToGridString(valuesArray: number[]) : string {
+  public arrayToGridString(valuesArray: number[]) : string {
+  // private arrayToGridString(valuesArray: number[]) : string {
     let s = '';
     let i = 0;
     let v: number;
@@ -819,7 +825,7 @@ export class SudokuService {
   /**
    * Represent the state of the sudoku as a string.
    */
-  toString() : string {
+  private toString() : string {
     let s = '';
     for (let r of ROWS) {
       s += this.rowToString(r) + '\n';
@@ -851,14 +857,14 @@ export class SudokuService {
   /**
    * 
    */
-  getCandidates_(r: number, c: number) : number[] {
+  private getCandidates_(r: number, c: number) : number[] {
     return this.getCandidates(Common.cellIdx(r, c));
   }
         
   /**
    * 
    */
-  getCandidates(c: number) : number[] {
+  public getCandidates(c: number) : number[] {
     if (this.hasValue(c)) {
       return [];
     }
@@ -874,28 +880,28 @@ export class SudokuService {
   /**
    * 
    */
-  isCandidate_(r: number, c: number, k: number) : boolean {
+  public isCandidate_(r: number, c: number, k: number) : boolean {
     return this.isCandidate(Common.cellIdx(r, c), k);
   }
   
   /**
    * Returns true if cell contains the candidate.
    */
-  isCandidate(c: number, k: number) : boolean {
+  public isCandidate(c: number, k: number) : boolean {
     return this.sudokuModel.cells[c].candidates[k];
   }
   
   /**
    * 
    */
-  isCellInvalid_(r: number, c: number) : boolean {
+  public isCellInvalid_(r: number, c: number) : boolean {
     return !this.isCellValid(Common.cellIdx(r, c));
   } // isCellInvalid_()
 
   /**
    * Determines if the given givenValue appears 9 times.
    */
-  isValueComplete(v: number) : boolean {
+  public isValueComplete(v: number) : boolean {
     let valueCount = 0;
     for (let c of CELLS) {
       if (this.sudokuModel.cells[c].value === v) {
@@ -908,7 +914,7 @@ export class SudokuService {
   /**
    * 
    */
-  getNumberOfCandidates(c: number) : number {
+  public getNumberOfCandidates(c: number) : number {
     let count = 0;
     let cell = this.sudokuModel.cells[c];
     for (let k of CANDIDATES) {
@@ -950,14 +956,14 @@ export class SudokuService {
   /**
    * Used by SudokoCreationService.
    */
-  removeLastActionLogEntry() : void {
+  public removeLastActionLogEntry() : void {
     this.actionLog.removeLastEntry();
   }
 
   /**
    * Represent the values of the sudoku as an array of 81 values.
    */
-  cellsToValuesArray() : number[] {
+  public cellsToValuesArray() : number[] {
     let v: number[] = [];
     for (let c of CELLS) {
       v.push(this.sudokuModel.cells[c].value);
@@ -968,21 +974,21 @@ export class SudokuService {
   /**
    * 
    */
-  getNakedCandidates_(r: number, c: number, maxCandidates: NakedType) {
+  public getNakedCandidates_(r: number, c: number, maxCandidates: NakedType) {
     return this.findNakedCandidates(Common.cellIdx(r, c), maxCandidates);
   }
 
   /**
    * 
    */
-  getLastAction() {
+  public getLastAction() {
     return this.actionLog.getLastEntry();
   }
 
   /**
    * Called by user button press (playComponent.ts) undoLastAction())
    */
-  undoLastAction() : void {    // called by user button
+  public undoLastAction() : void {    // called by user button
     let lastAction = this.actionLog.getLastEntry();
     this.undoAction(lastAction);
     this.actionLog.removeLastEntry();
@@ -991,9 +997,172 @@ export class SudokuService {
   /**
    * 
    */
-  getActionLogAsString() {
+  public getActionLogAsString() {
     return this.actionLog.toStringLastFirst();
-  }
+  } // getActionLogAsString()
+
+  /**
+   * Swap values of two given cells.
+   */
+  public swapCellValues(c1: number, c2: number) {
+    let v1 = this.sudokuModel.cells[c1].value;
+    this.sudokuModel.cells[c1].value = this.sudokuModel.cells[c2].value;
+    this.sudokuModel.cells[c2].value = v1;
+  } // swapCellValues()
+  
+//   /**
+//    * Swap values of every cell in two given rows. The rows must be in the 
+//    * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two rows in same group
+//    */
+//   private swapRowValues(r1: number, r2: number) {
+//     // for (let k = 0; k < 9; k++) {
+// // console.info('Swapping rows ' + r1 + ' & ' + r2);
+//     for (let c of COLS) {
+//       this.swapCellValues(ROW_CELLS[r1][c], ROW_CELLS[r2][c]);
+//     }
+//   } // swapRowValues()
+  
+//   /**
+//    * Swap values of every cell in two given columns. The columns must be in the
+//    * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two columns in same group
+//    */
+//   private swapColValues(c1: number, c2: number) {
+// // console.info('Swapping cols ' + c1 + ' & ' + c2);
+//     for (let r of ROWS) {
+//       this.swapCellValues(COL_CELLS[c1][r], COL_CELLS[c2][r]);
+//     }
+//   } // swapColValues()
+  
+//   /**
+//    * Swap values of every cell in groups of rows.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two groups of rows
+//    */
+//   private swapRowGroupValues(rg1: number, rg2: number) {
+//     for (let k of [0, 1, 2]) {
+//       this.swapRowValues(rg1 + k, rg2 + k);
+//     }
+//   } // swapRowGroupValues()
+  
+//   /**
+//    * Swap values of every cell in groups of columns.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two groups of columns
+//    */
+//   private swapColGroupValues(cg1: number, cg2: number) {
+//     for (let k of [0, 1, 2]) {
+//       this.swapColValues(cg1 + k, cg2 + k);
+//     }
+//   } // swapColGroupValues()
+
+//   /**
+//    * Get a random number 0..1 (0 or 1). 
+//    */
+//   private getRandomZeroOne() : number {
+//     return Math.floor(Math.random() * 2);
+//   } // getRandomZeroOne()
+
+//   /**
+//    * Get a random number 0..2 (0, 1, or 2). 
+//    */
+//   private getRandomZeroOneTwo() : number {
+//     return Math.floor(Math.random() * 3);
+//   } // getRandomZeroOneTwo()
+
+//   /**
+//    * Randomize rows and columns within each group.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two rows in same group
+//    * Step 2, swapping two columns in same group
+//    */
+//   private randomizeGroupRowsAndColumns() {
+//     let i = 0;
+//     let j = 0;
+
+//     // 012, 345, 678
+//     for (let k of [0, 1, 2]) {
+//       i = this.getRandomZeroOneTwo() + (k * 3);
+//       j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
+//       this.swapRowValues(i, j);
+
+//       i = this.getRandomZeroOneTwo() + (k * 3);
+//       j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
+//       this.swapColValues(i, j);
+//     }
+//   }
+  
+//   /**
+//    * Randomize groups of rows and columns.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two groups of rows
+//    * Step 2, swapping two groups of columns
+//    */
+//   private randomizeRowAndColumnGroups() {
+//     let i = this.getRandomZeroOneTwo();
+//     let j = (i + this.getRandomZeroOne() + 1) % 3;
+//     for (let k of [0, 1, 2]) {
+//       this.swapRowValues((i * 3 + k), (j * 3 + k));
+//     }
+
+//     i = this.getRandomZeroOneTwo();
+//     j = (i + this.getRandomZeroOne() + 1) % 3;
+//     for (let k of [0, 1, 2]) {
+//       this.swapColValues((i * 3 + k), (j * 3 + k));
+//     }
+//   }
+
+//   /**
+//    * Randomize cells by transposing across a northwest-southeast diagonal.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, transposing the whole grid (the columns become the rows and vice 
+//    * versa)
+//    */
+//   private randomizeDiagonalMirror1() {
+//     for (let r = 0; r < 9; r++) {
+//       for (let c = r + 1; c < 9; c++) {
+//         this.swapCellValues(ROW_CELLS[r][c], ROW_CELLS[c][r]);
+//       }
+//     }
+//   }
+
+//   /**
+//    * Randomize cells by transposing across a northeast-southwest diagonal.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, transposing the whole grid (the columns become the rows and vice 
+//    * versa)
+//    */
+//   private randomizeDiagonalMirror2() {
+//     for (let r = 0; r < 9; r++) {         // 0..8
+//       for (let c = 0; c < 8 - r; c++) {   // 
+// // console.info(r + ',' + c + ' -- ' + (8 - c) + ',' + (8 - r));
+//         this.swapCellValues(ROW_CELLS[r][c], ROW_CELLS[8 - c][8 -r]);
+//       }
+//     }
+//   }
+
+//   public randomizeFullSudoku() {
+//     this.randomizeGroupRowsAndColumns();
+//     this.randomizeRowAndColumnGroups();
+//     this.randomizeDiagonalMirror1();
+//     this.randomizeDiagonalMirror2();
+// }
+
+  /**
+   * for each row: every number from 1 to 9 should occur exactly once
+   * for each col: every number from 1 to 9 should occur exactly once
+   * for each box: every number from 1 to 9 should occur exactly once.
+   */
+  // public isValid() : boolean {
+  //   for (let row of GROUPS) {
+  //     for (let cell of GROUPS) {
+
+  //     }
+  //   }
+  // }
   
 }
 

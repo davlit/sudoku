@@ -23,6 +23,11 @@ import { NakedType }        from '../model/naked.type';
 import { CounterComponent } from './counter/counter.component';
 import { CombinationIterator } from '../common/combination.iterator';
 
+import { ActionLogService } from '../action/action-log.service';
+
+// test
+import { ROOT_VALUES } from '../common/common';
+
 enum PlayStates {
   NEW,
   ENTRY,    // not used currently
@@ -45,10 +50,12 @@ enum AutoSolveStates {
 @Component({
   selector: 'play',
   templateUrl: './play.component.html',
-  styleUrls: ['./play.component.css'],
+  styleUrls: ['./play.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
 export class PlayComponent implements OnInit {
+  private sudokuService: SudokuService;
+  private hintService: HintService;
 
   constructor(
     private router: Router,
@@ -56,10 +63,13 @@ export class PlayComponent implements OnInit {
     private ngZone: NgZone,
 
     /** */
-    private sudokuService: SudokuService,
-    private hintService: HintService,
+    // private sudokuService: SudokuService,
+    // private hintService: HintService,
     private cacheService: CacheService
-  ) {}
+  ) {
+    this.sudokuService = new SudokuService(new ActionLogService());
+    this.hintService = new HintService(this.sudokuService);
+  }
 
   // -----------------------------------------------------------------------
   // constants
@@ -119,13 +129,33 @@ export class PlayComponent implements OnInit {
     this.changeDetectorRef.detectChanges();
 
     // test
-    // let comboIt = new CombinationIterator([1,2,3], 3);
-    // // let comboIt = new CombinationIterator([1,2,3,4,5,6], 3);
-    // let i = 0;
-    // while (comboIt.hasNext()) {
-    //   i++
-    //   console.log(i + ' ' + JSON.stringify(comboIt.next()));
-    // }
+//     this.sudokuService.setAllValues(ROOT_VALUES);
+// console.info(this.sudokuService.arrayToGridString(this.sudokuService.cellsToValuesArray()));
+//     // if (this.sudokuService.isStateValid()) {
+//     //   console.info('Valid');
+//     // } else {
+//     //   console.error('Not valid');
+//     // }
+//     // this.sudokuService.randomizeGroupRowsAndColumns();
+//     // this.sudokuService.randomizeRowAndColumnGroups();
+//     // this.sudokuService.randomizeFullSudoku();
+//     this.creationService.randomizeFullSudoku();
+// console.info(this.sudokuService.arrayToGridString(this.sudokuService.cellsToValuesArray()));
+//     // if (this.sudokuService.isStateValid()) {
+//     //   console.info('Valid');
+//     // } else {
+//     //   console.error('Not valid');
+//     // }
+//     // let comboIt = new CombinationIterator([1,2,3], 3);
+//     // // let comboIt = new CombinationIterator([1,2,3,4,5,6], 3);
+//     // let i = 0;
+//     // while (comboIt.hasNext()) {
+//     //   i++
+//     //   console.log(i + ' ' + JSON.stringify(comboIt.next()));
+//     // }
+//     this.sudokuService.setAllValues(ROOT_VALUES);
+//     this.sudokuService.randomizeFullSudoku();
+// console.info(this.sudokuService.arrayToGridString(this.sudokuService.cellsToValuesArray()));
   }
 
   // -----------------------------------------------------------------------
@@ -386,7 +416,7 @@ export class PlayComponent implements OnInit {
    * Responds to Generate button. Gets sudoku puzzle of desired difficulty
    * from cache. Loads sudoku and switches to Play state.
    */
-  generate(difficulty: Difficulty) {
+  generate(difficulty: Difficulty) : void {
     this.currentPuzzle = this.cacheService.getSudoku(difficulty);
 
     // bind metadata for ui, load sudoku for user execution

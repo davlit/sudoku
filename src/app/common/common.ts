@@ -55,6 +55,30 @@ export const BOX_CELLS: number[][] = [[ 0,  1,  2,  9, 10, 11, 18, 19, 20],
                                       [57, 58, 59, 66, 67, 68, 75, 76, 77],
                                       [60, 61, 62, 69, 70, 71, 78, 79, 80]];
 
+// a completely valid sudoku
+export const ROOT_VALUES: number[] =  [ 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                                        4, 5, 6, 7, 8, 9, 1, 2, 3,
+                                        7, 8, 9, 1, 2, 3, 4, 5, 6, 
+                                        2, 3, 4, 5, 6, 7, 8, 9, 1,
+                                        5, 6, 7, 8, 9, 1, 2, 3, 4,
+                                        8, 9, 1, 2, 3, 4, 5, 6, 7, 
+                                        3, 4, 5, 6, 7, 8, 9, 1, 2, 
+                                        6, 7, 8, 9, 1, 2, 3, 4, 5, 
+                                        9, 1, 2, 3, 4, 5, 6, 7, 8];
+/**
+ * randomize:
+ * of rows 0, 1, 2, randomly select 2, swap the 2 rows
+ * of rows 5, 5, 6, randomly select 2, swap the 2 rows
+ * of rows 7, 8, 9, randomly select 2, swap the 2 rows
+ * of cols 0, 1, 2, randomly select 2, swap the 2 cols
+ * of cols 5, 5, 6, randomly select 2, swap the 2 cols
+ * of cols 7, 8, 9, randomly select 2, swap the 2 cols
+ * of a blocks of 3 rows (1,2,3) (4,5,6) (7,8,9),
+ *   rendomly select 2, swap them
+ * of a blocks of 3 cols (1,2,3) (4,5,6) (7,8,9),
+ *   rendomly select 2, swap them
+ */
+
 const enum SequenceType {
   SEQUENTIAL,
   RANDOM

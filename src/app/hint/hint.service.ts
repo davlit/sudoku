@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+// import { Injectable } from '@angular/core';
 
 import { SudokuService } from '../model/sudoku.service';
 // import { Group } from '../model/sudoku.model';
@@ -27,29 +27,35 @@ import { BOX_CELLS } from  '../common/common';
  * 
  */
 
-@Injectable()
+// @Injectable()
 export class HintService {
 
   private activeHint: Hint;
+  private hintLog: HintLogService;
+  private sudokuService: SudokuService;
 
   constructor(
-    private sudokuService: SudokuService,
-    private hintLog: HintLogService
-    ) {}
+    // private sudokuService: SudokuService,
+    // private hintLog: HintLogService
+    sudokuService: SudokuService
+    ) {
+      this.hintLog = new HintLogService();
+      this.sudokuService = sudokuService;
+    }
 
-  initializeHintLog() : void {
+  public initializeHintLog() : void {
     this.hintLog.initialize();
   }
 
-  addHintLogEntry(hint: Hint) : void {
+  public addHintLogEntry(hint: Hint) : void {
     this.hintLog.addEntry(hint);
   }
 
-  getHintCounts() : HintCounts {
+  public getHintCounts() : HintCounts {
     return this.hintLog.getHintCounts();
   }
 
-  getActiveHint() {
+  public getActiveHint() {
     return this.activeHint;
   }
 
@@ -58,7 +64,7 @@ export class HintService {
    * maxDifficulty is set to EASY only the easy solution techniques will be
    * sought for a hint. Similarly for MEDIUM and HARD.
    */
-  getHint(maxDifficulty : Difficulty) : Hint {
+  public getHint(maxDifficulty : Difficulty) : Hint {
     this.activeHint = undefined;
     
     // first, easy techniques
@@ -96,7 +102,7 @@ export class HintService {
   /**
    * Apply hint toward solution.
    */
-  applyHint() : void {
+  public applyHint() : void {
     // let args = hint.removals;
     if (this.activeHint == undefined) {
       return;   // no hunt to apply
@@ -126,7 +132,7 @@ export class HintService {
   /**
    * Apply hint toward solution.
    */
-  applyGivenHint(hint: Hint) : void {
+  private applyGivenHint(hint: Hint) : void {
     if (hint == undefined) {
       return;   // no hunt to apply
     }

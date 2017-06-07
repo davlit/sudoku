@@ -312,3 +312,110 @@ const sudoku: string = '{"_initialValues":[4,9,0,0,0,0,0,6,7,0,2,0,3,0,7,0,0,0,0
 	\"guesses\":0}"
 }
 
+GridLayout Notes
+----------------
+HTML
+<div class="box">
+  <div class="cell">
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+  <div>
+  <div class="cell">
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+    <div class="cand">8</div>
+  <div>
+<div>
+
+CSS
+body {
+  margin: 10px;
+}
+
+.box {
+  width: 600px;
+  height: 600px;
+  display: grid;
+  grid-template-columns: repeat(3, 66px);
+  /* grid-gap: 10px; */
+  background-color: lightgreen;
+  /* color: lightgreen; */
+}
+
+.cell {
+  width: 90px;
+  height: 100px;
+  display: grid;
+  grid-template-columns: repeat(3, 32px);
+  border: 1px solid black;
+  /* grid-gap: 10px; */
+  background-color: lightblue;
+  color: lightgreen;
+  line-height: 20px;
+}
+
+.cand {
+  width: 20px;
+  height: 20px;
+  background-color: pink;
+  color: black;
+  /* border: 1px solid black; */
+  /* border-radius: 5px; */
+  /* padding: 5px; */
+  font-size: 75%;
+  text-align: center;
+}
+
+6/5/17
+======Trigger: 
+play.component.html - "Generate" button
+play.component.ts - generate(difficulty: Difficulty) : void
+  this.cacheService.getSudoku(difficulty)
+  - loads suduku for user execution
+
+cacheService.ts - this.cacheService.getSudoku(difficulty) : Puzzle
+  this.creationService.createSudokuZ(difficulty)
+
+  - TODO set up to receive web worker output
+  ngOnInit() {
+    const that = this;  // see https://stackoverflow.com/questions/24634484/javascript-that-vs-this
+    this.creationWorker.onmessage = ((event: MessageEvent) => {
+      that.zone.run(() => {   // for change detection
+        that.webworkerDuration = ((new Date()).getTime() - that.webworkerStartTime) / 1000;
+        that.webworkerResults = event.data.results;
+      });
+    });
+  } // ngOnInit();
+
+  - TODO prepare request -- just the given difficulty
+  - TODO postMessage
+  /**
+   * Post a message to a web worker. The message contains the desired difficulty.
+   * This message triggers the web worker which works in background. The 
+   * result of the background task is posted by the web worker and this
+   * service is alerted and reacts in the ngOnInit() function above.
+   * 
+   * Called by: TODO ... cacheService
+   */
+  public startWebworkerCreation() {
+    this.webworkerStartTime = new Date();
+    this.creationWorker.postMessage(this.difficulty);
+  } // startWebworkerCreation()
+
+
+[background]
+creation.service.ts - 
+  createSudokuZ(difficulty: Difficulty) : string

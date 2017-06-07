@@ -9,7 +9,7 @@ import { Puzzle } from '../model/puzzle';
   selector: 'app-container',
   templateUrl: './print.component.html',
   // styleUrls: ['app/print/print.component.css', 'app/play/play.component.css']
-  styleUrls: ['./print.component.css']
+  styleUrls: ['./print.component.scss']
 })
 
 export class PrintComponent implements OnInit {

@@ -22,7 +22,7 @@ import { SudokuService }         from './model/sudoku.service';
 import { ActionLogService }      from './action/action-log.service';
 import { HintService }        from './hint/hint.service';
 import { HintLogService }        from './hint/hint-log.service';
-import { CreationService }        from './creation/creation.service';
+import { CreationService }        from '../web-workers/creation-worker/creation.service';
 
 @NgModule({
   declarations: [
@@ -44,12 +44,12 @@ import { CreationService }        from './creation/creation.service';
     CacheService, 
     // WebWorkerClient
     // WebWorkerService
-    SudokuService,
-      // SudokuModel, 
-      ActionLogService, 
-    HintService, 
-      HintLogService,
-    CreationService
+    // SudokuService,
+    //   // SudokuModel, 
+    //   ActionLogService, 
+    // HintService, 
+    //   HintLogService,
+    // CreationService
   ],
   bootstrap: [AppComponent]
 })

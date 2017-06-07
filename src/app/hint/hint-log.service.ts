@@ -1,26 +1,26 @@
-import { Injectable } from '@angular/core';
+// import { Injectable } from '@angular/core';
 
 import { LogService } from '../common/log.service';
 import { Hint } from './hint';
 import { HintType } from './hint.type';
 import { HintCounts } from './hintCounts';
 
-@Injectable()
+// @Injectable()
 export class HintLogService extends LogService {
   
-  addEntry(entry: Hint) : void {
+  public addEntry(entry: Hint) : void {
     super.addEntry(entry);
   }
 
-  getAllEntries() : Hint[] {
+  public getAllEntries() : Hint[] {
     return super.getAllEntries();
   }
 
-  getLastEntry() : Hint {
+  public getLastEntry() : Hint {
     return super.getLastEntry();
   }
   
-  getHintCounts() : HintCounts {
+  public getHintCounts() : HintCounts {
     let hintCounts = new HintCounts();
     for (let hint of this.getAllEntries()) {
       switch (hint.type) {
