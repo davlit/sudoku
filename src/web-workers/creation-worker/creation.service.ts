@@ -45,17 +45,7 @@ export class CreationService {
   /**
    * 
    */
-  private initializeLogs() {
-    this.sudokuService.initializeActionLog();
-    this.hintService.initializeHintLog();
-  }
-
-  /**
-   * 
-   */
-  // createSudoku(difficulty: Difficulty) : Puzzle {
-  // createSudoku(difficulty: Difficulty) : string {
-  createSudokuZ(difficulty: Difficulty) : string {
+  public createSudoku(difficulty: Difficulty) : string {
 console.info('wwStarting creationSvc.createSudoku()');
 
     let sudoku = new Puzzle();
@@ -90,6 +80,14 @@ console.log('Pass: ' + pass);
     sudoku.generatePasses = pass;
     return sudoku.serialize();
   } // createSudoku()
+
+  /**
+   * 
+   */
+  private initializeLogs() {
+    this.sudokuService.initializeActionLog();
+    this.hintService.initializeHintLog();
+  }
 
   /**
    * [Step 1]

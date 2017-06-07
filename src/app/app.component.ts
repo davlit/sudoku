@@ -19,9 +19,9 @@ export class AppComponent {
   ) {}
     
   ngOnInit() {
-    console.log('Cache: ' + this.cacheService.allCacheKeys());
+    // console.log('Cache: ' + this.cacheService.allCacheKeys());
     this.cacheService.replenishCache();
-    console.log('Cache: ' + this.cacheService.allCacheKeys());
+    // console.log('Cache: ' + this.cacheService.allCacheKeys());
   } // onInit()
 
 }
