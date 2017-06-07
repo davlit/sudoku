@@ -29,39 +29,12 @@ const DIFFICULTIES = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD, Diffi
 @Injectable()
 export class CacheService {
 
-  // webWorker element
-  // private promises: Promise<any>[] = [];
-  // private webWorkerResults: any[] = [];
   private promise: Promise<any> = undefined;
   private webWorkerResult: Result = undefined;
   private _webWorkerService = new WebWorkerService();
-
-  // private wwActionLog = new ActionLogService();
-  // private wwSudokuService = new SudokuService(this.wwActionLog);
-  // private wwHintService = new HintService(this.wwSudokuService, 
-  //     new HintLogService());
-  // private wwCreationService = new CreationService(this.wwActionLog, 
-  //     this.wwSudokuService, this.wwHintService)
-  // private wwCreationService: CreationService;
-
   private creationService: CreationService;
 
-  constructor (
-    // private creationService: CreationService
-    // private webWorkerClient: WebWorkerClient
-
-    // webWorker element
-    // private _webWorkerService: WebWorkerService) {
-    ) {
-      // let wwActionLog = new ActionLogService();
-      // let wwSudokuService = new SudokuService(wwActionLog);
-      // let wwHintService = new HintService(
-      //     wwSudokuService, 
-      //     new HintLogService());
-      // this.wwCreationService = new CreationService(
-      //     wwActionLog, 
-      //     wwSudokuService, 
-      //     wwHintService)
+  constructor() {
       this.creationService = new CreationService();
   }
   
@@ -110,21 +83,11 @@ console.info('Replenishment - begin');
     // for (let i = 0; i < 1; i++) {        // testing
       for (let j = 0; j < KEYS[i]. length; j++) {
         if (!localStorage.getItem(KEYS[i][j])) {
+
           // key is not in localStorage
           // create a sudoku
           let sudoku: string = this.creationService.createSudokuZ(DIFFICULTIES[i]);
 console.info('Sudoku string: ' + sudoku);
-
-          // let sudoku: string = undefined;
-          // let promise: Promise<string> = this._webWorkerService.run(
-          //     this.creationService.createSudoku, DIFFICULTIES[i]);
-          // promise.then((response: any) => {
-          //   sudoku = response;
-          //   localStorage.setItem(KEYS[i][j], sudoku);
-          // });
-
-
-
           localStorage.setItem(KEYS[i][j], sudoku);
         }
       }
@@ -132,65 +95,10 @@ console.info('Sudoku string: ' + sudoku);
 console.info('Replenishment - end');    
   } // replenishCache()
 
-  // replenishCache1() : String {
-  //   return 'Cache replenished';
-  // }
+  // -------------------------------------------------------------------------
+  //  Private methods
+  // -------------------------------------------------------------------------
 
-  // webWorker element
-  // startWebWorkerCacheReplenishment() {
-  //   this.stopWebWorkerCacheReplenishment();
-  //   this.webWorkerReplenishCache();
-  // }
-  
-  // webWorker element
-  // private stopWebWorkerCacheReplenishment() {
-  //   // this.promises.forEach(promise => {
-  //   //     this._webWorkerService.terminate(promise);
-  //   // });
-  //   // this.promises.length = 0;
-  //   // this.webWorkerResults.length = 0;
-  //   this._webWorkerService.terminate(this.promise);
-  //   this.promise = undefined;
-  //   this.webWorkerResult = undefined;
-  // }
-
-  // webWorker element
-  /**
-   * 
-   */
-  private webWorkerReplenishCache() {
-
-    // (1) works
-    this.replenishCache();
-
-    // (1a)
-
-
-    // (2) new
-    // const promise = this._webWorkerService.run(this.replenishCache(), undefined);
-    // const promise = this._webWorkerService.run(this.replenishCache());
-    // const result = new Result(undefined, undefined, true);
-    // this.webWorkerResults.push(result);
-    // this.promises.push(promise);
-    
-    // // promise.then(function (response: any) {
-    // promise.then((response: any) => {
-    //   result.result = response;
-    //   result.loading = false;
-    // });
-
-    // (3) new new
-    // this.promise = this._webWorkerService.run(this.replenishCache);
-    // this.webWorkerResult = new Result(undefined, undefined, true);
-    // this.promise.then((response: any) => {
-    //   this.webWorkerResult.result = response;
-    //   this.webWorkerResult.loading = false;
-    // });
-    // this.promise.catch((err) => {
-    //     console.error('I get called:', err.message); // I get called: 'Something awful happened'
-    // });
-  }
-    
   /**
    * Display cached sudokus on the console.
    */
@@ -203,10 +111,6 @@ console.info('Replenishment - end');
       }
     }
   } // keysToConsole()
-
-  // -------------------------------------------------------------------------
-  //  Private methods
-  // -------------------------------------------------------------------------
 
   /**
    * Retrieve sudoku specified by key from the cache. The also removes the
@@ -323,21 +227,6 @@ console.info('cacheSvc.createSudoku() cp5');
   // let actionLogService = new ActionLogService(); 
 console.info('wwEnding cacheSvc.createSudoku()');
     return sudoku;
-  }
-
-  /**
-   * 
-   * @param n 
-   */
-  private fib(n: number) {
-console.log('fib() start ' + n);
-    const fib = (n: number): number => {
-      if (n < 2) return 1;
-      return fib(n - 1) + fib(n - 2);
-    };
-    
-    return fib(n);
-    // return n + 1;
   }
 
   /**

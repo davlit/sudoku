@@ -15,14 +15,12 @@ export class AppComponent {
   copyright = COPYRIGHT;
 
   constructor (
-    // private localStorageService: LocalStorageService
     private cacheService: CacheService
   ) {}
     
   ngOnInit() {
     console.log('Cache: ' + this.cacheService.allCacheKeys());
     this.cacheService.replenishCache();
-    // this.cacheService.startWebWorkerCacheReplenishment();
     console.log('Cache: ' + this.cacheService.allCacheKeys());
   } // onInit()
 

@@ -9,16 +9,9 @@ import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { PlayComponent } from './play/play.component';
 import { PrintComponent } from './print/print.component';
-// import { CreationModule }  from './creation/creation.module';
 import { CacheService }         from './model/cache.service';
-// import { WebWorkerClient }         from './model/web-worker-client';
-// import { WebWorkerService }         from 'angular2-web-worker';
 import { CounterComponent } from './play/counter/counter.component';
-
-// import { SharedModule } from './shared.module';
-
 import { SudokuService }         from './model/sudoku.service';
-// import { SudokuModel }         from './model/sudoku.model';
 import { ActionLogService }      from './action/action-log.service';
 import { HintService }        from './hint/hint.service';
 import { HintLogService }        from './hint/hint-log.service';
@@ -36,20 +29,10 @@ import { CreationService }        from '../web-workers/creation-worker/creation.
   imports: [    
     BrowserModule,
     FormsModule,
-    AppRoutingModule//,
-    // CreationModule//,
-    // SharedModule
+    AppRoutingModule
   ],
   providers: [
-    CacheService, 
-    // WebWorkerClient
-    // WebWorkerService
-    // SudokuService,
-    //   // SudokuModel, 
-    //   ActionLogService, 
-    // HintService, 
-    //   HintLogService,
-    // CreationService
+    CacheService
   ],
   bootstrap: [AppComponent]
 })
