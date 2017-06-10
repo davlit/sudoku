@@ -412,12 +412,20 @@ export class PlayComponent implements OnInit {
     this.removeCellValue(r, c);
   } // handleChoiceClearClick_()
 
+/**
+ * 
+ */
+  isSudokuAvailable(difficulty: Difficulty) {
+console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
+    return this.cacheService.isSudokuAvailable(difficulty);
+  }
+
   /**
    * Responds to Generate button. Gets sudoku puzzle of desired difficulty
    * from cache. Loads sudoku and switches to Play state.
    */
   generate(difficulty: Difficulty) : void {
-    this.currentPuzzle = this.cacheService.getSudoku(difficulty);
+    this.currentPuzzle = Puzzle.deserialize(this.cacheService.getSudoku(difficulty));
 
     // bind metadata for ui, load sudoku for user execution
     this.actualDifficulty = 

@@ -46,7 +46,7 @@ export class CreationService {
    * 
    */
   public createSudoku(difficulty: Difficulty) : string {
-console.info('wwStarting creationSvc.createSudoku()');
+console.info('In creationService.createSudoku() difficulty: ' + difficulty);
 
     let sudoku = new Puzzle();
     sudoku.desiredDifficulty = difficulty;
@@ -73,11 +73,15 @@ console.log('Pass: ' + pass);
       // step 3 - solve puzzle to get stats and actual difficulty
       this.completePuzzle(sudoku);
 
-      console.log('Diff: ' + sudoku.actualDifficulty);
+console.log('Pass ' + pass + ' diff ' +  sudoku.actualDifficulty);
 
     } // while not getting desired difficulty
 
     sudoku.generatePasses = pass;
+// console.info('In creationService.createSudoku() sudoku: ' + sudoku);
+// console.info('In creationService.createSudoku() serialized: ' + sudoku.serialize());
+console.info('Created difficulty: ' + sudoku.actualDifficulty 
+    + ' in ' + sudoku.generatePasses + ' passes');
     return sudoku.serialize();
   } // createSudoku()
 

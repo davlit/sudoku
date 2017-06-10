@@ -5,11 +5,13 @@
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test",
+    "start": "npm run worker && ng serve",
+    "build": "npm run worker && ng build",
+    "test": "npm run worker && ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "npm run worker && ng e2e",
+    "worker": "webpack --config webpack.worker.config.js",
+    "serve.build": "lite-server --baseDir='dist'"
   },
   "private": true,
   "dependencies": {
@@ -48,6 +50,8 @@
     "ts-node": "2.1.0",
     "tslint": "4.5.1",
     "typescript": "~2.2.1",
-    "webdriver-manager": "12.0.4"
+    "webdriver-manager": "12.0.4",
+    "webpack": "^2.5.1",
+    "worker-loader": "^0.8.0"
   }
 }
