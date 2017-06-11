@@ -90,8 +90,8 @@
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Common; });
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
-var VERSION = '13';
-var SUB_VERSION = '4';
+var VERSION = '14';
+var SUB_VERSION = '0';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -4024,8 +4024,9 @@ var CreationService = (function () {
         else {
             puzzle.initialValues = this.sudokuService.cellsToValuesArray();
         }
-        var elapsed = Date.now() - start;
-        console.log('Step 2 elapsed: ' + elapsed + 'ms');
+        // activate to get and log step 2 elapsed times
+        // let elapsed: number = Date.now() - start;
+        // console.info('Step 2 elapsed: ' + elapsed + 'ms');
     }; // getStartingValues() [step 2 - no guesses]
     /**
      * [Step 3]

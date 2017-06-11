@@ -227,8 +227,9 @@ console.info('Created difficulty: ' + sudoku.actualDifficulty
       puzzle.initialValues = this.sudokuService.cellsToValuesArray();
     }
 
-    let elapsed: number = Date.now() - start;
-    console.log('Step 2 elapsed: ' + elapsed + 'ms');
+    // activate to get and log step 2 elapsed times
+    // let elapsed: number = Date.now() - start;
+    // console.info('Step 2 elapsed: ' + elapsed + 'ms');
 
   } // getStartingValues() [step 2 - no guesses]
   

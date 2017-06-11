@@ -1,14 +1,12 @@
-import { Injectable, Injector } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 import { Difficulty }       from './difficulty';
-import { Puzzle }           from './puzzle';
 import { CreationService }  from '../../web-workers/creation-worker/creation.service';
-import { Result }           from './result';
 
 import * as CreationWorker from 
   'worker-loader!../../web-workers/creation-worker/creation.worker.bundle.js';
 
-/*
+/*  localStorage API - keys and stored data are all strings
 localStorage.setItem(key: string, item: string) : void
 localStorage.getItem(key: string) : string
 localStorage.length : number
@@ -17,15 +15,15 @@ localStorage.removeItem(key: string) : void
 localStorage.clear() : void
  */
 
-const KEYS: string[][] = [['easy-1',    'easy-2',    'easy-3'   ],
-                          ['medium-1',  'medium-2',  'medium-3' ],
-                          ['hard-1',    'hard-2',    'hard-3'   ],
-                          ['hardest-1', 'hardest-2', 'hardest-3']];
+const USE_WEBWORKER = true;
 const DIFFICULTIES = [Difficulty.EASY, 
                       Difficulty.MEDIUM, 
                       Difficulty.HARD, 
                       Difficulty.HARDEST];
-const USE_WEBWORKER = true;
+const KEYS: string[][] = [['easy-1',    'easy-2',    'easy-3'   ],
+                          ['medium-1',  'medium-2',  'medium-3' ],
+                          ['hard-1',    'hard-2',    'hard-3'   ],
+                          ['hardest-1', 'hardest-2', 'hardest-3']];
 
 /**
  * Manages the cache of prepared sudokus of varying difficulty.
@@ -33,13 +31,10 @@ const USE_WEBWORKER = true;
 @Injectable()
 export class CacheService {
 
-  private creationService: CreationService;
-
-  // private creationWorker: Worker = new CreationWorker();
+  private creationService: CreationService = undefined;
   private creationWorker: Worker = undefined;
   private webworkerResult: string = undefined;  
   private webworkerStartTime: number = undefined;
-  private webworkerDuration: number = 0;
 
   private webworkerWorking: boolean = false;
 
@@ -51,43 +46,31 @@ export class CacheService {
       this.init();
   }
 
+  // -------------------------------------------------------------------------
+  //  Public methods
+  // -------------------------------------------------------------------------
+
+  /**
+   * Receive web worker output
+   */
   init() {
     this.creationWorker.onmessage = ((event: MessageEvent) => {
 console.info('cacheService.init() creationWorker.onmessage');
       this.webworkerWorking = false;
+      localStorage.setItem(this.localStorageKey, event.data);
+console.info('Cache keys after webworker replenishment: ' 
+  + JSON.stringify(this.getCacheKeys()));
 
-      // that.zone.run(() => {   // for change detection
-        this.webworkerDuration = ((new Date()).getTime() - this.webworkerStartTime) / 1000;
-        // that.webworkerResult = event.data.result;
-// console.info('cp50 - webworker reault: ' + event.data);
-        localStorage.setItem(this.localStorageKey, event.data);
-// console.info('cp51 - cache keys after web worker: ' 
-//     + JSON.stringify(this.getCacheKeys()));
-console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.getCacheKeys()));
-
-      // });
+      // This is a loop. Since replenishCache() engages a web worker to
+      // create a sudoku, and this method, creationWorker.onmessage(), is
+      // is called unpon the web worker's completion, calling 
+      // replenish.cache() here creates a loop. However, replenishCache()
+      // stop when the cache is full. So whenever replenishCache() is the
+      // loop will continue until the cache is full.
+      this.replenishCache();
     });
   }
   
-  /**
-   * Receive web worker output
-   */
-//   ngOnInit() {
-// console.info('cacheService ngOnInit()');
-//     const that = this;  // see https://stackoverflow.com/questions/24634484/javascript-that-vs-this
-//     this.creationWorker.onmessage = ((event: MessageEvent) => {
-// console.info('cacheService ngOnInit onmessage');
-//       this.webworkerWorking = false;
-
-//       // that.zone.run(() => {   // for change detection
-//         that.webworkerDuration = ((new Date()).getTime() - that.webworkerStartTime) / 1000;
-//         // that.webworkerResult = event.data.result;
-//         localStorage.setItem(this.localStorageKey, event.data.result);
-
-//       // });
-//     });
-//   } // ngOnInit();
-
   /**
    * Empty the cache.
    */
@@ -116,7 +99,7 @@ console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.
   } // getCacheSizeByDifficulty()
 
   /**
-   * 
+   * Get an array of current localStorage keys.
    */
   public getCacheKeys() : string[] {
     let keys: string[] = [];
@@ -136,7 +119,7 @@ console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.
       }
     }
     return false;
-  } // isSudokuAvailable
+  } // isSudokuAvailable()
 
   /**
    * Get a sudoku from the cache. If none available, create one.
@@ -146,34 +129,16 @@ console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.
     for (let key of KEYS[difficulty]) {
       sudoku = this.retrieveAndRemoveCacheItem(key);
       if (sudoku) {
+        if (USE_WEBWORKER) {
 
-        // TODO if WW not running, trigger WEB WORKER to replace
-
+          // as soon as a cached sudoku is used, replace it
+          this.replenishCache();
+        }
         return sudoku;
       }
     }
     sudoku = this.creationService.createSudoku(DIFFICULTIES[difficulty]);
     return sudoku;
-
-//     let keys = this.availableCacheKeys(difficulty);
-// console.info(Puzzle.getDifficultyLabel(difficulty) + ' keys: ' 
-//         + JSON.stringify(keys));
-//     let sudoku: string = undefined;
-//     if (keys.length > 0) {
-//       sudoku = this.retrieveAndRemoveCacheItem(keys[0]);
-//     } else {
-
-//           // BROWSER Option
-//       sudoku = this.creationService.createSudoku(difficulty);
-
-//           // WEB WORKER Option
-//       // this.startWebworkerCreation(difficulty);
-//     }
-
-//     // TODO replace any sudoku pulled from cache
-// console.info('getSudoku() sudoku: ' + sudoku);
-
-//     return Puzzle.deserialize(sudoku);
   } // getSudoku()
 
   /**
@@ -185,19 +150,20 @@ console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.
         if (!localStorage.getItem(key)) {
 
           // key is not in localStorage; create a sudoku
-
           if (USE_WEBWORKER) {
 
             // WEB WORKER Option
             if (!this.webworkerWorking) {
-              this.localStorageKey = key;
-              this.webworkerStartTime = Date.now();
-              this.webworkerWorking = true;
-  console.info('Calling startWebworkerCreation() key: ' + this.localStorageKey);
-              this.creationWorker.postMessage(diff);
+              this.startWebworkerCreation(diff, key);
+  //             this.localStorageKey = key;
+  //             this.webworkerStartTime = Date.now();
+  //             this.webworkerWorking = true;
+  // console.info('Calling startWebworkerCreation() key: ' + this.localStorageKey);
+  //             this.creationWorker.postMessage(diff);
             }
 
           } else {
+
             // BROWSER Option
             let sudoku: string = this.creationService.createSudoku(DIFFICULTIES[diff]);
             localStorage.setItem(key, sudoku);
@@ -219,7 +185,7 @@ console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.
   //  Private methods
   // -------------------------------------------------------------------------
 
-    /**
+   /**
    * Post a message to a web worker. The message contains the desired difficulty.
    * This message triggers the web worker which works in background. The 
    * result of the background task is posted by the web worker and this
@@ -227,12 +193,13 @@ console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.
    * 
    * Called by: TODO ... cacheService
    */
-//   private startWebworkerCreation(difficulty: Difficulty) {
-// console.info('In startWebworkerCreation difficulty: ' + difficulty);
-//     this.webworkerStartTime = Date.now();
-//     this.webworkerWorking = true;
-//     this.creationWorker.postMessage(difficulty);
-//   } // startWebworkerCreation()
+  private startWebworkerCreation(difficulty: Difficulty, key: string) {
+    this.localStorageKey = key;
+    this.webworkerStartTime = Date.now();
+    this.webworkerWorking = true;
+console.info('Calling startWebworkerCreation() key: ' + this.localStorageKey);
+    this.creationWorker.postMessage(difficulty);
+  } // startWebworkerCreation()
 
   /**
    * Get a list of cache keys for cached sudokus.
@@ -258,46 +225,10 @@ console.info('Cache keys after webworker replenishment: ' + JSON.stringify(this.
    * from the cache.
    */
   private retrieveAndRemoveCacheItem(key: string) {
-    let sudoku: string = localStorage.getItem(key);
+    let item: string = localStorage.getItem(key);
     this.removeCacheItem(key);
-    return sudoku;
+    return item;
   } // retrieveAndRemoveCacheItem()
-
-  /**
-   * Get the available keys for caches of the specified difficulty.
-   */
-  private availableCacheKeys(difficulty: Difficulty) : string[] {
-    let keys = [];
-    let key = '';
-    let ch = '';
-    for (let i = 0; i < localStorage.length; i++) {
-      key = localStorage.key(i);
-      ch = key.charAt(0);
-      switch (difficulty) {
-        case Difficulty.EASY:
-          if (ch === 'e') {
-            keys.push(key)
-          }
-          break;
-        case Difficulty.MEDIUM:
-          if (ch === 'm') {
-            keys.push(key)
-          }
-          break;
-        case Difficulty.HARD:
-          if (ch === 'h') {
-            keys.push(key)
-          }
-          break;
-        case Difficulty.HARDEST:
-          if (ch === 'd') {
-            keys.push(key)
-          }
-          break;
-        } // switch
-    } // for
-    return keys;
-  } // availableCacheKeys()
 
 }
 
