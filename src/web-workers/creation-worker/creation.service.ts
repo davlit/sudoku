@@ -53,7 +53,7 @@ console.info('In creationService.createSudoku() difficulty: ' + difficulty);
 
     // step 1 - generate random finished sudoku
     // sudoku.completedPuzzle = this.makeRandomSolution();
-    sudoku.completedPuzzle = this.makeRandomSolution1();
+    sudoku.completedPuzzle = this.makeRandomSolution();
 
     let pass = 0;
 
@@ -127,18 +127,18 @@ console.info('Created difficulty: ' + sudoku.actualDifficulty
    * solving and guessing techniques create a random, consistent, fully 
    * filled-in solution. Return the full solution as a cell values array.
    */
-  private makeRandomSolution1() : number[] {
+  // private makeRandomSolution1() : number[] {
 
-    let start: number = Date.now();   // for elapsed time
+  //   let start: number = Date.now();   // for elapsed time
 
-    this.sudokuService.setAllValues(ROOT_VALUES);
-    this.randomizeFullSudoku();
+  //   this.sudokuService.setAllValues(ROOT_VALUES);
+  //   this.randomizeFullSudoku();
 
-    let elapsed: number = Date.now() - start;
-    console.info('Step 1-1 elapsed: ' + elapsed + 'ms');
+  //   let elapsed: number = Date.now() - start;
+  //   console.info('Step 1-1 elapsed: ' + elapsed + 'ms');
 
-    return this.sudokuService.cellsToValuesArray();
-  } // makeRandomSolution()
+  //   return this.sudokuService.cellsToValuesArray();
+  // } // makeRandomSolution()
 
   /**
    * [Step 2]
@@ -460,146 +460,146 @@ console.info('Created difficulty: ' + sudoku.actualDifficulty
   //   this.sudokuModel.cells[c2].value = v1;
   // } // swapCellValues()
   
-  /**
-   * Swap values of every cell in two given rows. The rows must be in the 
-   * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, swapping two rows in same group
-   */
-  private swapRowValues(r1: number, r2: number) {
-    // for (let k = 0; k < 9; k++) {
-// console.info('Swapping rows ' + r1 + ' & ' + r2);
-    for (let c of COLS) {
-      // this.swapCellValues(ROW_CELLS[r1][c], ROW_CELLS[r2][c]);
-      this.sudokuService.swapCellValues(ROW_CELLS[r1][c], ROW_CELLS[r2][c]);
-    }
-  } // swapRowValues()
+//   /**
+//    * Swap values of every cell in two given rows. The rows must be in the 
+//    * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two rows in same group
+//    */
+//   private swapRowValues(r1: number, r2: number) {
+//     // for (let k = 0; k < 9; k++) {
+// // console.info('Swapping rows ' + r1 + ' & ' + r2);
+//     for (let c of COLS) {
+//       // this.swapCellValues(ROW_CELLS[r1][c], ROW_CELLS[r2][c]);
+//       this.sudokuService.swapCellValues(ROW_CELLS[r1][c], ROW_CELLS[r2][c]);
+//     }
+//   } // swapRowValues()
   
-  /**
-   * Swap values of every cell in two given columns. The columns must be in the
-   * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, swapping two columns in same group
-   */
-  private swapColValues(c1: number, c2: number) {
-// console.info('Swapping cols ' + c1 + ' & ' + c2);
-    for (let r of ROWS) {
-      this.sudokuService.swapCellValues(COL_CELLS[c1][r], COL_CELLS[c2][r]);
-    }
-  } // swapColValues()
+//   /**
+//    * Swap values of every cell in two given columns. The columns must be in the
+//    * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two columns in same group
+//    */
+//   private swapColValues(c1: number, c2: number) {
+// // console.info('Swapping cols ' + c1 + ' & ' + c2);
+//     for (let r of ROWS) {
+//       this.sudokuService.swapCellValues(COL_CELLS[c1][r], COL_CELLS[c2][r]);
+//     }
+//   } // swapColValues()
   
-  /**
-   * Swap values of every cell in groups of rows.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, swapping two groups of rows
-   */
-  private swapRowGroupValues(rg1: number, rg2: number) {
-    for (let k of [0, 1, 2]) {
-      this.swapRowValues(rg1 + k, rg2 + k);
-    }
-  } // swapRowGroupValues()
+//   /**
+//    * Swap values of every cell in groups of rows.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two groups of rows
+//    */
+//   private swapRowGroupValues(rg1: number, rg2: number) {
+//     for (let k of [0, 1, 2]) {
+//       this.swapRowValues(rg1 + k, rg2 + k);
+//     }
+//   } // swapRowGroupValues()
   
-  /**
-   * Swap values of every cell in groups of columns.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, swapping two groups of columns
-   */
-  private swapColGroupValues(cg1: number, cg2: number) {
-    for (let k of [0, 1, 2]) {
-      this.swapColValues(cg1 + k, cg2 + k);
-    }
-  } // swapColGroupValues()
+//   /**
+//    * Swap values of every cell in groups of columns.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two groups of columns
+//    */
+//   private swapColGroupValues(cg1: number, cg2: number) {
+//     for (let k of [0, 1, 2]) {
+//       this.swapColValues(cg1 + k, cg2 + k);
+//     }
+//   } // swapColGroupValues()
 
-  /**
-   * Get a random number 0..1 (0 or 1). 
-   */
-  private getRandomZeroOne() : number {
-    return Math.floor(Math.random() * 2);
-  } // getRandomZeroOne()
+//   /**
+//    * Get a random number 0..1 (0 or 1). 
+//    */
+//   private getRandomZeroOne() : number {
+//     return Math.floor(Math.random() * 2);
+//   } // getRandomZeroOne()
 
-  /**
-   * Get a random number 0..2 (0, 1, or 2). 
-   */
-  private getRandomZeroOneTwo() : number {
-    return Math.floor(Math.random() * 3);
-  } // getRandomZeroOneTwo()
+//   /**
+//    * Get a random number 0..2 (0, 1, or 2). 
+//    */
+//   private getRandomZeroOneTwo() : number {
+//     return Math.floor(Math.random() * 3);
+//   } // getRandomZeroOneTwo()
 
-  /**
-   * Randomize rows and columns within each group.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, swapping two rows in same group
-   * Step 2, swapping two columns in same group
-   */
-  private randomizeGroupRowsAndColumns() {
-    let i = 0;
-    let j = 0;
+//   /**
+//    * Randomize rows and columns within each group.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two rows in same group
+//    * Step 2, swapping two columns in same group
+//    */
+//   private randomizeGroupRowsAndColumns() {
+//     let i = 0;
+//     let j = 0;
 
-    // 012, 345, 678
-    for (let k of [0, 1, 2]) {
-      i = this.getRandomZeroOneTwo() + (k * 3);
-      j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
-      this.swapRowValues(i, j);
+//     // 012, 345, 678
+//     for (let k of [0, 1, 2]) {
+//       i = this.getRandomZeroOneTwo() + (k * 3);
+//       j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
+//       this.swapRowValues(i, j);
 
-      i = this.getRandomZeroOneTwo() + (k * 3);
-      j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
-      this.swapColValues(i, j);
-    }
-  }
+//       i = this.getRandomZeroOneTwo() + (k * 3);
+//       j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
+//       this.swapColValues(i, j);
+//     }
+//   }
   
-  /**
-   * Randomize groups of rows and columns.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, swapping two groups of rows
-   * Step 2, swapping two groups of columns
-   */
-  private randomizeRowAndColumnGroups() {
-    let i = this.getRandomZeroOneTwo();
-    let j = (i + this.getRandomZeroOne() + 1) % 3;
-    for (let k of [0, 1, 2]) {
-      this.swapRowValues((i * 3 + k), (j * 3 + k));
-    }
+//   /**
+//    * Randomize groups of rows and columns.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, swapping two groups of rows
+//    * Step 2, swapping two groups of columns
+//    */
+//   private randomizeRowAndColumnGroups() {
+//     let i = this.getRandomZeroOneTwo();
+//     let j = (i + this.getRandomZeroOne() + 1) % 3;
+//     for (let k of [0, 1, 2]) {
+//       this.swapRowValues((i * 3 + k), (j * 3 + k));
+//     }
 
-    i = this.getRandomZeroOneTwo();
-    j = (i + this.getRandomZeroOne() + 1) % 3;
-    for (let k of [0, 1, 2]) {
-      this.swapColValues((i * 3 + k), (j * 3 + k));
-    }
-  }
+//     i = this.getRandomZeroOneTwo();
+//     j = (i + this.getRandomZeroOne() + 1) % 3;
+//     for (let k of [0, 1, 2]) {
+//       this.swapColValues((i * 3 + k), (j * 3 + k));
+//     }
+//   }
 
-  /**
-   * Randomize cells by transposing across a northwest-southeast diagonal.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, transposing the whole grid (the columns become the rows and vice 
-   * versa)
-   */
-  private randomizeDiagonalMirror1() {
-    for (let r = 0; r < 9; r++) {
-      for (let c = r + 1; c < 9; c++) {
-        this.sudokuService.swapCellValues(ROW_CELLS[r][c], ROW_CELLS[c][r]);
-      }
-    }
-  }
+//   /**
+//    * Randomize cells by transposing across a northwest-southeast diagonal.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, transposing the whole grid (the columns become the rows and vice 
+//    * versa)
+//    */
+//   private randomizeDiagonalMirror1() {
+//     for (let r = 0; r < 9; r++) {
+//       for (let c = r + 1; c < 9; c++) {
+//         this.sudokuService.swapCellValues(ROW_CELLS[r][c], ROW_CELLS[c][r]);
+//       }
+//     }
+//   }
 
-  /**
-   * Randomize cells by transposing across a northeast-southwest diagonal.
-   * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-   * Step 2, transposing the whole grid (the columns become the rows and vice 
-   * versa)
-   */
-  private randomizeDiagonalMirror2() {
-    for (let r = 0; r < 9; r++) {         // 0..8
-      for (let c = 0; c < 8 - r; c++) {   // 
-// console.info(r + ',' + c + ' -- ' + (8 - c) + ',' + (8 - r));
-        this.sudokuService.swapCellValues(ROW_CELLS[r][c], ROW_CELLS[8 - c][8 -r]);
-      }
-    }
-  }
+//   /**
+//    * Randomize cells by transposing across a northeast-southwest diagonal.
+//    * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
+//    * Step 2, transposing the whole grid (the columns become the rows and vice 
+//    * versa)
+//    */
+//   private randomizeDiagonalMirror2() {
+//     for (let r = 0; r < 9; r++) {         // 0..8
+//       for (let c = 0; c < 8 - r; c++) {   // 
+// // console.info(r + ',' + c + ' -- ' + (8 - c) + ',' + (8 - r));
+//         this.sudokuService.swapCellValues(ROW_CELLS[r][c], ROW_CELLS[8 - c][8 -r]);
+//       }
+//     }
+//   }
 
-  private randomizeFullSudoku() {
-    this.randomizeGroupRowsAndColumns();
-    this.randomizeRowAndColumnGroups();
-    this.randomizeDiagonalMirror1();
-    this.randomizeDiagonalMirror2();
-  }
+//   private randomizeFullSudoku() {
+//     this.randomizeGroupRowsAndColumns();
+//     this.randomizeRowAndColumnGroups();
+//     this.randomizeDiagonalMirror1();
+//     this.randomizeDiagonalMirror2();
+//   }
 
 }

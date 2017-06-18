@@ -1,43 +1,3 @@
-
-// import { Difficulty } from './model/difficulty';
-// import { CacheService } from './model/cache.service'; 
-// import { CreationService } from '../web-workers/creation-worker/creation.service'; 
-
-// @Component({
-//   selector: 'app-root',
-//   templateUrl: './app.component.html',
-//   styleUrls: ['./app.component.scss']
-// })
-// export class AppComponent {
-//   title = TITLE;
-//   version = 'v' + MAJOR_VERSION + '.' + VERSION + '.' + SUB_VERSION;
-//   copyright = COPYRIGHT;
-
-  // constructor (
-  //   private cacheService: CacheService
-  // ) {}
-    
-//   // on app startup, replenish cache    
-//   ngOnInit() {
-//     let cacheKeys: string[] = this.cacheService.getCacheKeys();
-
-// console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
-
-//     // activate for maintenance
-//     // this.cacheService.removeCacheItem('undefined');
-//     // this.cacheService.emptyCache();
-//     // cacheKeys = this.cacheService.getCacheKeys();
-//     // console.info('Cache keys after maintenance:  + JSON.stringify(cacheKeys));
-
-//     this.cacheService.replenishCache();
-//   } // onInit()
-
-// }
-
-
-
-
-
 import { Component, OnInit, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { ChangeDetectionStrategy } from '@angular/core';
@@ -144,7 +104,6 @@ export class AppComponent implements OnInit {
   candidatesShowing: boolean;   // also in execute
 
   // ----- new properties -----
-  passCount: string;
   desiredDifficulty: Difficulty;
 
   // ----- execute properties -----
@@ -154,7 +113,6 @@ export class AppComponent implements OnInit {
   autoSolveMessage: string;
   actionLog: string;
   solutionClues: string;
-  // busy: Subscription;
   timerSubscription: Subscription;
   elapsedTime: string;
   hintsViewed: number;
@@ -186,35 +144,7 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
 
     this.cacheService.replenishCache();
 
-    // test
-//     this.sudokuService.setAllValues(ROOT_VALUES);
-// console.info(this.sudokuService.arrayToGridString(this.sudokuService.cellsToValuesArray()));
-//     // if (this.sudokuService.isStateValid()) {
-//     //   console.info('Valid');
-//     // } else {
-//     //   console.error('Not valid');
-//     // }
-//     // this.sudokuService.randomizeGroupRowsAndColumns();
-//     // this.sudokuService.randomizeRowAndColumnGroups();
-//     // this.sudokuService.randomizeFullSudoku();
-//     this.creationService.randomizeFullSudoku();
-// console.info(this.sudokuService.arrayToGridString(this.sudokuService.cellsToValuesArray()));
-//     // if (this.sudokuService.isStateValid()) {
-//     //   console.info('Valid');
-//     // } else {
-//     //   console.error('Not valid');
-//     // }
-//     // let comboIt = new CombinationIterator([1,2,3], 3);
-//     // // let comboIt = new CombinationIterator([1,2,3,4,5,6], 3);
-//     // let i = 0;
-//     // while (comboIt.hasNext()) {
-//     //   i++
-//     //   console.log(i + ' ' + JSON.stringify(comboIt.next()));
-//     // }
-//     this.sudokuService.setAllValues(ROOT_VALUES);
-//     this.sudokuService.randomizeFullSudoku();
-// console.info(this.sudokuService.arrayToGridString(this.sudokuService.cellsToValuesArray()));
-  }
+  } // ngOnInit()
 
   // -----------------------------------------------------------------------
   // public methods
@@ -998,7 +928,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.valuesComplete[v] = false;
     }
 
-    this.passCount = undefined;
+    // this.passCount = undefined;
     this.playState = PlayStates.NEW;
     // this.generating = false;
     this.hint = undefined;

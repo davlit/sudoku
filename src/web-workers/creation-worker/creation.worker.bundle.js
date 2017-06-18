@@ -77,20 +77,20 @@
 /* unused harmony export SUB_VERSION */
 /* unused harmony export COPYRIGHT */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return VALUES; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return CANDIDATES; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return GROUPS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return ROWS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return CANDIDATES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return GROUPS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return ROWS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return COLS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return BOXS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return BOXS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CELLS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return ROW_CELLS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return COL_CELLS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return BOX_CELLS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return ROOT_VALUES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return ROW_CELLS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return COL_CELLS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return BOX_CELLS; });
+/* unused harmony export ROOT_VALUES */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Common; });
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
-var VERSION = '14';
+var VERSION = '15';
 var SUB_VERSION = '0';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -1838,7 +1838,7 @@ var HintService = (function () {
      * a hint and return true, otherwise return false.
      */
     HintService.prototype.checkHiddenSingles = function () {
-        for (var _i = 0, ROWS_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* ROWS */]; _i < ROWS_1.length; _i++) {
+        for (var _i = 0, ROWS_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["d" /* ROWS */]; _i < ROWS_1.length; _i++) {
             var r = ROWS_1[_i];
             if (this.checkHiddenSinglesGroup(this.sudokuService.getRow(r), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_SINGLE_ROW)) {
                 return true;
@@ -1850,7 +1850,7 @@ var HintService = (function () {
                 return true;
             }
         }
-        for (var _b = 0, BOXS_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* BOXS */]; _b < BOXS_1.length; _b++) {
+        for (var _b = 0, BOXS_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* BOXS */]; _b < BOXS_1.length; _b++) {
             var b = BOXS_1[_b];
             if (this.checkHiddenSinglesGroup(this.sudokuService.getBox(b), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_SINGLE_BOX)) {
                 return true;
@@ -1864,7 +1864,7 @@ var HintService = (function () {
      */
     HintService.prototype.checkHiddenSinglesGroup = function (group, hintType) {
         var singleCell = -1;
-        NEXT_CANDIDATE: for (var _i = 0, CANDIDATES_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_1.length; _i++) {
+        NEXT_CANDIDATE: for (var _i = 0, CANDIDATES_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_1.length; _i++) {
             var k = CANDIDATES_1[_i];
             if (this.sudokuService.containsValue(group, k)) {
                 continue NEXT_CANDIDATE; // candidate cannot be single
@@ -1923,17 +1923,17 @@ var HintService = (function () {
                 var cells = [nakedCells[i1].idx, nakedCells[i2].idx];
                 // look for actions; if none, move on
                 if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameRow(cells)) {
-                    if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_PAIRS_ROW)) {
+                    if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_PAIRS_ROW)) {
                         return true;
                     }
                 }
                 if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameCol(cells)) {
-                    if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_PAIRS_COL)) {
+                    if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_PAIRS_COL)) {
                         return true;
                     }
                 }
                 if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameBox(cells)) {
-                    if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["k" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_PAIRS_BOX)) {
+                    if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_PAIRS_BOX)) {
                         return true;
                     }
                 }
@@ -1990,17 +1990,17 @@ var HintService = (function () {
                         nakedCells[i2].idx, nakedCells[i3].idx];
                     // look for actions; if none, move on
                     if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameRow(cells)) {
-                        if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_TRIPLES_ROW)) {
+                        if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_TRIPLES_ROW)) {
                             return true;
                         }
                     }
                     if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameCol(cells)) {
-                        if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_TRIPLES_COL)) {
+                        if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_TRIPLES_COL)) {
                             return true;
                         }
                     }
                     if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameBox(cells)) {
-                        if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["k" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_TRIPLES_BOX)) {
+                        if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_TRIPLES_BOX)) {
                             return true;
                         }
                     }
@@ -2176,17 +2176,17 @@ var HintService = (function () {
                             nakedCells[i2].idx, nakedCells[i3].idx, nakedCells[i4].idx];
                         // look for actions; if none, move on
                         if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameRow(cells)) {
-                            if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_QUADS_ROW)) {
+                            if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_QUADS_ROW)) {
                                 return true;
                             }
                         }
                         if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameCol(cells)) {
-                            if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_QUADS_COL)) {
+                            if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_QUADS_COL)) {
                                 return true;
                             }
                         }
                         if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].areCellsInSameBox(cells)) {
-                            if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["k" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_QUADS_BOX)) {
+                            if (this.checkNakedsRemovals(__WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(cells[0])], cells, candidates, __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].NAKED_QUADS_BOX)) {
                                 return true;
                             }
                         }
@@ -2234,7 +2234,7 @@ var HintService = (function () {
      * http://www.thonky.com/sudoku/hidden-pairs-triples-quads/
      */
     HintService.prototype.checkHiddenPairs = function () {
-        for (var _i = 0, ROWS_2 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* ROWS */]; _i < ROWS_2.length; _i++) {
+        for (var _i = 0, ROWS_2 = __WEBPACK_IMPORTED_MODULE_0__common_common__["d" /* ROWS */]; _i < ROWS_2.length; _i++) {
             var r = ROWS_2[_i];
             if (this.checkHiddenPairsGroup(this.sudokuService.getRow(r), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_PAIRS_ROW)) {
                 return true;
@@ -2246,7 +2246,7 @@ var HintService = (function () {
                 return true;
             }
         }
-        for (var _b = 0, BOXS_2 = __WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* BOXS */]; _b < BOXS_2.length; _b++) {
+        for (var _b = 0, BOXS_2 = __WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* BOXS */]; _b < BOXS_2.length; _b++) {
             var b = BOXS_2[_b];
             if (this.checkHiddenPairsGroup(this.sudokuService.getBox(b), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_PAIRS_BOX)) {
                 return true;
@@ -2265,7 +2265,7 @@ var HintService = (function () {
      * http://www.thonky.com/sudoku/hidden-pairs-triples-quads/
      */
     HintService.prototype.checkHiddenTriples = function () {
-        for (var _i = 0, ROWS_3 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* ROWS */]; _i < ROWS_3.length; _i++) {
+        for (var _i = 0, ROWS_3 = __WEBPACK_IMPORTED_MODULE_0__common_common__["d" /* ROWS */]; _i < ROWS_3.length; _i++) {
             var r = ROWS_3[_i];
             if (this.checkHiddenTriplesGroup(this.sudokuService.getRow(r), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_TRIPLES_ROW)) {
                 return true;
@@ -2277,7 +2277,7 @@ var HintService = (function () {
                 return true;
             }
         }
-        for (var _b = 0, BOXS_3 = __WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* BOXS */]; _b < BOXS_3.length; _b++) {
+        for (var _b = 0, BOXS_3 = __WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* BOXS */]; _b < BOXS_3.length; _b++) {
             var b = BOXS_3[_b];
             if (this.checkHiddenTriplesGroup(this.sudokuService.getBox(b), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_TRIPLES_BOX)) {
                 return true;
@@ -2295,7 +2295,7 @@ var HintService = (function () {
      * http://www.thonky.com/sudoku/hidden-pairs-triples-quads/
      */
     HintService.prototype.checkHiddenQuads = function () {
-        for (var _i = 0, ROWS_4 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* ROWS */]; _i < ROWS_4.length; _i++) {
+        for (var _i = 0, ROWS_4 = __WEBPACK_IMPORTED_MODULE_0__common_common__["d" /* ROWS */]; _i < ROWS_4.length; _i++) {
             var r = ROWS_4[_i];
             if (this.checkHiddenQuadsGroup(this.sudokuService.getRow(r), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_QUADS_ROW)) {
                 return true;
@@ -2307,7 +2307,7 @@ var HintService = (function () {
                 return true;
             }
         }
-        for (var _b = 0, BOXS_4 = __WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* BOXS */]; _b < BOXS_4.length; _b++) {
+        for (var _b = 0, BOXS_4 = __WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* BOXS */]; _b < BOXS_4.length; _b++) {
             var b = BOXS_4[_b];
             if (this.checkHiddenQuadsGroup(this.sudokuService.getBox(b), __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_QUADS_BOX)) {
                 return true;
@@ -2331,7 +2331,7 @@ var HintService = (function () {
         var pairCells = [];
         // look for 2 candidates occurring 2 times in group
         kCounts = this.sudokuService.getCandidateCounts(group);
-        for (var _i = 0, CANDIDATES_2 = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_2.length; _i++) {
+        for (var _i = 0, CANDIDATES_2 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_2.length; _i++) {
             var k = CANDIDATES_2[_i];
             if (kCounts[k] === 2) {
                 pairCandidates.push(k);
@@ -2415,7 +2415,7 @@ var HintService = (function () {
         var tripCells = [];
         // look for at least 3 candidates occurring 2 or 3 times in group
         kCounts = this.sudokuService.getCandidateCounts(group);
-        for (var _i = 0, CANDIDATES_3 = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_3.length; _i++) {
+        for (var _i = 0, CANDIDATES_3 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_3.length; _i++) {
             var k = CANDIDATES_3[_i];
             if (kCounts[k] >= 2 && kCounts[k] <= 3) {
                 tripCandidates.push(k);
@@ -2498,7 +2498,7 @@ var HintService = (function () {
         // group cells containing a quad candidate
         var quadCells = [];
         kCounts = this.sudokuService.getCandidateCounts(group);
-        for (var _i = 0, CANDIDATES_4 = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_4.length; _i++) {
+        for (var _i = 0, CANDIDATES_4 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_4.length; _i++) {
             var k = CANDIDATES_4[_i];
             if (kCounts[k] >= 2 && kCounts[k] <= 4) {
                 quadCandidates.push(k);
@@ -2622,15 +2622,15 @@ var HintService = (function () {
      * http://www.thonky.com/sudoku/pointing-pairs-triples/
      */
     HintService.prototype.checkPointingRowCol = function () {
-        for (var _i = 0, BOXS_5 = __WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* BOXS */]; _i < BOXS_5.length; _i++) {
+        for (var _i = 0, BOXS_5 = __WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* BOXS */]; _i < BOXS_5.length; _i++) {
             var b = BOXS_5[_i];
-            CANDS: for (var _a = 0, CANDIDATES_5 = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* CANDIDATES */]; _a < CANDIDATES_5.length; _a++) {
+            CANDS: for (var _a = 0, CANDIDATES_5 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _a < CANDIDATES_5.length; _a++) {
                 var k = CANDIDATES_5[_a];
                 var boxCandOccurrences = []; // [idx, ...]
                 if (this.sudokuService.containsValue(this.sudokuService.getBox(b), k)) {
                     continue CANDS; // k cannot be candidate in box
                 }
-                for (var _b = 0, _c = __WEBPACK_IMPORTED_MODULE_0__common_common__["k" /* BOX_CELLS */][b]; _b < _c.length; _b++) {
+                for (var _b = 0, _c = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* BOX_CELLS */][b]; _b < _c.length; _b++) {
                     var c = _c[_b];
                     if (this.sudokuService.isCandidate(c, k)) {
                         boxCandOccurrences.push(c);
@@ -2653,7 +2653,7 @@ var HintService = (function () {
                 var removals = [];
                 if (sameRow) {
                     // scan other cells in row outside box
-                    for (var _d = 0, _e = __WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(boxCandOccurrences[0])]; _d < _e.length; _d++) {
+                    for (var _d = 0, _e = __WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* ROW_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowIdx(boxCandOccurrences[0])]; _d < _e.length; _d++) {
                         var c = _e[_d];
                         if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(c) === b) {
                             continue; // cell in same box
@@ -2670,7 +2670,7 @@ var HintService = (function () {
                 }
                 else {
                     // scan other cells in col outside box
-                    for (var _f = 0, _g = __WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(boxCandOccurrences[0])]; _f < _g.length; _f++) {
+                    for (var _f = 0, _g = __WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* COL_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colIdx(boxCandOccurrences[0])]; _f < _g.length; _f++) {
                         var c = _g[_f];
                         if (__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(c) === b) {
                             continue; // cell in same box
@@ -2703,16 +2703,16 @@ var HintService = (function () {
      */
     HintService.prototype.checkRowBoxReductions = function () {
         //ROWS:
-        for (var _i = 0, ROWS_5 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* ROWS */]; _i < ROWS_5.length; _i++) {
+        for (var _i = 0, ROWS_5 = __WEBPACK_IMPORTED_MODULE_0__common_common__["d" /* ROWS */]; _i < ROWS_5.length; _i++) {
             var row = ROWS_5[_i];
-            CANDS: for (var _a = 0, CANDIDATES_6 = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* CANDIDATES */]; _a < CANDIDATES_6.length; _a++) {
+            CANDS: for (var _a = 0, CANDIDATES_6 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _a < CANDIDATES_6.length; _a++) {
                 var k = CANDIDATES_6[_a];
                 if (this.sudokuService.containsValue(this.sudokuService.getRow(row), k)) {
                     continue CANDS; // not candidate in row
                 }
                 var rowCandOccurrences = [];
                 //CELLS:
-                for (var _b = 0, _c = __WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* ROW_CELLS */][row]; _b < _c.length; _b++) {
+                for (var _b = 0, _c = __WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* ROW_CELLS */][row]; _b < _c.length; _b++) {
                     var c = _c[_b];
                     // if (this.cells[c].hasValue[k]) {   REDUNDANT
                     //   continue CELLS;	// k cannot be candidate in col
@@ -2735,10 +2735,10 @@ var HintService = (function () {
                 var removals = [];
                 // look for k's in other rows in box 
                 // this row is row, this box is box
-                for (var _d = 0, _e = __WEBPACK_IMPORTED_MODULE_0__common_common__["k" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(rowCandOccurrences[0])]; _d < _e.length; _d++) {
+                for (var _d = 0, _e = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(rowCandOccurrences[0])]; _d < _e.length; _d++) {
                     var c = _e[_d];
                     // if c in row, continue next c
-                    if (__WEBPACK_IMPORTED_MODULE_0__common_common__["f" /* ROW_CELLS */][row].indexOf(c) >= 0) {
+                    if (__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* ROW_CELLS */][row].indexOf(c) >= 0) {
                         continue; // box cell in same row, next c
                     }
                     // if isCandidate, push to removals
@@ -2762,7 +2762,7 @@ var HintService = (function () {
         //COLS:
         for (var _i = 0, COLS_5 = __WEBPACK_IMPORTED_MODULE_0__common_common__["e" /* COLS */]; _i < COLS_5.length; _i++) {
             var col = COLS_5[_i];
-            CANDS: for (var _a = 0, CANDIDATES_7 = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* CANDIDATES */]; _a < CANDIDATES_7.length; _a++) {
+            CANDS: for (var _a = 0, CANDIDATES_7 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _a < CANDIDATES_7.length; _a++) {
                 var k = CANDIDATES_7[_a];
                 // if (this.cols[col].containsValue(k)) {
                 if (this.sudokuService.containsValue(this.sudokuService.getCol(col), k)) {
@@ -2770,7 +2770,7 @@ var HintService = (function () {
                 }
                 var colCandOccurrences = [];
                 //CELLS:
-                for (var _b = 0, _c = __WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* COL_CELLS */][col]; _b < _c.length; _b++) {
+                for (var _b = 0, _c = __WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* COL_CELLS */][col]; _b < _c.length; _b++) {
                     var c = _c[_b];
                     // if (this.cells[c].hasValue[k]) {   REDUNDANT!
                     //   continue CELLS;	// k cannot be candidate in row
@@ -2793,10 +2793,10 @@ var HintService = (function () {
                 var removals = [];
                 // look for k's in other cols in box
                 // this col is col, this box is box
-                for (var _d = 0, _e = __WEBPACK_IMPORTED_MODULE_0__common_common__["k" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(colCandOccurrences[0])]; _d < _e.length; _d++) {
+                for (var _d = 0, _e = __WEBPACK_IMPORTED_MODULE_0__common_common__["j" /* BOX_CELLS */][__WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].boxIdx(colCandOccurrences[0])]; _d < _e.length; _d++) {
                     var c = _e[_d];
                     // if c in col, continue next c
-                    if (__WEBPACK_IMPORTED_MODULE_0__common_common__["h" /* COL_CELLS */][col].indexOf(c) >= 0) {
+                    if (__WEBPACK_IMPORTED_MODULE_0__common_common__["i" /* COL_CELLS */][col].indexOf(c) >= 0) {
                         continue; // box cell in same col, next c
                     }
                     // if isCandidate, push to removals
@@ -2871,7 +2871,7 @@ var SudokuService = (function () {
             var c = CELLS_1[_i];
             this.initializeCell(this.sudokuModel.cells[c]);
         }
-        for (var _a = 0, GROUPS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["l" /* GROUPS */]; _a < GROUPS_1.length; _a++) {
+        for (var _a = 0, GROUPS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _a < GROUPS_1.length; _a++) {
             var g = GROUPS_1[_a];
             this.initializeGroup(this.sudokuModel.rows[g]);
             this.initializeGroup(this.sudokuModel.cols[g]);
@@ -2885,7 +2885,7 @@ var SudokuService = (function () {
     SudokuService.prototype.initializeCell = function (cell) {
         cell.value = 0;
         cell.locked = false;
-        for (var _i = 0, CANDIDATES_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_1.length; _i++) {
+        for (var _i = 0, CANDIDATES_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_1.length; _i++) {
             var k = CANDIDATES_1[_i];
             cell.candidates[k] = true;
         }
@@ -2948,7 +2948,7 @@ var SudokuService = (function () {
             cell.value = values[c]; // value at [c] in values array
             this.removeCandidates(cell);
         }
-        for (var _a = 0, GROUPS_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["l" /* GROUPS */]; _a < GROUPS_2.length; _a++) {
+        for (var _a = 0, GROUPS_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _a < GROUPS_2.length; _a++) {
             var g = GROUPS_2[_a];
             for (var _b = 0, VALUES_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _b < VALUES_2.length; _b++) {
                 var v = VALUES_2[_b];
@@ -3157,7 +3157,7 @@ var SudokuService = (function () {
      *
      */
     SudokuService.prototype.removeCandidates = function (cell) {
-        for (var _i = 0, CANDIDATES_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_2.length; _i++) {
+        for (var _i = 0, CANDIDATES_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_2.length; _i++) {
             var k = CANDIDATES_2[_i];
             cell.candidates[k] = false;
         }
@@ -3261,7 +3261,7 @@ var SudokuService = (function () {
         if (this.hasValue(c)) {
             return [];
         }
-        for (var _i = 0, CANDIDATES_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_3.length; _i++) {
+        for (var _i = 0, CANDIDATES_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_3.length; _i++) {
             var k = CANDIDATES_3[_i];
             if (this.isCandidate(c, k)) {
                 nakeds.push(k);
@@ -3335,7 +3335,7 @@ var SudokuService = (function () {
                 return false;
             }
         }
-        for (var _a = 0, GROUPS_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["l" /* GROUPS */]; _a < GROUPS_3.length; _a++) {
+        for (var _a = 0, GROUPS_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _a < GROUPS_3.length; _a++) {
             var g = GROUPS_3[_a];
             if (!this.isGroupValid(this.sudokuModel.rows[g])) {
                 return false;
@@ -3360,7 +3360,7 @@ var SudokuService = (function () {
      * once and only once, the sudoku is completely solved.
      */
     SudokuService.prototype.isSolved = function () {
-        for (var _i = 0, ROWS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* ROWS */]; _i < ROWS_1.length; _i++) {
+        for (var _i = 0, ROWS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["d" /* ROWS */]; _i < ROWS_1.length; _i++) {
             var r = ROWS_1[_i];
             for (var _a = 0, VALUES_5 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _a < VALUES_5.length; _a++) {
                 var v = VALUES_5[_a];
@@ -3482,7 +3482,7 @@ var SudokuService = (function () {
      * Returns true if cell has one or more candidates.
      */
     SudokuService.prototype.hasCandidates = function (c) {
-        for (var _i = 0, CANDIDATES_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_4.length; _i++) {
+        for (var _i = 0, CANDIDATES_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_4.length; _i++) {
             var k = CANDIDATES_4[_i];
             if (this.sudokuModel.cells[c].candidates[k]) {
                 return true;
@@ -3596,7 +3596,7 @@ var SudokuService = (function () {
         var s = '' + __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].toRowColString(c) + ': ';
         s += 'v:' + (cell.value != 0 ? cell.value : '.');
         s += ' k:';
-        for (var _i = 0, CANDIDATES_5 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_5.length; _i++) {
+        for (var _i = 0, CANDIDATES_5 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_5.length; _i++) {
             var k = CANDIDATES_5[_i];
             s += (cell.candidates[k]) ? k : '.';
         }
@@ -3611,7 +3611,7 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.toString = function () {
         var s = '';
-        for (var _i = 0, ROWS_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* ROWS */]; _i < ROWS_2.length; _i++) {
+        for (var _i = 0, ROWS_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["d" /* ROWS */]; _i < ROWS_2.length; _i++) {
             var r = ROWS_2[_i];
             s += this.rowToString(r) + '\n';
         }
@@ -3619,7 +3619,7 @@ var SudokuService = (function () {
             var c = COLS_1[_a];
             s += this.colToString(c) + '\n';
         }
-        for (var _b = 0, BOXS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["i" /* BOXS */]; _b < BOXS_1.length; _b++) {
+        for (var _b = 0, BOXS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["f" /* BOXS */]; _b < BOXS_1.length; _b++) {
             var b = BOXS_1[_b];
             s += this.boxToString(b) + '\n';
         }
@@ -3635,7 +3635,7 @@ var SudokuService = (function () {
     SudokuService.prototype.toStringRow = function (r) {
         var s = '';
         s += this.rowToString(r) + '\n';
-        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_4__common_common__["f" /* ROW_CELLS */][r]; _i < _a.length; _i++) {
+        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_4__common_common__["h" /* ROW_CELLS */][r]; _i < _a.length; _i++) {
             var c = _a[_i];
             s += this.cellToString(c) + '\n';
         }
@@ -3655,7 +3655,7 @@ var SudokuService = (function () {
             return [];
         }
         var candidates = [];
-        for (var _i = 0, CANDIDATES_6 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_6.length; _i++) {
+        for (var _i = 0, CANDIDATES_6 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_6.length; _i++) {
             var k = CANDIDATES_6[_i];
             if (this.sudokuModel.cells[c].candidates[k]) {
                 candidates.push(k);
@@ -3700,7 +3700,7 @@ var SudokuService = (function () {
     SudokuService.prototype.getNumberOfCandidates = function (c) {
         var count = 0;
         var cell = this.sudokuModel.cells[c];
-        for (var _i = 0, CANDIDATES_7 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_7.length; _i++) {
+        for (var _i = 0, CANDIDATES_7 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_7.length; _i++) {
             var k = CANDIDATES_7[_i];
             if (cell.candidates[k]) {
                 count++;
@@ -3794,11 +3794,11 @@ var SudokuModel = (function () {
         this.rows = new Array(9);
         this.cols = new Array(9);
         this.boxs = new Array(9);
-        for (var _i = 0, GROUPS_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["l" /* GROUPS */]; _i < GROUPS_4.length; _i++) {
+        for (var _i = 0, GROUPS_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _i < GROUPS_4.length; _i++) {
             var g = GROUPS_4[_i];
-            this.rows[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["f" /* ROW_CELLS */][g]);
-            this.cols[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["h" /* COL_CELLS */][g]);
-            this.boxs[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* BOX_CELLS */][g]);
+            this.rows[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["h" /* ROW_CELLS */][g]);
+            this.cols[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["i" /* COL_CELLS */][g]);
+            this.boxs[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* BOX_CELLS */][g]);
         }
         for (var _a = 0, CELLS_12 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _a < CELLS_12.length; _a++) {
             var c = CELLS_12[_a];
@@ -3811,7 +3811,7 @@ var Cell = (function () {
     function Cell(r, c, b) {
         this.value = 0;
         this.candidates = new Array(10);
-        for (var _i = 0, CANDIDATES_8 = __WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* CANDIDATES */]; _i < CANDIDATES_8.length; _i++) {
+        for (var _i = 0, CANDIDATES_8 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_8.length; _i++) {
             var k = CANDIDATES_8[_i];
             this.candidates[k] = true;
         }
@@ -3861,11 +3861,6 @@ var Group = (function () {
 
 
 
-
-
-
-
-
 // @Injectable()
 var CreationService = (function () {
     function CreationService() {
@@ -3882,7 +3877,7 @@ var CreationService = (function () {
         sudoku.desiredDifficulty = difficulty;
         // step 1 - generate random finished sudoku
         // sudoku.completedPuzzle = this.makeRandomSolution();
-        sudoku.completedPuzzle = this.makeRandomSolution1();
+        sudoku.completedPuzzle = this.makeRandomSolution();
         var pass = 0;
         // loop until we get sudoku of desired difficulty
         var desiredDifficulty = sudoku.desiredDifficulty;
@@ -3942,14 +3937,14 @@ var CreationService = (function () {
      * solving and guessing techniques create a random, consistent, fully
      * filled-in solution. Return the full solution as a cell values array.
      */
-    CreationService.prototype.makeRandomSolution1 = function () {
-        var start = Date.now(); // for elapsed time
-        this.sudokuService.setAllValues(__WEBPACK_IMPORTED_MODULE_0__app_common_common__["d" /* ROOT_VALUES */]);
-        this.randomizeFullSudoku();
-        var elapsed = Date.now() - start;
-        console.info('Step 1-1 elapsed: ' + elapsed + 'ms');
-        return this.sudokuService.cellsToValuesArray();
-    }; // makeRandomSolution()
+    // private makeRandomSolution1() : number[] {
+    //   let start: number = Date.now();   // for elapsed time
+    //   this.sudokuService.setAllValues(ROOT_VALUES);
+    //   this.randomizeFullSudoku();
+    //   let elapsed: number = Date.now() - start;
+    //   console.info('Step 1-1 elapsed: ' + elapsed + 'ms');
+    //   return this.sudokuService.cellsToValuesArray();
+    // } // makeRandomSolution()
     /**
      * [Step 2]
      */
@@ -4225,149 +4220,6 @@ var CreationService = (function () {
             this.actionLog.removeLastEntry();
         }
     }; // rollbackAll()
-    // /**
-    //  * Swap values of two given cells.
-    //  */
-    // private swapCellValues(c1: number, c2: number) {
-    //   let v1 = this.sudokuModel.cells[c1].value;
-    //   this.sudokuModel.cells[c1].value = this.sudokuModel.cells[c2].value;
-    //   this.sudokuModel.cells[c2].value = v1;
-    // } // swapCellValues()
-    /**
-     * Swap values of every cell in two given rows. The rows must be in the
-     * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, swapping two rows in same group
-     */
-    CreationService.prototype.swapRowValues = function (r1, r2) {
-        // for (let k = 0; k < 9; k++) {
-        // console.info('Swapping rows ' + r1 + ' & ' + r2);
-        for (var _i = 0, COLS_1 = __WEBPACK_IMPORTED_MODULE_0__app_common_common__["e" /* COLS */]; _i < COLS_1.length; _i++) {
-            var c = COLS_1[_i];
-            // this.swapCellValues(ROW_CELLS[r1][c], ROW_CELLS[r2][c]);
-            this.sudokuService.swapCellValues(__WEBPACK_IMPORTED_MODULE_0__app_common_common__["f" /* ROW_CELLS */][r1][c], __WEBPACK_IMPORTED_MODULE_0__app_common_common__["f" /* ROW_CELLS */][r2][c]);
-        }
-    }; // swapRowValues()
-    /**
-     * Swap values of every cell in two given columns. The columns must be in the
-     * same "third." That is i and j must be 0..2 or 3..5 or 6..8.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, swapping two columns in same group
-     */
-    CreationService.prototype.swapColValues = function (c1, c2) {
-        // console.info('Swapping cols ' + c1 + ' & ' + c2);
-        for (var _i = 0, ROWS_1 = __WEBPACK_IMPORTED_MODULE_0__app_common_common__["g" /* ROWS */]; _i < ROWS_1.length; _i++) {
-            var r = ROWS_1[_i];
-            this.sudokuService.swapCellValues(__WEBPACK_IMPORTED_MODULE_0__app_common_common__["h" /* COL_CELLS */][c1][r], __WEBPACK_IMPORTED_MODULE_0__app_common_common__["h" /* COL_CELLS */][c2][r]);
-        }
-    }; // swapColValues()
-    /**
-     * Swap values of every cell in groups of rows.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, swapping two groups of rows
-     */
-    CreationService.prototype.swapRowGroupValues = function (rg1, rg2) {
-        for (var _i = 0, _a = [0, 1, 2]; _i < _a.length; _i++) {
-            var k = _a[_i];
-            this.swapRowValues(rg1 + k, rg2 + k);
-        }
-    }; // swapRowGroupValues()
-    /**
-     * Swap values of every cell in groups of columns.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, swapping two groups of columns
-     */
-    CreationService.prototype.swapColGroupValues = function (cg1, cg2) {
-        for (var _i = 0, _a = [0, 1, 2]; _i < _a.length; _i++) {
-            var k = _a[_i];
-            this.swapColValues(cg1 + k, cg2 + k);
-        }
-    }; // swapColGroupValues()
-    /**
-     * Get a random number 0..1 (0 or 1).
-     */
-    CreationService.prototype.getRandomZeroOne = function () {
-        return Math.floor(Math.random() * 2);
-    }; // getRandomZeroOne()
-    /**
-     * Get a random number 0..2 (0, 1, or 2).
-     */
-    CreationService.prototype.getRandomZeroOneTwo = function () {
-        return Math.floor(Math.random() * 3);
-    }; // getRandomZeroOneTwo()
-    /**
-     * Randomize rows and columns within each group.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, swapping two rows in same group
-     * Step 2, swapping two columns in same group
-     */
-    CreationService.prototype.randomizeGroupRowsAndColumns = function () {
-        var i = 0;
-        var j = 0;
-        // 012, 345, 678
-        for (var _i = 0, _a = [0, 1, 2]; _i < _a.length; _i++) {
-            var k = _a[_i];
-            i = this.getRandomZeroOneTwo() + (k * 3);
-            j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
-            this.swapRowValues(i, j);
-            i = this.getRandomZeroOneTwo() + (k * 3);
-            j = ((i + this.getRandomZeroOne() + 1) % 3) + (k * 3);
-            this.swapColValues(i, j);
-        }
-    };
-    /**
-     * Randomize groups of rows and columns.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, swapping two groups of rows
-     * Step 2, swapping two groups of columns
-     */
-    CreationService.prototype.randomizeRowAndColumnGroups = function () {
-        var i = this.getRandomZeroOneTwo();
-        var j = (i + this.getRandomZeroOne() + 1) % 3;
-        for (var _i = 0, _a = [0, 1, 2]; _i < _a.length; _i++) {
-            var k = _a[_i];
-            this.swapRowValues((i * 3 + k), (j * 3 + k));
-        }
-        i = this.getRandomZeroOneTwo();
-        j = (i + this.getRandomZeroOne() + 1) % 3;
-        for (var _b = 0, _c = [0, 1, 2]; _b < _c.length; _b++) {
-            var k = _c[_b];
-            this.swapColValues((i * 3 + k), (j * 3 + k));
-        }
-    };
-    /**
-     * Randomize cells by transposing across a northwest-southeast diagonal.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, transposing the whole grid (the columns become the rows and vice
-     * versa)
-     */
-    CreationService.prototype.randomizeDiagonalMirror1 = function () {
-        for (var r = 0; r < 9; r++) {
-            for (var c = r + 1; c < 9; c++) {
-                this.sudokuService.swapCellValues(__WEBPACK_IMPORTED_MODULE_0__app_common_common__["f" /* ROW_CELLS */][r][c], __WEBPACK_IMPORTED_MODULE_0__app_common_common__["f" /* ROW_CELLS */][c][r]);
-            }
-        }
-    };
-    /**
-     * Randomize cells by transposing across a northeast-southwest diagonal.
-     * See http://blog.forret.com/2006/08/14/a-sudoku-challenge-generator/
-     * Step 2, transposing the whole grid (the columns become the rows and vice
-     * versa)
-     */
-    CreationService.prototype.randomizeDiagonalMirror2 = function () {
-        for (var r = 0; r < 9; r++) {
-            for (var c = 0; c < 8 - r; c++) {
-                // console.info(r + ',' + c + ' -- ' + (8 - c) + ',' + (8 - r));
-                this.sudokuService.swapCellValues(__WEBPACK_IMPORTED_MODULE_0__app_common_common__["f" /* ROW_CELLS */][r][c], __WEBPACK_IMPORTED_MODULE_0__app_common_common__["f" /* ROW_CELLS */][8 - c][8 - r]);
-            }
-        }
-    };
-    CreationService.prototype.randomizeFullSudoku = function () {
-        this.randomizeGroupRowsAndColumns();
-        this.randomizeRowAndColumnGroups();
-        this.randomizeDiagonalMirror1();
-        this.randomizeDiagonalMirror2();
-    };
     return CreationService;
 }());
 

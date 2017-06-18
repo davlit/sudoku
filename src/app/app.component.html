@@ -4,10 +4,10 @@
 </div>
 
 <!-- ANIMATED PROGRESS BAR - DEMO -->
-<div class="progress-cont">
+<!--<div class="progress-cont">
   <div class="progress"></div>
 </div>
-<br/>
+<br/>-->
 
 <section id="gridsection">
 <!--
@@ -67,12 +67,16 @@ s: sudoku, b: box, v: value, k: candidate
     <!-- ========== play-new ========== -->
     <div *ngSwitchCase="PlayStates.NEW">
 
-      <p><span class="metalabel">New Puzzle Instructions:</span><br/>
-        - Select desired difficulty.<br/>
+      <!--<p><span class="metalabel">New Puzzle Instructions:</span><br/>
+        - Select desired difficulty.<br/>-->
+        <!-- Press Generate.<br/>-->
+      <!--</p>-->
+      <p><span class="metalabel">Get a new Sudoku</span><br/>
+        Select desired difficulty:<br/>
         <!--- Press Generate.<br/>-->
       </p>
 
-      <ul style="list-style: none;">
+      <!--<ul style="list-style: none;">
         <div *ngFor="let difficulty of difficulties">
           <li>
             <input type="radio" name="diff" [(ngModel)]="desiredDifficulty" 
@@ -84,19 +88,32 @@ s: sudoku, b: box, v: value, k: candidate
 
       <p>
         <button (click)="generate(desiredDifficulty)">Generate</button><br/>
+      </p>-->
+
+      <!--<p>
+        <button (click)="generate(0)">Easy</button><br/>
       </p>
 
       <p>
-        <button (click)="testObservable()">Test Observable</button><br/>
+        <button (click)="generate(1)">Medium</button><br/>
       </p>
 
       <p>
-        <span class="metalabel">Pass: </span> {{passCount}}<br/>
+        <button (click)="generate(2)">Hard</button><br/>
       </p>
+
+      <p>
+        <button (click)="generate(3)">Hardest</button><br/>
+      </p>-->
+
+      <button (click)="generate(0)" class="diff-button button-easy">Easy</button>
+      <button (click)="generate(1)" class="diff-button button-medium">Medium</button>
+      <button (click)="generate(2)" class="diff-button button-hard">Hard</button>
+      <button (click)="generate(3)" class="diff-button button-hardest">Hardest</button>
 
       <!-- SAVE these tests -->
-      <br/><br/><br/><br/><br/>
-      <p>
+      <!--<br/><br/><br/><br/><br/>
+      <p>-->
         <!--<span class="metalabel">Testing:</span><br/>-->
         <!--<button (click)="testNakedTriple()">Test Naked Triple</button><br/>-->
 
@@ -116,7 +133,7 @@ s: sudoku, b: box, v: value, k: candidate
         <button (click)="testRowBoxReduction()">Test Row-Box Reduction</button><br/>
         <button (click)="testColBoxReduction()">Test Col-Box Reduction</button><br/>
         <button (click)="testHiddenPairsRow()">Test Hidden Pairs Row</button>-->
-      </p>
+      <!--</p>-->
 
       <!--<div [ngBusy]="busy"></div>-->
       
