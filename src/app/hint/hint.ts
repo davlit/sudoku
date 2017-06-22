@@ -1,5 +1,5 @@
 import { HintType } from './hint.type';
-import { ActionType } from '../action/action.type';
+import { ActionType } from '../action/action';
 import { Difficulty } from '../model/difficulty';
 import { Common } from '../common/common';
 

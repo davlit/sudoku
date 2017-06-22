@@ -7,7 +7,7 @@ import { Common } from '../common/common';
 import { CombinationIterator } from '../common/combination.iterator';
 import { NakedType }  from '../model/naked.type';
 import { Difficulty }  from '../model/difficulty';
-import { ActionType } from '../action/action.type';
+import { ActionType } from '../action/action';
 import { Hint } from '../hint/hint';
 import { ValueHint } from '../hint/hint';
 import { CandidatesHint } from '../hint/hint';

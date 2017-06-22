@@ -1,8 +1,15 @@
-import { ActionType } from './action.type';
+// import { ActionType } from './action.type';
 import { Hint } from '../hint/hint';
 import { ValueHint } from '../hint/hint';
 import { CandidatesHint } from '../hint/hint';
 import { Common } from '../common/common';
+
+export const enum ActionType {
+  SET_VALUE,
+  GUESS_VALUE,
+  // SET_INITIAL,
+  REMOVE_CANDIDATE
+}
 
 export abstract class Action {
   private _type: ActionType;
@@ -33,7 +40,7 @@ export abstract class Action {
 
 }
 
-export abstract class BaseValueAction extends Action {
+abstract class BaseValueAction extends Action {
   private _value: number;
 
   constructor(type: ActionType, cell: number, value: number, hint?: ValueHint) {

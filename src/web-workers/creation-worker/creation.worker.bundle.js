@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 16);
+/******/ 	return __webpack_require__(__webpack_require__.s = 15);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -568,25 +568,10 @@ var Difficulty;
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ActionType; });
-var ActionType;
-(function (ActionType) {
-    ActionType[ActionType["SET_VALUE"] = 0] = "SET_VALUE";
-    ActionType[ActionType["GUESS_VALUE"] = 1] = "GUESS_VALUE";
-    // SET_INITIAL,
-    ActionType[ActionType["REMOVE_CANDIDATE"] = 2] = "REMOVE_CANDIDATE";
-})(ActionType || (ActionType = {}));
-//# sourceMappingURL=action.type.js.map
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* unused harmony export Action */
-/* unused harmony export BaseValueAction */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ValueAction; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return GuessAction; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return RemoveAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ValueAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return GuessAction; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return RemoveAction; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_common__ = __webpack_require__(0);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -599,6 +584,13 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 
+var ActionType;
+(function (ActionType) {
+    ActionType[ActionType["SET_VALUE"] = 0] = "SET_VALUE";
+    ActionType[ActionType["GUESS_VALUE"] = 1] = "GUESS_VALUE";
+    // SET_INITIAL,
+    ActionType[ActionType["REMOVE_CANDIDATE"] = 2] = "REMOVE_CANDIDATE";
+})(ActionType || (ActionType = {}));
 var Action = (function () {
     function Action(type, cell, hint) {
         this._type = type;
@@ -648,7 +640,6 @@ var BaseValueAction = (function (_super) {
     });
     return BaseValueAction;
 }(Action));
-
 var ValueAction = (function (_super) {
     __extends(ValueAction, _super);
     function ValueAction(type, cell, value, hint) {
@@ -728,7 +719,7 @@ var RemoveAction = (function (_super) {
 //# sourceMappingURL=action.js.map
 
 /***/ }),
-/* 5 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -736,7 +727,7 @@ var RemoveAction = (function (_super) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ValueHint; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CandidatesHint; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__hint_type__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__action_action_type__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__action_action__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__model_difficulty__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__common_common__ = __webpack_require__(0);
 var __extends = (this && this.__extends) || (function () {
@@ -807,7 +798,7 @@ var ValueHint = (function (_super) {
         return this._value;
     };
     ValueHint.prototype.getActionType = function () {
-        return __WEBPACK_IMPORTED_MODULE_1__action_action_type__["a" /* ActionType */].SET_VALUE;
+        return __WEBPACK_IMPORTED_MODULE_1__action_action__["a" /* ActionType */].SET_VALUE;
     };
     ValueHint.prototype.getDifficultyRating = function () {
         if (this.type === __WEBPACK_IMPORTED_MODULE_0__hint_type__["a" /* HintType */].GUESS) {
@@ -859,7 +850,7 @@ var CandidatesHint = (function (_super) {
         return undefined;
     };
     CandidatesHint.prototype.getActionType = function () {
-        return __WEBPACK_IMPORTED_MODULE_1__action_action_type__["a" /* ActionType */].REMOVE_CANDIDATE;
+        return __WEBPACK_IMPORTED_MODULE_1__action_action__["a" /* ActionType */].REMOVE_CANDIDATE;
     };
     Object.defineProperty(CandidatesHint.prototype, "candidates", {
         get: function () {
@@ -939,7 +930,7 @@ var CandidatesHint = (function (_super) {
 //# sourceMappingURL=hint.js.map
 
 /***/ }),
-/* 6 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -995,7 +986,7 @@ var LogService = (function () {
 //# sourceMappingURL=log.service.js.map
 
 /***/ }),
-/* 7 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1306,7 +1297,7 @@ var HintCounts = (function () {
 //# sourceMappingURL=hintCounts.js.map
 
 /***/ }),
-/* 8 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1321,14 +1312,14 @@ var NakedType;
 //# sourceMappingURL=naked.type.js.map
 
 /***/ }),
-/* 9 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Puzzle; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_common__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__difficulty__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__hint_hintCounts__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__hint_hintCounts__ = __webpack_require__(6);
 
 
 
@@ -1497,12 +1488,12 @@ var Puzzle = (function () {
 //# sourceMappingURL=puzzle.js.map
 
 /***/ }),
-/* 10 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__creation_service__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__creation_service__ = __webpack_require__(14);
 console.log('Creation web worker loaded.');
 
 // prevent TypeScript compile error
@@ -1524,12 +1515,12 @@ onmessage = function (event) {
 //# sourceMappingURL=creation.worker.js.map
 
 /***/ }),
-/* 11 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ActionLogService; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_log_service__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_log_service__ = __webpack_require__(5);
 // import { Injectable } from '@angular/core';
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -1560,14 +1551,14 @@ var ActionLogService = (function (_super) {
 //# sourceMappingURL=action-log.service.js.map
 
 /***/ }),
-/* 12 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HintLogService; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_log_service__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_log_service__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__hint_type__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__hintCounts__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__hintCounts__ = __webpack_require__(6);
 // import { Injectable } from '@angular/core';
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
@@ -1676,18 +1667,18 @@ var HintLogService = (function (_super) {
 //# sourceMappingURL=hint-log.service.js.map
 
 /***/ }),
-/* 13 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return HintService; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_common__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__model_naked_type__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__model_naked_type__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__model_difficulty__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__action_action_type__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__hint_hint__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__action_action__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__hint_hint__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__hint_hint_log_service__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__hint_hint_log_service__ = __webpack_require__(11);
 // import { Injectable } from '@angular/core';
 
 
@@ -1779,7 +1770,7 @@ var HintService = (function () {
             case __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_SINGLE_COL:
             case __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_SINGLE_BOX:
                 var vHint = this.activeHint;
-                this.sudokuService.setValue(vHint.cell, vHint.value, __WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].SET_VALUE, undefined, vHint);
+                this.sudokuService.setValue(vHint.cell, vHint.value, __WEBPACK_IMPORTED_MODULE_3__action_action__["a" /* ActionType */].SET_VALUE, undefined, vHint);
                 break;
             default:
                 var kHint = this.activeHint;
@@ -1806,7 +1797,7 @@ var HintService = (function () {
             case __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_SINGLE_COL:
             case __WEBPACK_IMPORTED_MODULE_5__hint_hint_type__["a" /* HintType */].HIDDEN_SINGLE_BOX:
                 var vHint = hint;
-                this.sudokuService.setValue(vHint.cell, vHint.value, __WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].SET_VALUE, undefined, vHint);
+                this.sudokuService.setValue(vHint.cell, vHint.value, __WEBPACK_IMPORTED_MODULE_3__action_action__["a" /* ActionType */].SET_VALUE, undefined, vHint);
                 break;
             default:
                 var kHint = hint;
@@ -2818,36 +2809,32 @@ var HintService = (function () {
 //# sourceMappingURL=hint.service.js.map
 
 /***/ }),
-/* 14 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SudokuService; });
 /* unused harmony export Group */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__puzzle__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__naked_type__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__action_action__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__action_action_type__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__common_common__ = __webpack_require__(0);
-// import { Injectable } from '@angular/core';
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__puzzle__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__naked_type__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__action_action__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__common_common__ = __webpack_require__(0);
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// @Injectable()
+/**
+ * This service maintains the sudoku's state: essentially cell values and
+ * cell candidates. This class's public methods provide the only access to
+ * this state.
+ *
+ * This application runs (1) a user interface in the foreground (browser)
+ * and (2) a web worker (background) that creates and caches sudokus.
+ * Therefore there are two instances of this SudokuService: one to provide
+ * the user interactive experience in solving a sudoku, and another instance
+ * to be building sudokus in the background to be instantly available when
+ * the user wants a new sudoku.
+ */
 var SudokuService = (function () {
     /**
      * Inject the data model and logs.
@@ -2867,11 +2854,11 @@ var SudokuService = (function () {
      * Initialize the entire sudoku.
      */
     SudokuService.prototype.initializeModel = function () {
-        for (var _i = 0, CELLS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_1.length; _i++) {
+        for (var _i = 0, CELLS_1 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_1.length; _i++) {
             var c = CELLS_1[_i];
             this.initializeCell(this.sudokuModel.cells[c]);
         }
-        for (var _a = 0, GROUPS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _a < GROUPS_1.length; _a++) {
+        for (var _a = 0, GROUPS_1 = __WEBPACK_IMPORTED_MODULE_3__common_common__["k" /* GROUPS */]; _a < GROUPS_1.length; _a++) {
             var g = GROUPS_1[_a];
             this.initializeGroup(this.sudokuModel.rows[g]);
             this.initializeGroup(this.sudokuModel.cols[g]);
@@ -2880,37 +2867,17 @@ var SudokuService = (function () {
         this.initializeActionLog();
     }; // initializeModel()
     /**
-     * Initialize a cell.
-     */
-    SudokuService.prototype.initializeCell = function (cell) {
-        cell.value = 0;
-        cell.locked = false;
-        for (var _i = 0, CANDIDATES_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_1.length; _i++) {
-            var k = CANDIDATES_1[_i];
-            cell.candidates[k] = true;
-        }
-    }; // initializeCell()
-    /**
-     * Initialize a group (row, column, or box).
-     */
-    SudokuService.prototype.initializeGroup = function (group) {
-        for (var _i = 0, VALUES_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_1.length; _i++) {
-            var v = VALUES_1[_i];
-            group.vOccurrences[v] = 0;
-        }
-    }; // initializeGroup()
-    /**
      *
      */
     SudokuService.prototype.initializeActionLog = function () {
         this.actionLog.initialize();
-    };
+    }; // initializeActionLog()
     /**
      *
      */
     SudokuService.prototype.getCurrentSudoku = function () {
         return this.currentSudoku;
-    };
+    }; // getCurrentSudoku()
     /**
      * Sets up a sudoku puzzle with a set of initial vallues. The initial values
      * will be an array of 81 numbers each 0..9. A zero indicates a blank or
@@ -2920,10 +2887,8 @@ var SudokuService = (function () {
     SudokuService.prototype.loadProvidedSudoku = function (givenValues) {
         var puzzle = new __WEBPACK_IMPORTED_MODULE_0__puzzle__["a" /* Puzzle */]();
         puzzle.initialValues = givenValues;
-        // TODO do the work: solve puzzle, get stats, flesh out puzzle object
-        // this.completePuzzle(puzzle);   // step 3
         this.initializeModel();
-        for (var _i = 0, CELLS_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_2.length; _i++) {
+        for (var _i = 0, CELLS_2 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_2.length; _i++) {
             var c = CELLS_2[_i];
             var cell = this.sudokuModel.cells[c]; // cell at [c] in cells array
             var givenValue = givenValues[c]; // givenValue at [c] in givenValues array
@@ -2931,7 +2896,7 @@ var SudokuService = (function () {
                 continue;
             }
             // set cell, update row/col/box, lock cell
-            this.setValue(c, givenValue, __WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].SET_VALUE);
+            this.setValue(c, givenValue, __WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].SET_VALUE);
             cell.locked = true;
         } // for
         this.initializeActionLog();
@@ -2941,17 +2906,17 @@ var SudokuService = (function () {
      * Sets a given value in every cell and set all groups to complete.
      */
     SudokuService.prototype.setAllValues = function (values) {
-        for (var _i = 0, CELLS_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_3.length; _i++) {
+        for (var _i = 0, CELLS_3 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_3.length; _i++) {
             var c = CELLS_3[_i];
             var cell = this.sudokuModel.cells[c]; // cell at [c] in cells array
             cell.locked = false;
             cell.value = values[c]; // value at [c] in values array
-            this.removeCandidates(cell);
+            this.removeAllCellCandidates(c);
         }
-        for (var _a = 0, GROUPS_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _a < GROUPS_2.length; _a++) {
+        for (var _a = 0, GROUPS_2 = __WEBPACK_IMPORTED_MODULE_3__common_common__["k" /* GROUPS */]; _a < GROUPS_2.length; _a++) {
             var g = GROUPS_2[_a];
-            for (var _b = 0, VALUES_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _b < VALUES_2.length; _b++) {
-                var v = VALUES_2[_b];
+            for (var _b = 0, VALUES_1 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _b < VALUES_1.length; _b++) {
+                var v = VALUES_1[_b];
                 this.sudokuModel.rows[g].vOccurrences[v] = 1;
                 this.sudokuModel.cols[g].vOccurrences[v] = 1;
                 this.sudokuModel.boxs[g].vOccurrences[v] = 1;
@@ -2962,32 +2927,25 @@ var SudokuService = (function () {
      *
      */
     SudokuService.prototype.isCellLocked_ = function (r, c) {
-        return this.isCellLocked(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c));
-    };
-    /**
-     *
-     */
-    SudokuService.prototype.isCellLocked = function (c) {
-        return this.sudokuModel.cells[c].locked;
-    };
+        return this.isCellLocked(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
+    }; // isCellLocked_()
     /**
      * Gets givenValue in cell at given row and column (1..9).
      */
     SudokuService.prototype.getValue_ = function (r, c) {
-        return this.getValue(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c));
+        return this.getValue(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
     }; // getValue_()
     /**
      * Return givenValue of cell. Zero means no givenValue;
      */
     SudokuService.prototype.getValue = function (c) {
         return this.sudokuModel.cells[c].value;
-    };
-    ;
+    }; // getValue()
     /**
      * Sets givenValue in cell at given row and column (1..9).
      */
     SudokuService.prototype.setValue_ = function (r, c, newValue) {
-        this.setValue(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c), newValue, __WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].SET_VALUE);
+        this.setValue(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), newValue, __WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].SET_VALUE);
     }; // setValue_()
     /**
      * Sets value of a cell to the given value. In the specified cell, all candidates
@@ -3044,7 +3002,7 @@ var SudokuService = (function () {
         }
         // set new value, remove candidates
         cell.value = newValue;
-        this.removeCandidates(cell);
+        this.removeAllCellCandidates(c);
         // increment occurrences in groups
         this.sudokuModel.rows[cell.row].vOccurrences[newValue]++;
         this.sudokuModel.cols[cell.col].vOccurrences[newValue]++;
@@ -3052,16 +3010,16 @@ var SudokuService = (function () {
         // log action
         var action;
         switch (actionType) {
-            case __WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].SET_VALUE:
-                action = new __WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ValueAction */](__WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].SET_VALUE, c, newValue, hint);
+            case __WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].SET_VALUE:
+                action = new __WEBPACK_IMPORTED_MODULE_2__action_action__["b" /* ValueAction */](__WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].SET_VALUE, c, newValue, hint);
                 break;
-            case __WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].GUESS_VALUE:
-                action = new __WEBPACK_IMPORTED_MODULE_2__action_action__["b" /* GuessAction */](__WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].GUESS_VALUE, c, newValue, guessPossibles, hint);
+            case __WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].GUESS_VALUE:
+                action = new __WEBPACK_IMPORTED_MODULE_2__action_action__["c" /* GuessAction */](__WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].GUESS_VALUE, c, newValue, guessPossibles, hint);
                 break;
         } // switch
         this.actionLog.addEntry(action);
         // remove candidate (this new value) from related cells
-        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].getRelatedCells(c); _i < _a.length; _i++) {
+        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].getRelatedCells(c); _i < _a.length; _i++) {
             var rc = _a[_i];
             if (this.sudokuModel.cells[rc].value != 0) {
                 continue;
@@ -3073,7 +3031,7 @@ var SudokuService = (function () {
      * Removes givenValue in cell at given row and column (1..9).
      */
     SudokuService.prototype.removeValue_ = function (r, c) {
-        this.removeValue(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c));
+        this.removeValue(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
     }; // removeValue_()
     /**
      * Removes the givenValue of the specified cell to make it empty. This
@@ -3129,8 +3087,8 @@ var SudokuService = (function () {
         col.vOccurrences[oldValue]--;
         box.vOccurrences[oldValue]--;
         // add applicable candidates to cell
-        for (var _i = 0, VALUES_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_3.length; _i++) {
-            var v = VALUES_3[_i];
+        for (var _i = 0, VALUES_2 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_2.length; _i++) {
+            var v = VALUES_2[_i];
             if (row.vOccurrences[oldValue] > 0
                 || col.vOccurrences[oldValue] > 0
                 || box.vOccurrences[oldValue] > 0) {
@@ -3139,7 +3097,7 @@ var SudokuService = (function () {
             this.addCandidate(c, v);
         }
         // add candidate (this cell's old givenValue) to related cells
-        for (var _a = 0, _b = __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].getRelatedCells(c); _a < _b.length; _a++) {
+        for (var _a = 0, _b = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].getRelatedCells(c); _a < _b.length; _a++) {
             var rc = _b[_a];
             var relatedCell = this.sudokuModel.cells[rc];
             var rcRow = this.sudokuModel.rows[relatedCell.row];
@@ -3154,19 +3112,10 @@ var SudokuService = (function () {
         }
     }; // removeValue()
     /**
-     *
-     */
-    SudokuService.prototype.removeCandidates = function (cell) {
-        for (var _i = 0, CANDIDATES_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_2.length; _i++) {
-            var k = CANDIDATES_2[_i];
-            cell.candidates[k] = false;
-        }
-    };
-    /**
      * Removes given candidate from cell at given row and column (1..9).
      */
     SudokuService.prototype.removeCandidate_ = function (r, c, k) {
-        this.removeCandidate(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c), k, undefined); // user action
+        this.removeCandidate(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), k, undefined); // user action
     }; // removeCandidate_()
     /**
      * Remove given candidate from given cell. This method is only
@@ -3189,7 +3138,7 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.removeCandidate = function (c, k, hint) {
         this.sudokuModel.cells[c].candidates[k] = false;
-        var action = new __WEBPACK_IMPORTED_MODULE_2__action_action__["c" /* RemoveAction */](__WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].REMOVE_CANDIDATE, c, k, hint);
+        var action = new __WEBPACK_IMPORTED_MODULE_2__action_action__["d" /* RemoveAction */](__WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].REMOVE_CANDIDATE, c, k, hint);
         this.actionLog.addEntry(action);
     }; // removeCandidate()
     /**
@@ -3228,11 +3177,11 @@ var SudokuService = (function () {
     SudokuService.prototype.undoAction = function (action) {
         var actionType = action.type;
         switch (actionType) {
-            case (__WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].SET_VALUE):
-            case (__WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].GUESS_VALUE):
+            case (__WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].SET_VALUE):
+            case (__WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].GUESS_VALUE):
                 this.removeValue(action.cell);
                 break;
-            case (__WEBPACK_IMPORTED_MODULE_3__action_action_type__["a" /* ActionType */].REMOVE_CANDIDATE):
+            case (__WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].REMOVE_CANDIDATE):
                 this.addCandidate(action.cell, action.candidate);
         }
     }; // undoAction()
@@ -3261,8 +3210,8 @@ var SudokuService = (function () {
         if (this.hasValue(c)) {
             return [];
         }
-        for (var _i = 0, CANDIDATES_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_3.length; _i++) {
-            var k = CANDIDATES_3[_i];
+        for (var _i = 0, CANDIDATES_1 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_1.length; _i++) {
+            var k = CANDIDATES_1[_i];
             if (this.isCandidate(c, k)) {
                 nakeds.push(k);
                 if (nakeds.length > maxCandidates) {
@@ -3271,99 +3220,16 @@ var SudokuService = (function () {
             }
         } // next k
         return nakeds; // cell has maxCandidates or fewer
-    };
-    /**
-     * A cell's *state* is valid if has a value and no candidates,
-     * OR has no value and one or more candidates. Conversely, a cell's state is
-     * in valid it has no value and no candidates, or has both a value and one
-     * or more candidates.
-     *
-     * Cell state validity considers only the cell's internal consistancy. It's
-     * state may be valid, but it's value may be in conflict with with the same
-     * value occurring in a related group cell.
-     */
-    SudokuService.prototype.isCellStateValid = function (c) {
-        return (this.hasValue(c) && !this.hasCandidates(c))
-            || (!this.hasValue(c) && this.hasCandidates(c));
-    };
-    /**
-     *
-     */
-    // private isStateValid() {
-    SudokuService.prototype.isStateValid = function () {
-        for (var _i = 0, CELLS_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_4.length; _i++) {
-            var c = CELLS_4[_i];
-            if (!this.isCellValid(c)) {
-                return false;
-            }
-        }
-        return true;
-    }; // isValid()
-    /**
-     * A cell is valid if its row, column, and box are all valid. In other words,
-     * no value occurs more than once in the cell's row, column, and box.
-     */
-    SudokuService.prototype.isCellValid = function (c) {
-        if (this.isGroupValid(this.sudokuModel.rows[__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].rowIdx(c)])
-            && this.isGroupValid(this.sudokuModel.cols[__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].colIdx(c)])
-            && this.isGroupValid(this.sudokuModel.boxs[__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].boxIdx(c)])) {
-            return true;
-        }
-        return false;
-    };
-    /**
-     * A group (row, column, or box) is valid if values 1..9 occur no more than
-     * once in the group.
-     */
-    SudokuService.prototype.isGroupValid = function (group) {
-        for (var _i = 0, VALUES_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_4.length; _i++) {
-            var v = VALUES_4[_i];
-            if (group.vOccurrences[v] > 1) {
-                return false;
-            }
-        }
-        return true;
-    };
-    /**
-     * Return true if every cell is in a valid state, and
-     * if every row, column, and box in a valid state.
-     */
-    SudokuService.prototype.isSolutionPossible = function () {
-        for (var _i = 0, CELLS_5 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_5.length; _i++) {
-            var c = CELLS_5[_i];
-            if (!this.isCellStateValid(c)) {
-                return false;
-            }
-        }
-        for (var _a = 0, GROUPS_3 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _a < GROUPS_3.length; _a++) {
-            var g = GROUPS_3[_a];
-            if (!this.isGroupValid(this.sudokuModel.rows[g])) {
-                return false;
-            }
-            if (!this.isGroupValid(this.sudokuModel.cols[g])) {
-                return false;
-            }
-            if (!this.isGroupValid(this.sudokuModel.boxs[g])) {
-                return false;
-            }
-        }
-        return true;
-    };
-    /**
-     *
-     */
-    SudokuService.prototype.isImpossible = function () {
-        return !this.isSolutionPossible();
-    }; // isImpossible()
+    }; // findNakedCandidates()
     /**
      * Determines if sudoku is fully solved. If every row's every value is used
      * once and only once, the sudoku is completely solved.
      */
     SudokuService.prototype.isSolved = function () {
-        for (var _i = 0, ROWS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["d" /* ROWS */]; _i < ROWS_1.length; _i++) {
+        for (var _i = 0, ROWS_1 = __WEBPACK_IMPORTED_MODULE_3__common_common__["d" /* ROWS */]; _i < ROWS_1.length; _i++) {
             var r = ROWS_1[_i];
-            for (var _a = 0, VALUES_5 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _a < VALUES_5.length; _a++) {
-                var v = VALUES_5[_a];
+            for (var _a = 0, VALUES_3 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _a < VALUES_3.length; _a++) {
+                var v = VALUES_3[_a];
                 if (this.sudokuModel.rows[r].vOccurrences[v] != 1) {
                     return false;
                 }
@@ -3382,29 +3248,318 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.getRow = function (r) {
         return this.sudokuModel.rows[r];
-    };
+    }; // getRow()
     /**
      *
      */
     SudokuService.prototype.getCol = function (c) {
         return this.sudokuModel.cols[c];
-    };
+    }; // getCol()
     /**
      *
      */
     SudokuService.prototype.getBox = function (b) {
         return this.sudokuModel.boxs[b];
+    }; // getBox()
+    /**
+     * Returns true if cell has a value;
+     */
+    SudokuService.prototype.containsValue = function (group, v) {
+        return group.vOccurrences[v] === 1;
+    }; // groupContainsValue()
+    /**
+     * Return the number of cells in the group that do not have a value. That is
+     * cells that are open or not filled. A candidate cell cannot have a value.
+     * cannot have any candidates. Within a group (row, column, or box),
+     * value cells + candidate cells = 9.
+     */
+    SudokuService.prototype.candidateCellsCount = function (group) {
+        var count = 0;
+        for (var _i = 0, VALUES_4 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_4.length; _i++) {
+            var v = VALUES_4[_i];
+            if (group.vOccurrences[v] === 0) {
+                count++;
+            }
+        }
+        return count;
+    }; // candidateCellsCount()
+    /**
+     * Count the occurrences of each candidate in a group (row, column, or box).
+     * Return an array of the counts. The array is 10 numbers each element
+     * being the count of the corresponding candidate. The zero-th element is
+     * not used. E.g. [0, 0,0,2, 3,0,0, 0,2,0] means candidate [3] occurs twice,
+     * [4] 3 times, [8] twice, and all other candidate are absent in the group.
+     */
+    SudokuService.prototype.getCandidateCounts = function (group) {
+        var kCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (var _i = 0, VALUES_5 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_5.length; _i++) {
+            var k = VALUES_5[_i];
+            if (this.groupContainsValue(group, k)) {
+                continue; // next candidate
+            }
+            for (var _a = 0, _b = group.cells; _a < _b.length; _a++) {
+                var c = _b[_a];
+                if (this.hasValue(c)) {
+                    continue; // next cell in group
+                }
+                if (this.sudokuModel.cells[c].candidates[k]) {
+                    kCounts[k]++;
+                }
+            } // for cells in group
+        } // for candidates
+        return kCounts;
+    }; // getCandidateCounts()
+    /**
+     *
+     */
+    SudokuService.prototype.isImpossible = function () {
+        return !this.isSolutionPossible();
+    }; // isImpossible()
+    /**
+     *
+     */
+    SudokuService.prototype.getCandidates = function (c) {
+        if (this.hasValue(c)) {
+            return [];
+        }
+        var candidates = [];
+        for (var _i = 0, CANDIDATES_2 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_2.length; _i++) {
+            var k = CANDIDATES_2[_i];
+            if (this.sudokuModel.cells[c].candidates[k]) {
+                candidates.push(k);
+            }
+        }
+        return candidates;
+    }; // getCandidates()
+    /**
+     *
+     */
+    SudokuService.prototype.isCandidate_ = function (r, c, k) {
+        return this.isCandidate(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), k);
+    }; // isCandidate_()
+    /**
+     * Returns true if cell contains the candidate.
+     */
+    SudokuService.prototype.isCandidate = function (c, k) {
+        return this.sudokuModel.cells[c].candidates[k];
+    }; // isCandidate()
+    /**
+     *
+     */
+    SudokuService.prototype.isCellInvalid_ = function (r, c) {
+        return !this.isCellValid(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
+    }; // isCellInvalid_()
+    /**
+     * Determines if the given givenValue appears 9 times.
+     */
+    SudokuService.prototype.isValueComplete = function (v) {
+        var valueCount = 0;
+        for (var _i = 0, CELLS_4 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_4.length; _i++) {
+            var c = CELLS_4[_i];
+            if (this.sudokuModel.cells[c].value === v) {
+                valueCount++;
+            }
+        }
+        return valueCount === 9;
+    }; // isValueComplete()
+    /**
+     *
+     */
+    SudokuService.prototype.getNumberOfCandidates = function (c) {
+        var count = 0;
+        var cell = this.sudokuModel.cells[c];
+        for (var _i = 0, CANDIDATES_3 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_3.length; _i++) {
+            var k = CANDIDATES_3[_i];
+            if (cell.candidates[k]) {
+                count++;
+            }
+        }
+        return count;
+    }; // getNumberOfCandidates()
+    /**
+     * Used by SudokoCreationService.
+     */
+    SudokuService.prototype.removeLastActionLogEntry = function () {
+        this.actionLog.removeLastEntry();
+    }; // removeLastActionLogEntry()
+    /**
+     * Represent the values of the sudoku as an array of 81 values.
+     */
+    SudokuService.prototype.cellsToValuesArray = function () {
+        var v = [];
+        for (var _i = 0, CELLS_5 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_5.length; _i++) {
+            var c = CELLS_5[_i];
+            v.push(this.sudokuModel.cells[c].value);
+        }
+        return v;
+    }; // cellsToValuesArray()
+    /**
+     *
+     */
+    SudokuService.prototype.getNakedCandidates_ = function (r, c, maxCandidates) {
+        return this.findNakedCandidates(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), maxCandidates);
+    }; // getNakedCandidates_()
+    /**
+     *
+     */
+    SudokuService.prototype.getLastAction = function () {
+        return this.actionLog.getLastEntry();
+    }; // getLastAction()
+    /**
+     * Called by user button press (playComponent.ts) undoLastAction())
+     */
+    SudokuService.prototype.undoLastAction = function () {
+        var lastAction = this.actionLog.getLastEntry();
+        this.undoAction(lastAction);
+        this.actionLog.removeLastEntry();
+    }; // undoLastAction()
+    /**
+     *
+     */
+    SudokuService.prototype.getActionLogAsString = function () {
+        return this.actionLog.toStringLastFirst();
+    }; // getActionLogAsString()
+    /**
+     * Refresh all cells candidates by first clearing all then seting
+     * appropriate candidates in all cells that do not have a value.
+     */
+    SudokuService.prototype.refreshAllCandidates = function () {
+        for (var _i = 0, CELLS_6 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_6.length; _i++) {
+            var c = CELLS_6[_i];
+            if (!this.hasValue(c)) {
+                this.removeAllCellCandidates(c);
+                this.setCellCandidates(c);
+            }
+        }
+    }; // refreshCandidates()
+    // -------------------------------------------------------------------------
+    // private methods
+    // -------------------------------------------------------------------------
+    /**
+     * Initialize a cell.
+     */
+    SudokuService.prototype.initializeCell = function (cell) {
+        cell.value = 0;
+        cell.locked = false;
+        for (var _i = 0, CANDIDATES_4 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_4.length; _i++) {
+            var k = CANDIDATES_4[_i];
+            cell.candidates[k] = true;
+        }
+    }; // initializeCell()
+    /**
+     * Initialize a group (row, column, or box).
+     */
+    SudokuService.prototype.initializeGroup = function (group) {
+        for (var _i = 0, VALUES_6 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_6.length; _i++) {
+            var v = VALUES_6[_i];
+            group.vOccurrences[v] = 0;
+        }
+    }; // initializeGroup()
+    /**
+     * Set the appropriate candidates in a cell based on values that exist in
+     * the cell's row, column, and box.
+     */
+    SudokuService.prototype.setCellCandidates = function (c) {
+        // skip cells that have value
+        if (this.hasValue(c)) {
+            return;
+        }
+        var cell = this.sudokuModel.cells[c];
+        var row = this.sudokuModel.rows[cell.row];
+        var col = this.sudokuModel.cols[cell.col];
+        var box = this.sudokuModel.boxs[cell.box];
+        // add candidates to cell when value
+        for (var _i = 0, VALUES_7 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_7.length; _i++) {
+            var v = VALUES_7[_i];
+            if (row.vOccurrences[v] == 0
+                && col.vOccurrences[v] == 0
+                && box.vOccurrences[v] == 0) {
+                this.addCandidate(c, v);
+            }
+        }
+    }; // setCellCandidates()
+    /**
+     *
+     */
+    SudokuService.prototype.isCellLocked = function (c) {
+        return this.sudokuModel.cells[c].locked;
+    }; // isCellLocked()
+    /**
+     *
+     */
+    // private removeCandidates(cell: Cell) {
+    //   for (let k of CANDIDATES) {
+    //     cell.candidates[k] = false;
+    //   }
+    // } // removeCandidates()
+    /**
+     * A cell's *state* is valid if has a value and no candidates,
+     * OR has no value and one or more candidates. Conversely, a cell's state is
+     * in valid it has no value and no candidates, or has both a value and one
+     * or more candidates.
+     *
+     * Cell state validity considers only the cell's internal consistancy. It's
+     * state may be valid, but it's value may be in conflict with with the same
+     * value occurring in a related group cell.
+     */
+    SudokuService.prototype.isCellStateValid = function (c) {
+        return (this.hasValue(c) && !this.hasCandidates(c))
+            || (!this.hasValue(c) && this.hasCandidates(c));
+    }; // isCellStateValid()
+    /**
+     * A cell is valid if its row, column, and box are all valid. In other words,
+     * no value occurs more than once in the cell's row, column, and box.
+     */
+    SudokuService.prototype.isCellValid = function (c) {
+        if (this.isGroupValid(this.sudokuModel.rows[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowIdx(c)])
+            && this.isGroupValid(this.sudokuModel.cols[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colIdx(c)])
+            && this.isGroupValid(this.sudokuModel.boxs[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxIdx(c)])) {
+            return true;
+        }
+        return false;
+    };
+    /**
+     * A group (row, column, or box) is valid if values 1..9 occur no more than
+     * once in the group.
+     */
+    SudokuService.prototype.isGroupValid = function (group) {
+        for (var _i = 0, VALUES_8 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_8.length; _i++) {
+            var v = VALUES_8[_i];
+            if (group.vOccurrences[v] > 1) {
+                return false;
+            }
+        }
+        return true;
+    };
+    /**
+     * Return true if every cell is in a valid state, and
+     * if every row, column, and box in a valid state.
+     */
+    SudokuService.prototype.isSolutionPossible = function () {
+        for (var _i = 0, CELLS_7 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_7.length; _i++) {
+            var c = CELLS_7[_i];
+            if (!this.isCellStateValid(c)) {
+                return false;
+            }
+        }
+        for (var _a = 0, GROUPS_3 = __WEBPACK_IMPORTED_MODULE_3__common_common__["k" /* GROUPS */]; _a < GROUPS_3.length; _a++) {
+            var g = GROUPS_3[_a];
+            if (!this.isGroupValid(this.sudokuModel.rows[g])) {
+                return false;
+            }
+            if (!this.isGroupValid(this.sudokuModel.cols[g])) {
+                return false;
+            }
+            if (!this.isGroupValid(this.sudokuModel.boxs[g])) {
+                return false;
+            }
+        }
+        return true;
     };
     /**
      * Returns true if cell has a value;
      */
     SudokuService.prototype.groupContainsValue = function (group, v) {
-        return group.vOccurrences[v] === 1;
-    }; // groupContainsValue()
-    /**
-     * Returns true if cell has a value;
-     */
-    SudokuService.prototype.containsValue = function (group, v) {
         return group.vOccurrences[v] === 1;
     }; // groupContainsValue()
     /**
@@ -3416,25 +3571,9 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.valueCellsCount = function (group) {
         var count = 0;
-        for (var _i = 0, VALUES_6 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_6.length; _i++) {
-            var v = VALUES_6[_i];
+        for (var _i = 0, VALUES_9 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_9.length; _i++) {
+            var v = VALUES_9[_i];
             if (group.vOccurrences[v] > 0) {
-                count++;
-            }
-        }
-        return count;
-    };
-    /**
-     * Return the number of cells in the group that do not have a value. That is
-     * cells that are open or not filled. A candidate cell cannot have a value.
-     * cannot have any candidates. Within a group (row, column, or box),
-     *    value cells + candidate cells = 9.
-     */
-    SudokuService.prototype.candidateCellsCount = function (group) {
-        var count = 0;
-        for (var _i = 0, VALUES_7 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_7.length; _i++) {
-            var v = VALUES_7[_i];
-            if (group.vOccurrences[v] === 0) {
                 count++;
             }
         }
@@ -3453,37 +3592,11 @@ var SudokuService = (function () {
     //   return candidateCount;
     // } // groupCandidateCount()
     /**
-     * Count the occurrences of each candidate in a group (row, column, or box).
-     * Return an array of the counts. The array is 10 numbers each element
-     * being the count of the corresponding candidate. The zero-th element is
-     * not used. E.g. [0, 0,0,2, 3,0,0, 0,2,0] means candidate [3] occurs twice,
-     * [4] 3 times, [8] twice, and all other candidate are absent in the group.
-     */
-    SudokuService.prototype.getCandidateCounts = function (group) {
-        var kCounts = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        for (var _i = 0, VALUES_8 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_8.length; _i++) {
-            var k = VALUES_8[_i];
-            if (this.groupContainsValue(group, k)) {
-                continue; // next candidate
-            }
-            for (var _a = 0, _b = group.cells; _a < _b.length; _a++) {
-                var c = _b[_a];
-                if (this.hasValue(c)) {
-                    continue; // next cell in group
-                }
-                if (this.sudokuModel.cells[c].candidates[k]) {
-                    kCounts[k]++;
-                }
-            } // for cells in group
-        } // for candidates
-        return kCounts;
-    }; // getCandidateCounts()
-    /**
      * Returns true if cell has one or more candidates.
      */
     SudokuService.prototype.hasCandidates = function (c) {
-        for (var _i = 0, CANDIDATES_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_4.length; _i++) {
-            var k = CANDIDATES_4[_i];
+        for (var _i = 0, CANDIDATES_5 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_5.length; _i++) {
+            var k = CANDIDATES_5[_i];
             if (this.sudokuModel.cells[c].candidates[k]) {
                 return true;
             }
@@ -3495,8 +3608,8 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.cellValuesToArray = function () {
         var valuesArray = [];
-        for (var _i = 0, CELLS_6 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_6.length; _i++) {
-            var c = CELLS_6[_i];
+        for (var _i = 0, CELLS_8 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_8.length; _i++) {
+            var c = CELLS_8[_i];
             valuesArray.push(this.sudokuModel.cells[c].value);
         }
         return valuesArray;
@@ -3507,8 +3620,8 @@ var SudokuService = (function () {
     SudokuService.prototype.toOneLineString = function () {
         var s = '';
         var v;
-        for (var _i = 0, CELLS_7 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_7.length; _i++) {
-            var c = CELLS_7[_i];
+        for (var _i = 0, CELLS_9 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_9.length; _i++) {
+            var c = CELLS_9[_i];
             v = this.sudokuModel.cells[c].value;
             s += (v === 0 ? '.' : v);
         }
@@ -3520,31 +3633,6 @@ var SudokuService = (function () {
     SudokuService.prototype.toGridString = function () {
         return this.arrayToGridString(this.cellValuesToArray());
     }; // toGridString()
-    /**
-     * Represent a givenValues array of sudoku cell givenValues as a grid string.
-     */
-    SudokuService.prototype.arrayToGridString = function (valuesArray) {
-        // private arrayToGridString(valuesArray: number[]) : string {
-        var s = '';
-        var i = 0;
-        var v;
-        for (var _i = 0, CELLS_8 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_8.length; _i++) {
-            var c = CELLS_8[_i];
-            v = valuesArray[c];
-            if (i > 0 && i % 3 == 0 && i % 9 != 0) {
-                s += '| ';
-            }
-            if (i > 0 && i % 9 == 0) {
-                s += '\n';
-            }
-            if (i > 0 && i % 27 == 0) {
-                s += '------+-------+------\n';
-            }
-            s += (v === 0 ? '. ' : v + ' ');
-            i++;
-        }
-        return s;
-    }; // arrayToGridString()
     /**
      * Represent the state of a row as a string.
      */
@@ -3572,8 +3660,8 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.groupToString = function (group) {
         var s = '';
-        for (var _i = 0, VALUES_9 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_9.length; _i++) {
-            var v = VALUES_9[_i];
+        for (var _i = 0, VALUES_10 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_10.length; _i++) {
+            var v = VALUES_10[_i];
             s += (group.vOccurrences[v] === 0) ? '.' : group.vOccurrences[v];
             if (v == 3 || v == 6) {
                 s += ' ';
@@ -3581,7 +3669,7 @@ var SudokuService = (function () {
         }
         s += ' ';
         for (var i = 0; i < group.cells.length; i++) {
-            s += __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].pad(group.cells[i], 2) + ' ';
+            s += __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].pad(group.cells[i], 2) + ' ';
             if (i == 2 || i == 5) {
                 s += ' ';
             }
@@ -3593,11 +3681,11 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.cellToString = function (c) {
         var cell = this.sudokuModel.cells[c];
-        var s = '' + __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].toRowColString(c) + ': ';
+        var s = '' + __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].toRowColString(c) + ': ';
         s += 'v:' + (cell.value != 0 ? cell.value : '.');
         s += ' k:';
-        for (var _i = 0, CANDIDATES_5 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_5.length; _i++) {
-            var k = CANDIDATES_5[_i];
+        for (var _i = 0, CANDIDATES_6 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_6.length; _i++) {
+            var k = CANDIDATES_6[_i];
             s += (cell.candidates[k]) ? k : '.';
         }
         s += ' r' + (cell.row + 1) + ' c' + (cell.col + 1) + ' b' + (cell.box + 1);
@@ -3611,20 +3699,20 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.toString = function () {
         var s = '';
-        for (var _i = 0, ROWS_2 = __WEBPACK_IMPORTED_MODULE_4__common_common__["d" /* ROWS */]; _i < ROWS_2.length; _i++) {
+        for (var _i = 0, ROWS_2 = __WEBPACK_IMPORTED_MODULE_3__common_common__["d" /* ROWS */]; _i < ROWS_2.length; _i++) {
             var r = ROWS_2[_i];
             s += this.rowToString(r) + '\n';
         }
-        for (var _a = 0, COLS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["e" /* COLS */]; _a < COLS_1.length; _a++) {
+        for (var _a = 0, COLS_1 = __WEBPACK_IMPORTED_MODULE_3__common_common__["e" /* COLS */]; _a < COLS_1.length; _a++) {
             var c = COLS_1[_a];
             s += this.colToString(c) + '\n';
         }
-        for (var _b = 0, BOXS_1 = __WEBPACK_IMPORTED_MODULE_4__common_common__["f" /* BOXS */]; _b < BOXS_1.length; _b++) {
+        for (var _b = 0, BOXS_1 = __WEBPACK_IMPORTED_MODULE_3__common_common__["f" /* BOXS */]; _b < BOXS_1.length; _b++) {
             var b = BOXS_1[_b];
             s += this.boxToString(b) + '\n';
         }
-        for (var _c = 0, CELLS_9 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _c < CELLS_9.length; _c++) {
-            var c = CELLS_9[_c];
+        for (var _c = 0, CELLS_10 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _c < CELLS_10.length; _c++) {
+            var c = CELLS_10[_c];
             s += this.cellToString(c) + '\n';
         }
         return s;
@@ -3635,7 +3723,7 @@ var SudokuService = (function () {
     SudokuService.prototype.toStringRow = function (r) {
         var s = '';
         s += this.rowToString(r) + '\n';
-        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_4__common_common__["h" /* ROW_CELLS */][r]; _i < _a.length; _i++) {
+        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_3__common_common__["h" /* ROW_CELLS */][r]; _i < _a.length; _i++) {
             var c = _a[_i];
             s += this.cellToString(c) + '\n';
         }
@@ -3645,68 +3733,7 @@ var SudokuService = (function () {
      *
      */
     SudokuService.prototype.getCandidates_ = function (r, c) {
-        return this.getCandidates(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c));
-    };
-    /**
-     *
-     */
-    SudokuService.prototype.getCandidates = function (c) {
-        if (this.hasValue(c)) {
-            return [];
-        }
-        var candidates = [];
-        for (var _i = 0, CANDIDATES_6 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_6.length; _i++) {
-            var k = CANDIDATES_6[_i];
-            if (this.sudokuModel.cells[c].candidates[k]) {
-                candidates.push(k);
-            }
-        }
-        return candidates;
-    };
-    /**
-     *
-     */
-    SudokuService.prototype.isCandidate_ = function (r, c, k) {
-        return this.isCandidate(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c), k);
-    };
-    /**
-     * Returns true if cell contains the candidate.
-     */
-    SudokuService.prototype.isCandidate = function (c, k) {
-        return this.sudokuModel.cells[c].candidates[k];
-    };
-    /**
-     *
-     */
-    SudokuService.prototype.isCellInvalid_ = function (r, c) {
-        return !this.isCellValid(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c));
-    }; // isCellInvalid_()
-    /**
-     * Determines if the given givenValue appears 9 times.
-     */
-    SudokuService.prototype.isValueComplete = function (v) {
-        var valueCount = 0;
-        for (var _i = 0, CELLS_10 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_10.length; _i++) {
-            var c = CELLS_10[_i];
-            if (this.sudokuModel.cells[c].value === v) {
-                valueCount++;
-            }
-        }
-        return valueCount === 9;
-    }; // isValueComplete()
-    /**
-     *
-     */
-    SudokuService.prototype.getNumberOfCandidates = function (c) {
-        var count = 0;
-        var cell = this.sudokuModel.cells[c];
-        for (var _i = 0, CANDIDATES_7 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_7.length; _i++) {
-            var k = CANDIDATES_7[_i];
-            if (cell.candidates[k]) {
-                count++;
-            }
-        }
-        return count;
+        return this.getCandidates(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
     };
     /**
      * Add given candidate to given cell.
@@ -3724,7 +3751,7 @@ var SudokuService = (function () {
             return;
         }
         // do not add if any related cell has that givenValue
-        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].getRelatedCells(c); _i < _a.length; _i++) {
+        for (var _i = 0, _a = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].getRelatedCells(c); _i < _a.length; _i++) {
             var rc = _a[_i];
             if (this.sudokuModel.cells[rc].value === k) {
                 return;
@@ -3734,98 +3761,106 @@ var SudokuService = (function () {
         this.sudokuModel.cells[c].candidates[k] = true;
     }; // addCandidate()
     /**
-     * Used by SudokoCreationService.
+     * Make every value a candidate because all initialized cells do not have
+     * values.
      */
-    SudokuService.prototype.removeLastActionLogEntry = function () {
-        this.actionLog.removeLastEntry();
-    };
+    SudokuService.prototype.setAllCellCandidates = function (c) {
+        this.sudokuModel.cells[c].setAllCandidates();
+    }; // setAllCellCandidates()
     /**
-     * Represent the values of the sudoku as an array of 81 values.
+     * Remove all candidates from a cell.
      */
-    SudokuService.prototype.cellsToValuesArray = function () {
-        var v = [];
-        for (var _i = 0, CELLS_11 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _i < CELLS_11.length; _i++) {
+    SudokuService.prototype.removeAllCellCandidates = function (c) {
+        this.sudokuModel.cells[c].unsetAllCandidates();
+    }; // removeAllCellCandidates()
+    /**
+     * Represent a givenValues array of sudoku cell givenValues as a grid string.
+     */
+    SudokuService.prototype.arrayToGridString = function (valuesArray) {
+        // private arrayToGridString(valuesArray: number[]) : string {
+        var s = '';
+        var i = 0;
+        var v;
+        for (var _i = 0, CELLS_11 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_11.length; _i++) {
             var c = CELLS_11[_i];
-            v.push(this.sudokuModel.cells[c].value);
+            v = valuesArray[c];
+            if (i > 0 && i % 3 == 0 && i % 9 != 0) {
+                s += '| ';
+            }
+            if (i > 0 && i % 9 == 0) {
+                s += '\n';
+            }
+            if (i > 0 && i % 27 == 0) {
+                s += '------+-------+------\n';
+            }
+            s += (v === 0 ? '. ' : v + ' ');
+            i++;
         }
-        return v;
-    }; // cellsToValuesArray()
-    /**
-     *
-     */
-    SudokuService.prototype.getNakedCandidates_ = function (r, c, maxCandidates) {
-        return this.findNakedCandidates(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].cellIdx(r, c), maxCandidates);
-    };
-    /**
-     *
-     */
-    SudokuService.prototype.getLastAction = function () {
-        return this.actionLog.getLastEntry();
-    };
-    /**
-     * Called by user button press (playComponent.ts) undoLastAction())
-     */
-    SudokuService.prototype.undoLastAction = function () {
-        var lastAction = this.actionLog.getLastEntry();
-        this.undoAction(lastAction);
-        this.actionLog.removeLastEntry();
-    }; // undoLastAction()
-    /**
-     *
-     */
-    SudokuService.prototype.getActionLogAsString = function () {
-        return this.actionLog.toStringLastFirst();
-    }; // getActionLogAsString()
-    /**
-     * Swap values of two given cells.
-     */
-    SudokuService.prototype.swapCellValues = function (c1, c2) {
-        var v1 = this.sudokuModel.cells[c1].value;
-        this.sudokuModel.cells[c1].value = this.sudokuModel.cells[c2].value;
-        this.sudokuModel.cells[c2].value = v1;
-    }; // swapCellValues()
+        return s;
+    }; // arrayToGridString()
     return SudokuService;
-}());
+}()); // class SudokuService
 
 var SudokuModel = (function () {
     function SudokuModel() {
-        console.info('SudokuModel constructor() cp1-1');
         this.cells = new Array(81);
         this.rows = new Array(9);
         this.cols = new Array(9);
         this.boxs = new Array(9);
-        for (var _i = 0, GROUPS_4 = __WEBPACK_IMPORTED_MODULE_4__common_common__["k" /* GROUPS */]; _i < GROUPS_4.length; _i++) {
+        for (var _i = 0, GROUPS_4 = __WEBPACK_IMPORTED_MODULE_3__common_common__["k" /* GROUPS */]; _i < GROUPS_4.length; _i++) {
             var g = GROUPS_4[_i];
-            this.rows[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["h" /* ROW_CELLS */][g]);
-            this.cols[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["i" /* COL_CELLS */][g]);
-            this.boxs[g] = new Group(__WEBPACK_IMPORTED_MODULE_4__common_common__["j" /* BOX_CELLS */][g]);
+            this.rows[g] = new Group(__WEBPACK_IMPORTED_MODULE_3__common_common__["h" /* ROW_CELLS */][g]);
+            this.cols[g] = new Group(__WEBPACK_IMPORTED_MODULE_3__common_common__["i" /* COL_CELLS */][g]);
+            this.boxs[g] = new Group(__WEBPACK_IMPORTED_MODULE_3__common_common__["j" /* BOX_CELLS */][g]);
         }
-        for (var _a = 0, CELLS_12 = __WEBPACK_IMPORTED_MODULE_4__common_common__["b" /* CELLS */]; _a < CELLS_12.length; _a++) {
+        for (var _a = 0, CELLS_12 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _a < CELLS_12.length; _a++) {
             var c = CELLS_12[_a];
-            this.cells[c] = new Cell(__WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].rowIdx(c), __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].colIdx(c), __WEBPACK_IMPORTED_MODULE_4__common_common__["a" /* Common */].boxIdx(c));
+            this.cells[c] = new Cell(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowIdx(c), __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colIdx(c), __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxIdx(c));
         }
     }
     return SudokuModel;
 }()); // class SudokuModel
 var Cell = (function () {
-    function Cell(r, c, b) {
-        this.value = 0;
+    /**
+     * Initialize the cell to empty: no value and all candidates. Give the cell
+     * a reference to its row, column, and box.
+     * @param row
+     * @param col
+     * @param box
+     */
+    function Cell(row, col, box) {
+        this.value = 0; // no value
         this.candidates = new Array(10);
-        for (var _i = 0, CANDIDATES_8 = __WEBPACK_IMPORTED_MODULE_4__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_8.length; _i++) {
-            var k = CANDIDATES_8[_i];
+        this.setAllCandidates(); // every value is candidate
+        this.row = row;
+        this.col = col;
+        this.box = box;
+    }
+    /**
+     * Make every value a candidate.
+     */
+    Cell.prototype.setAllCandidates = function () {
+        for (var _i = 0, CANDIDATES_7 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_7.length; _i++) {
+            var k = CANDIDATES_7[_i];
             this.candidates[k] = true;
         }
-        this.row = r;
-        this.col = c;
-        this.box = b;
-    }
+    }; // setAllCandidates()
+    /**
+     * Clear all candidates.
+     */
+    Cell.prototype.unsetAllCandidates = function () {
+        for (var _i = 0, CANDIDATES_8 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_8.length; _i++) {
+            var k = CANDIDATES_8[_i];
+            this.candidates[k] = false;
+        }
+    }; // unsetAllCandidates()
     return Cell;
 }()); // class Cell
 var Group = (function () {
     function Group(groupCells) {
         this.vOccurrences = new Array(10);
-        for (var _i = 0, VALUES_10 = __WEBPACK_IMPORTED_MODULE_4__common_common__["c" /* VALUES */]; _i < VALUES_10.length; _i++) {
-            var v = VALUES_10[_i];
+        for (var _i = 0, VALUES_11 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_11.length; _i++) {
+            var v = VALUES_11[_i];
             this.vOccurrences[v] = 0;
         }
         this.cells = groupCells;
@@ -3836,20 +3871,20 @@ var Group = (function () {
 //# sourceMappingURL=sudoku.service.js.map
 
 /***/ }),
-/* 15 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CreationService; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__app_common_common__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_model_difficulty__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_model_puzzle__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_action_action_type__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_action_action_log_service__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_hint_hint__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_model_puzzle__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_action_action__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_action_action_log_service__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_hint_hint__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__app_hint_hint_type__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__app_hint_hint_service__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__app_model_sudoku_service__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__app_hint_hint_service__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__app_model_sudoku_service__ = __webpack_require__(13);
 
 
 
@@ -3924,7 +3959,7 @@ var CreationService = (function () {
         // this.randomValues = Common.RANDOM_VALUES_1;
         for (var _i = 0, VALUES_1 = __WEBPACK_IMPORTED_MODULE_0__app_common_common__["c" /* VALUES */]; _i < VALUES_1.length; _i++) {
             var v = VALUES_1[_i];
-            this.sudokuService.setValue(this.randomCellIndexes[v], v, __WEBPACK_IMPORTED_MODULE_3__app_action_action_type__["a" /* ActionType */].GUESS_VALUE);
+            this.sudokuService.setValue(this.randomCellIndexes[v], v, __WEBPACK_IMPORTED_MODULE_3__app_action_action__["a" /* ActionType */].GUESS_VALUE);
         }
         this.solve();
         var elapsed = Date.now() - start;
@@ -4004,8 +4039,8 @@ var CreationService = (function () {
                         continue NEXT_CELL; // don't restore sym cells
                     } // if multiple solutions, fall through to restore pared cells
             } // switch
-            this.sudokuService.setValue(c, savedValue, __WEBPACK_IMPORTED_MODULE_3__app_action_action_type__["a" /* ActionType */].SET_VALUE);
-            this.sudokuService.setValue(symC, savedSymValue, __WEBPACK_IMPORTED_MODULE_3__app_action_action_type__["a" /* ActionType */].SET_VALUE);
+            this.sudokuService.setValue(c, savedValue, __WEBPACK_IMPORTED_MODULE_3__app_action_action__["a" /* ActionType */].SET_VALUE);
+            this.sudokuService.setValue(symC, savedSymValue, __WEBPACK_IMPORTED_MODULE_3__app_action_action__["a" /* ActionType */].SET_VALUE);
             this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
             this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
         } // for next random symmetric pairs of cells to pare
@@ -4159,7 +4194,7 @@ var CreationService = (function () {
         guessValue = possibleValues[0]; // try 1st available candidate
         possibleValues = possibleValues.slice(1); // remove guess value
         this.hintService.addHintLogEntry(new __WEBPACK_IMPORTED_MODULE_5__app_hint_hint__["a" /* ValueHint */](__WEBPACK_IMPORTED_MODULE_6__app_hint_hint_type__["a" /* HintType */].GUESS, guessCell, guessValue));
-        this.sudokuService.setValue(guessCell, guessValue, __WEBPACK_IMPORTED_MODULE_3__app_action_action_type__["a" /* ActionType */].GUESS_VALUE, possibleValues);
+        this.sudokuService.setValue(guessCell, guessValue, __WEBPACK_IMPORTED_MODULE_3__app_action_action__["a" /* ActionType */].GUESS_VALUE, possibleValues);
         return true;
     }; // guess()
     /**
@@ -4199,13 +4234,13 @@ var CreationService = (function () {
     CreationService.prototype.rollbackToLastGuess = function () {
         // undo entries that are not guesses
         var lastAction = this.actionLog.getLastEntry();
-        while (lastAction && lastAction.type != __WEBPACK_IMPORTED_MODULE_3__app_action_action_type__["a" /* ActionType */].GUESS_VALUE) {
+        while (lastAction && lastAction.type != __WEBPACK_IMPORTED_MODULE_3__app_action_action__["a" /* ActionType */].GUESS_VALUE) {
             this.sudokuService.undoAction(lastAction);
             this.actionLog.removeLastEntry();
             lastAction = this.actionLog.getLastEntry();
         }
         if (this.actionLog.getLastEntry() &&
-            this.actionLog.getLastEntry().type === __WEBPACK_IMPORTED_MODULE_3__app_action_action_type__["a" /* ActionType */].GUESS_VALUE) {
+            this.actionLog.getLastEntry().type === __WEBPACK_IMPORTED_MODULE_3__app_action_action__["a" /* ActionType */].GUESS_VALUE) {
             this.sudokuService.undoAction(this.actionLog.getLastEntry());
             return this.actionLog.getLastEntry(); // last GUESS_VALUE action
         }
@@ -4226,10 +4261,10 @@ var CreationService = (function () {
 //# sourceMappingURL=creation.service.js.map
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(10);
+module.exports = __webpack_require__(9);
 
 
 /***/ })

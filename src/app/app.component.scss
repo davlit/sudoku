@@ -1,31 +1,77 @@
+$white:  #ffffff;  // white
+$gray1:  #cccccc;
+$gray2:  #808080;  //gray
+$tan1:   #ffebcc;
+$tan2:   #ffdead;  // navajowhite
+$black:  #000000;  // black
+$red1:   #ffcccc;
+$red2:   #ff4d4d;
+$red3:   #ff0000;  // red
+$green1: #00ff00;
+$green2: #00cc00;
+$green3: #009900;  // xgreen
+$blue1:  #4d4dff;
+$blue2:  #0000ff;  // blue
+
+
 html {
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
 }
 
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
+*, *:before, *:after { box-sizing: inherit; }
+
+.exec-text {
+  font-size: 16px;
+  color: $blue2;
 }
 
+button {
+  border: none;
+  border-radius: 5px;
+  color: $white;
+  padding: 2px 6px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: auto;
+  cursor: pointer;
+}
+
+button.diff { width: 80px;}
+button.easy    { background-color: $white; color: $black; }
+button.medium  { background-color: $green3; } 
+button.hard    { background-color: $blue2; } 
+button.hardest { background-color: $red3; }
+
+button.exec { width: 140px; }
+button.start { background-color: $green2; } 
+button.stop  { background-color: $red2 }
+
+button.general { background-color: $blue1; }
+
+cands { margin-left: 1px; }
+
+
+
 span.appTitle {
-    float: left;
-    font-size: 30px;
-    font-weight: bold;
-    color: green;
-    line-height: 60px;
+  float: left;
+  font-size: 30px;
+  font-weight: bold;
+  color: $green2;
+  line-height: 60px;
 }
 span.appVersion {
-    float: left;
-    font-size: 10px;
-    line-height: 75px;
+  float: left;
+  font-size: 10px;
+  line-height: 75px;
 }
 
 .sGrid {    /* 1 */
   display: table;
-  border: 2px solid black;
-  background-color: #ffebcc;
+  border: 2px solid $black;
+  background-color: $tan1;
 }
 .bRow {     /* 3/grid */
   display: table-row;
@@ -33,7 +79,7 @@ span.appVersion {
 .box {      /* 3/boxrow, 9/grid */
   display: table-cell;
   float: left;
-  border: 2px solid gray;
+  border: 2px solid $gray2;
 }
 .sRow {     /* 3/box, 9/grid */
   display: table-row;
@@ -43,22 +89,22 @@ span.appVersion {
   float: left;
   height: 66px;
   width:  66px;
-  border: 1px solid #bfbfbf;
+  border: 1px solid $gray1;
   margin: -1px -1px -1px -1px;
   text-align: center;
   font-size: 40px;
   font-weight: bold;
-  color: green;
+  color: $green3;
 }
 .sCell.locked {
-  color: black;
+  color: $black;
 }
 .sCell.selected {
-  background-color: #cefdce; /* very light green */
+  background-color: $green1;
 }
 .sCell.invalid {
-  background-color: #ffe5e5; /* very light red */
-  color: red;
+  background-color: $red1;
+  color: $red3;
 }
 .value {
   line-height: 66px;
@@ -85,14 +131,14 @@ span.appVersion {
   line-height: 22px;  /* better for numbers instead of vertical-align */
   /*color: white;*/   /* disappearing ink */
   cursor: default;
-  color: gray;
+  color: $gray2;
 }
 /*.candidate.show {
   color: gray;
 }*/
 td.dim {
   /*color: #b8b8b8;*/   /* a light gray */ 
-  color: #cccccc;		/* a light gray */
+  color: $gray2;		/* a light gray */
 }
 #gridsection {
   clear: left;
@@ -111,7 +157,7 @@ td.dim {
 textarea {
   font-family: monospace;
   font-size: 9px;
-  background-color: #ffebcc;
+  background-color: $tan1;
 }
 
 .val-table {
@@ -119,9 +165,8 @@ textarea {
   width: auto;
   text-align: center;
   font-size: 18px;
-  background-color: #ffebcc;
-  border: 2px solid black;
-  background-color: #ffebcc;
+  background-color: $tan1;
+  border: 2px solid $black;
   /*border-spacing: 5px;*/
   /*cellspacing:poor IE support for  this*/
   /* border-collapse: separate;*/
@@ -135,12 +180,11 @@ textarea {
   display: table-column;
   height: 30px;
   width:  40px;
-  border: 1px solid black;
+  border: 1px solid $black;
   margin: -1px -1px -1px -1px;
 }
-span.dim {
-  /*color: #b8b8b8;*/   /* a light gray */ 
-  color: #cccccc;		/* a light gray */
+.dim {
+  color: $gray1;
 }
 .val-val {
   line-height: 30px;
@@ -150,13 +194,13 @@ span.dim {
   display: table-row;
   /*width: auto;*/
 }
-.clear-cell{
+.clear-cell {
   /*float: left;  /*fix for  buggy browsers*/
   display: table-cell;
   width: auto;
   height: 30px;
   text-align: center;
-  border-top: 1px solid black;
+  border-top: 1px solid $black;
   margin: -1px -1px -1px -1px;
 }
 .clear-val {
@@ -177,40 +221,20 @@ $progress-height: 10px;
     position: relative;
     width: $progress-width;
     height: $progress-height;
-    background-color: rgb(200, 200, 200);
+    background-color: $tan1;
     margin-top: 1em;
     .progress {
         position: absolute;
         width: $progress-height;
         height: 100%;
-        background-color: green;
+        background-color: $green3;
         animation-name: running;
         animation-duration: 8s;
         animation-iteration-count: infinite;
     }
 }
 
-.diff-button {
-    width: 80px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    padding: 8px 8px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    // margin: 2px 1px;
-    margin: auto;
-    cursor: pointer;
-}
-
-.button-easy {background-color: white; color: black;} /* Blue */
-.button-medium {background-color: green;} /* Red */ 
-.button-hard {background-color: blue;} /* Gray */ 
-.button-hardest {background-color: red;} /* Black */
-
 footer {
     clear: both;
-    padding-top: 10px;
+    // padding-top: 10px;
 }

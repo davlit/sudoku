@@ -6,7 +6,7 @@ import { Difficulty } from '../../app/model/difficulty';
 import { Puzzle } from '../../app/model/puzzle';
 
 import { GuessAction } from '../../app/action/action';
-import { ActionType } from '../../app/action/action.type';
+import { ActionType } from '../../app/action/action';
 import { ActionLogService } from '../../app/action/action-log.service';
 import { ValueHint } from '../../app/hint/hint';
 import { HintType } from '../../app/hint/hint.type';

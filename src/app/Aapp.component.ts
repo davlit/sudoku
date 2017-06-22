@@ -18,7 +18,6 @@ import { CandidatesHint }   from './hint/hint';
 import { HintType }         from './hint/hint.type';
 import { HintCounts }       from './hint/hintCounts';
 import { ActionType }       from './action/action';
-import { Action }           from './action/action';
 import { ValueAction }      from './action/action';
 import { NakedType }        from './model/naked.type';
 import { CombinationIterator } from './common/combination.iterator';
@@ -62,6 +61,9 @@ export class AppComponent implements OnInit {
   private copyright = COPYRIGHT;
   private sudokuService: SudokuService;
   private hintService: HintService;
+  // private hintStates: HintStates;
+  public hintStates = HintStates;
+  public hintState = HintStates.READY;
 
   constructor(
     // private router: Router,
@@ -75,6 +77,7 @@ export class AppComponent implements OnInit {
   ) {
     this.sudokuService = new SudokuService(new ActionLogService());
     this.hintService = new HintService(this.sudokuService);
+    this.initializeUserInterface();
   }
 
   // -----------------------------------------------------------------------
@@ -97,35 +100,34 @@ export class AppComponent implements OnInit {
 
   // ----- state properties -----
   playState: PlayStates;
-  hintState: HintStates;
+  // hintState: HintStates;
   autoSolveState: AutoSolveStates;
 
   // ----- grid properties -----
   candidatesShowing: boolean;   // also in execute
 
-  // ----- new properties -----
-  desiredDifficulty: Difficulty;
-
   // ----- execute properties -----
   actualDifficulty: string;
-  valuesComplete: boolean[];
-  hintMessage: string;
-  autoSolveMessage: string;
-  actionLog: string;
-  solutionClues: string;
   timerSubscription: Subscription;
   elapsedTime: string;
-  hintsViewed: number;
-  hintsApplied: number;
+  hintMessage: string;
+  autoSolveMessage: string;
+  candidatesModified: boolean;
+  valuesComplete: boolean[];
+  actionLog: string;
+  solutionClues: string;
   
   // ----- solved properties -----
+  hintsViewed: number;
+  hintsApplied: number;
+
   currentPuzzle: Puzzle;
+
   hint: Hint;
   candidatesVisible: boolean[];
   selectedCell: {r: number, c: number};
 
   ngOnInit() {
-    this.desiredDifficulty = Difficulty.MEDIUM;   // default
     this.valuesComplete = new Array(10);
     this.candidatesVisible = new Array(10);
 
@@ -484,6 +486,15 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.candidatesVisible[kand] = true;
   }
 
+  /**
+   * Restore all candidates. This undoes any user candidate eliminations.
+   */
+  refreshCandidates() : void {
+    this.sudokuService.refreshAllCandidates();
+    this.candidatesModified = false;
+  } // refreshCandidates()
+
+
   // button 'All' EXECUTION state
   allCandidatesVisible() {
     for (let k = 1; k <= 9; k++) {
@@ -583,7 +594,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   } // autoSolveLoop()
 
   autoSolveButtonLabel() {
-    return this.autoSolveState === AutoSolveStates.RUNNING ? 'Stop' : 'Start';
+    return this.autoSolveState === AutoSolveStates.RUNNING 
+        ? 'Auto Solve Stop' : 'Auto Solve Start';
   }
   
   /**
@@ -831,12 +843,13 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   
   // ng-dblclick candidate in grid EXECUTION state
   private removeCandidate(r: number, c: number, k: number) {
+    this.candidatesModified = true;
     this.initializeHintStates();
     if (this.candidatesShowing) {
       this.sudokuService.removeCandidate_(r, c, k);
     }
     this.refreshActionLog();
-  }
+  } // removeCandidate()
   
   private findHint() : void {
     this.hint = this.hintService.getHint(Difficulty.HARDEST);
@@ -850,7 +863,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.hintState = HintStates.NO_HINT;
       this.hintMessage = 'No hint available';
     }
-  }
+  } // findHint()
     
   // apply hint toward solution
   private applyHint() {
@@ -928,13 +941,14 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.valuesComplete[v] = false;
     }
 
+    this.candidatesModified = false;  // has user removed any?
+
     // this.passCount = undefined;
     this.playState = PlayStates.NEW;
     // this.generating = false;
     this.hint = undefined;
     this.initializeHintStates();
     this.actionLog = '';
-    this.desiredDifficulty = this.DEFAULT_DIFFICULTY;
 
     this.actionLog = '';
     this.hintsViewed = 0;
