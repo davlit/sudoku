@@ -101,20 +101,6 @@ s: sudoku, b: box, v: value, k: candidate
       
     </div>  <!-- *ngSwitchCase="PlayStates.NEW" -->
 
-<!-- test -->
-<br/><br/><br/>
-<div [ngSwitch]="directionState">
-  <!--<b *ngSwitchCase="dirEnum.East">East Direction</b>
-  <b *ngSwitchCase="dirEnum.West">West Direction</b>
-  <b *ngSwitchCase="dirEnum.North">North Direction</b>
-  <b *ngSwitchCase="dirEnum.South">South Direction</b>-->
-  <b *ngSwitchCase="directionStates.East">East Direction</b>
-  <b *ngSwitchCase="directionStates.West">West Direction</b>
-  <b *ngSwitchCase="directionStates.North">North Direction</b>
-  <b *ngSwitchCase="directionStates.South">South Direction</b>
-  <b *ngSwitchDefault>No Direction</b>
-</div>  
-
     <!-- ========== play-new ========== -->
     <div *ngSwitchCase="PlayStates.CREATING">
 
@@ -173,14 +159,16 @@ s: sudoku, b: box, v: value, k: candidate
         {{autoSolveMessage}}
       </p>-->
 
-      <p>
-        <button *ngIf="autoSolveState == 0" class="exec start" 
-            (click)="handleAutoSolveClick()">
-            {{autoSolveButtonLabel()}}</button>
-        <button *ngIf="autoSolveState == 1" class="exec stop" 
-            (click)="handleAutoSolveClick()">
-            {{autoSolveButtonLabel()}}</button>
-        <span>{{autoSolveMessage}}</span>
+      <p [ngSwitch]="autoSolveState">
+        <button *ngSwitchCase="autoSolveStates.READY" 
+            class="exec start" (click)="handleAutoSolveClick()">
+            Auto solve start</button>
+        <button *ngSwitchCase="autoSolveStates.RUNNING" 
+            class="exec stop" (click)="handleAutoSolveClick()">
+            Auto solve stop</button>
+        <span *ngSwitchCase="autoSolveStates.NO_HINT
+            || autoSolveStates.PENDING_STOP">
+            Auto solve not available</span>
       </p>
 
       <p *ngIf="!isAnySelectedCell()"><span>Select a cell</span></p>

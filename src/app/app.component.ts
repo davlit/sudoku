@@ -27,13 +27,6 @@ import { ActionLogService } from './action/action-log.service';
 // test
 import { ROOT_VALUES } from './common/common';
 
-// test
-// import {DirectionEnum} from './directionEnum';
-enum DirectionStates {
-    East, West, North, South 
-}
-  
-
 enum PlayStates {
   NEW,
   ENTRY,    // not used currently
@@ -66,18 +59,14 @@ export class AppComponent implements OnInit {
   sudokuService: SudokuService;
   hintService: HintService;
 
-  // test
-  directionStates = DirectionStates;  
-  directionState = DirectionStates.North;  
-
   // ----- state properties -----
   playState: PlayStates;
   hintStates = HintStates;
   hintState = HintStates.NO_HINT;
-  autoSolveState: AutoSolveStates;
+  autoSolveStates = AutoSolveStates;
+  autoSolveState = AutoSolveStates.NO_HINT;
 
   constructor(
-    //   router: Router,
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
 
@@ -118,7 +107,7 @@ export class AppComponent implements OnInit {
   actualDifficulty: string;
   valuesComplete: boolean[];
   hintMessage: string;
-  autoSolveMessage: string;
+  // autoSolveMessage: string;
   actionLog: string;
   solutionClues: string;
   timerSubscription: Subscription;
@@ -566,7 +555,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
           this.findHint();
           if (!this.hint) {
               this.autoSolveState = AutoSolveStates.NO_HINT;
-              this.autoSolveMessage = 'Not available';
+              // this.autoSolveMessage = 'Not available';
           }
           break;
         case HintStates.ACTIVE:
@@ -581,7 +570,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
           break;
         case HintStates.NO_HINT:
           this.autoSolveState = AutoSolveStates.NO_HINT;
-          this.autoSolveMessage = 'Not available';
+          // this.autoSolveMessage = 'Not available';
         } // switch
 
         if (this.autoSolveState === AutoSolveStates.RUNNING) {
@@ -590,9 +579,9 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }, this.AUTO_SOLVE_DELAY);
   } // autoSolveLoop()
 
-  autoSolveButtonLabel() {
-    return this.autoSolveState === AutoSolveStates.RUNNING ? 'Stop' : 'Start';
-  }
+  // autoSolveButtonLabel() {
+  //   return this.autoSolveState === AutoSolveStates.RUNNING ? 'Stop' : 'Start';
+  // }
   
   /**
    * button 'Undo Last Action' EXECUTION state
@@ -816,7 +805,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.hintState = HintStates.READY;
     this.hintMessage = '';
     this.autoSolveState = AutoSolveStates.READY;
-    this.autoSolveMessage = '';
+    // this.autoSolveMessage = '';
   }
 
   setSelectedCell(r: number, c: number) {
@@ -856,7 +845,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
           Common.colNr(this.hint.getCell()));
     } else {
       this.hintState = HintStates.NO_HINT;
-      this.hintMessage = 'No hint available';
+      // this.hintMessage = 'No hint available';
     }
   }
     
@@ -864,6 +853,9 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   applyHint() {
     this.hintMessage = '';
     this.hintState = HintStates.READY
+    // WARNING - cannot set autoStartState to READY here
+    //    or the auto start loop will stop
+    //    therefore cannot call: this.initializeHintStates();
     this.hintService.applyHint();
     this.hintsApplied++;
     if (this.hint.getActionType() === ActionType.SET_VALUE) {
