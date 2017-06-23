@@ -3,7 +3,6 @@ import { ChangeDetectorRef } from '@angular/core';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
-// import { Router } from '@angular/router';
 
 import { TITLE, MAJOR_VERSION, VERSION, SUB_VERSION, COPYRIGHT } from './common/common'; 
 import { Common }           from './common/common';
@@ -28,6 +27,13 @@ import { ActionLogService } from './action/action-log.service';
 // test
 import { ROOT_VALUES } from './common/common';
 
+// test
+// import {DirectionEnum} from './directionEnum';
+enum DirectionStates {
+    East, West, North, South 
+}
+  
+
 enum PlayStates {
   NEW,
   ENTRY,    // not used currently
@@ -51,26 +57,33 @@ enum AutoSolveStates {
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  // selector: 'play',
-  // templateUrl: './play.component.html',
-  // styleUrls: ['./play.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
 export class AppComponent implements OnInit {
-  private title = TITLE;
-  private version = 'v' + MAJOR_VERSION + '.' + VERSION + '.' + SUB_VERSION;
-  private copyright = COPYRIGHT;
-  private sudokuService: SudokuService;
-  private hintService: HintService;
+  title = TITLE;
+  version = 'v' + MAJOR_VERSION + '.' + VERSION + '.' + SUB_VERSION;
+  copyright = COPYRIGHT;
+  sudokuService: SudokuService;
+  hintService: HintService;
+
+  // test
+  directionStates = DirectionStates;  
+  directionState = DirectionStates.North;  
+
+  // ----- state properties -----
+  playState: PlayStates;
+  hintStates = HintStates;
+  hintState = HintStates.NO_HINT;
+  autoSolveState: AutoSolveStates;
 
   constructor(
-    // private router: Router,
+    //   router: Router,
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
 
     /** */
-    // private sudokuService: SudokuService,
-    // private hintService: HintService,
+    // sudokuService: SudokuService,
+    // hintService: HintService,
     private cacheService: CacheService
   ) {
     this.sudokuService = new SudokuService(new ActionLogService());
@@ -84,7 +97,7 @@ export class AppComponent implements OnInit {
   DEFAULT_DIFFICULTY = Difficulty.MEDIUM;
   AUTO_SOLVE_DELAY = 250;	// msec
   
-  private difficulties = [
+  difficulties = [
     { value: Difficulty.EASY,    label: 'Easy' },
     { value: Difficulty.MEDIUM,  label: 'Medium' },
     { value: Difficulty.HARD,    label: 'Hard' },
@@ -94,11 +107,6 @@ export class AppComponent implements OnInit {
   // -----------------------------------------------------------------------
   // properties
   // -----------------------------------------------------------------------
-
-  // ----- state properties -----
-  playState: PlayStates;
-  hintState: HintStates;
-  autoSolveState: AutoSolveStates;
 
   // ----- grid properties -----
   candidatesShowing: boolean;   // also in execute
@@ -491,10 +499,10 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
   }
   
-  // true if hintState ACTIVE or READY
-  hintButton() {
-    return this.hintState != HintStates.NO_HINT; 
-  }
+  // // true if hintState ACTIVE or READY
+  // hintButton() {
+  //   return this.hintState != HintStates.NO_HINT; 
+  // }
   
   /**
    * Respond to the 'Get/Apply hint' button. If a hint is already displayed,
@@ -515,15 +523,15 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
   }
   
-  hintButtonLabel() {
-    switch (this.hintState) {
-    case HintStates.READY:
-      return 'Get Hint';
-    case HintStates.ACTIVE:
-      return 'Apply Hint';
-    }
-    return 
-  }
+  // hintButtonLabel() {
+  //   switch (this.hintState) {
+  //   case HintStates.READY:
+  //     return 'Get Hint';
+  //   case HintStates.ACTIVE:
+  //     return 'Apply Hint';
+  //   }
+  //   return 
+  // }
   
   autoSolveButton() {
     return this.autoSolveState != AutoSolveStates.NO_HINT
@@ -637,7 +645,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     // this.router.navigate(['/print']);
   }
   
-  private loadTestPuzzle(initialValues: string) : void {
+  loadTestPuzzle(initialValues: string) : void {
     this.currentPuzzle = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
     this.playState = PlayStates.EXECUTE;
   }
@@ -792,26 +800,26 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
 
   // -----------------------------------------------------------------------
-  // private methods
+  // methods
   // -----------------------------------------------------------------------
 
   /**
    * The for choosing a value is 3x3. Row and column coords are 0,1,2.
    * Row/column values are 1..9. Row 0 has values 1,2,3. Row 2 has 7,8,9.
    */
-  private valueCoordsToValue(r: number, c: number) : number {
+  valueCoordsToValue(r: number, c: number) : number {
     return (r * 3) + c + 1;
   }
 
 
-  private initializeHintStates() {
+  initializeHintStates() {
     this.hintState = HintStates.READY;
     this.hintMessage = '';
     this.autoSolveState = AutoSolveStates.READY;
     this.autoSolveMessage = '';
   }
 
-  private setSelectedCell(r: number, c: number) {
+  setSelectedCell(r: number, c: number) {
     if (!this.sudokuService.isCellInvalid_(r, c)) {
       this.selectedCell.r = r;
       this.selectedCell.c = c;
@@ -821,16 +829,16 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
   }
     
-  private isSelectedCell(r: number, c: number) : boolean {
+  isSelectedCell(r: number, c: number) : boolean {
     return this.selectedCell.r === r && this.selectedCell.c === c;
   }
   
-  private isCellLocked(r: number, c: number) : boolean {
+  isCellLocked(r: number, c: number) : boolean {
     return this.sudokuService.isCellLocked_(r, c);
   }
   
   // ng-dblclick candidate in grid EXECUTION state
-  private removeCandidate(r: number, c: number, k: number) {
+  removeCandidate(r: number, c: number, k: number) {
     this.initializeHintStates();
     if (this.candidatesShowing) {
       this.sudokuService.removeCandidate_(r, c, k);
@@ -838,7 +846,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.refreshActionLog();
   }
   
-  private findHint() : void {
+  findHint() : void {
     this.hint = this.hintService.getHint(Difficulty.HARDEST);
     if (this.hint) {
       this.hintState = HintStates.ACTIVE
@@ -853,7 +861,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
     
   // apply hint toward solution
-  private applyHint() {
+  applyHint() {
     this.hintMessage = '';
     this.hintState = HintStates.READY
     this.hintService.applyHint();
@@ -870,7 +878,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   } // applyHint()
     
   // can be set by key press, apply hint
-  private setCellValue(r: number, c: number, v: number) {
+  setCellValue(r: number, c: number, v: number) {
     this.sudokuService.setValue_(r, c, v);
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     if (this.sudokuService.isSolved()) {
@@ -879,7 +887,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.refreshActionLog();
   }
   
-  private removeCellValue(r: number, c: number) {
+  removeCellValue(r: number, c: number) {
     let oldValue = this.sudokuService.getValue_(r, c);
     if (oldValue >= 1) {
       this.sudokuService.removeValue_(r, c);
@@ -888,22 +896,22 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
   }
   
-  private unselectCell() {
+  unselectCell() {
     this.selectedCell.r = 0;
     this.selectedCell.c = 0;
   }
     
-  private handlePuzzleComplete() {
+  handlePuzzleComplete() {
     this.refreshActionLog();
     this.stopUserTimer();
     this.playState = PlayStates.SOLVED;
   }
     
-  private refreshActionLog() {
+  refreshActionLog() {
     this.actionLog = this.sudokuService.getActionLogAsString();
   }
 
-  private startUserTimer() : void {
+  startUserTimer() : void {
     let elapsedSeconds = 0;
     let timerObservable = Observable.timer(1, 1000);
     this.timerSubscription = timerObservable.subscribe(
@@ -913,11 +921,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
         });
   }
 
-  private stopUserTimer() : void {
+  stopUserTimer() : void {
     this.timerSubscription.unsubscribe();
   }
 
-  private initializeUserInterface() {
+  initializeUserInterface() {
     this.sudokuService.initializeModel();
     this.actualDifficulty = undefined;
     this.selectedCell = {r: 0, c: 0};

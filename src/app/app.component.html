@@ -101,6 +101,20 @@ s: sudoku, b: box, v: value, k: candidate
       
     </div>  <!-- *ngSwitchCase="PlayStates.NEW" -->
 
+<!-- test -->
+<br/><br/><br/>
+<div [ngSwitch]="directionState">
+  <!--<b *ngSwitchCase="dirEnum.East">East Direction</b>
+  <b *ngSwitchCase="dirEnum.West">West Direction</b>
+  <b *ngSwitchCase="dirEnum.North">North Direction</b>
+  <b *ngSwitchCase="dirEnum.South">South Direction</b>-->
+  <b *ngSwitchCase="directionStates.East">East Direction</b>
+  <b *ngSwitchCase="directionStates.West">West Direction</b>
+  <b *ngSwitchCase="directionStates.North">North Direction</b>
+  <b *ngSwitchCase="directionStates.South">South Direction</b>
+  <b *ngSwitchDefault>No Direction</b>
+</div>  
+
     <!-- ========== play-new ========== -->
     <div *ngSwitchCase="PlayStates.CREATING">
 
@@ -134,17 +148,7 @@ s: sudoku, b: box, v: value, k: candidate
             (click)="refreshCandidates()">Refresh candidates</button>
       </p>
 
-      <p>
-        <button *ngIf="hintState == 0" class="exec start" 
-            (click)="handleHintClick()">
-            {{hintButtonLabel()}}</button>
-        <button *ngIf="hintState == 1" class="exec stop" 
-            (click)="handleHintClick()">
-            {{hintButtonLabel()}}</button>
-        {{hintMessage}}
-      </p>
-
-      <!--<div [ngSwitch]="hintState">
+      <div [ngSwitch]="hintState">
         <p *ngSwitchCase="hintStates.READY">
           <button class="exec start" 
               (click)="handleHintClick()">Get hint</button>
@@ -157,7 +161,17 @@ s: sudoku, b: box, v: value, k: candidate
         <p *ngSwitchCase="hintStates.NO_HINT">
           No hint available              
         </p>
-      </div>-->
+      </div>
+
+      <!--<p>
+        <button *ngIf="autoSolveState == 0" class="exec start" 
+            (click)="handleAutoSolveClick()">
+            {{autoSolveButtonLabel()}}</button>
+        <button *ngIf="autoSolveState == 1" class="exec stop" 
+            (click)="handleAutoSolveClick()">
+            {{autoSolveButtonLabel()}}</button>
+        {{autoSolveMessage}}
+      </p>-->
 
       <p>
         <button *ngIf="autoSolveState == 0" class="exec start" 
@@ -166,7 +180,7 @@ s: sudoku, b: box, v: value, k: candidate
         <button *ngIf="autoSolveState == 1" class="exec stop" 
             (click)="handleAutoSolveClick()">
             {{autoSolveButtonLabel()}}</button>
-        {{autoSolveMessage}}
+        <span>{{autoSolveMessage}}</span>
       </p>
 
       <p *ngIf="!isAnySelectedCell()"><span>Select a cell</span></p>
