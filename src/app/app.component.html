@@ -48,7 +48,7 @@ s: sudoku, b: box, v: value, k: candidate
                     {{candToChar_(br, bc, cr, cc, kr, kc)}}
                     <!--8-->
                   </span>
-                </div>
+                </div> <!-- kcell -->
               </div>
             </div>
               
@@ -134,6 +134,7 @@ s: sudoku, b: box, v: value, k: candidate
             (click)="refreshCandidates()">Refresh candidates</button>
       </p>
 
+      <!-- ===== Hints ===== -->
       <div [ngSwitch]="hintState">
         <p *ngSwitchCase="hintStates.READY">
           <button class="exec start" 
@@ -149,21 +150,13 @@ s: sudoku, b: box, v: value, k: candidate
         </p>
       </div>
 
-      <!--<p>
-        <button *ngIf="autoSolveState == 0" class="exec start" 
-            (click)="handleAutoSolveClick()">
-            {{autoSolveButtonLabel()}}</button>
-        <button *ngIf="autoSolveState == 1" class="exec stop" 
-            (click)="handleAutoSolveClick()">
-            {{autoSolveButtonLabel()}}</button>
-        {{autoSolveMessage}}
-      </p>-->
-
+      <!-- ===== Auto Solve ===== -->
       <p [ngSwitch]="autoSolveState">
         <button *ngSwitchCase="autoSolveStates.READY" 
             class="exec start" (click)="handleAutoSolveClick()">
             Auto solve start</button>
-        <button *ngSwitchCase="autoSolveStates.RUNNING" 
+        <button *ngSwitchCase="autoSolveStates.RUNNING
+            || autoSolveStates.PENDING_STOP" 
             class="exec stop" (click)="handleAutoSolveClick()">
             Auto solve stop</button>
         <span *ngSwitchCase="autoSolveStates.NO_HINT
@@ -171,6 +164,7 @@ s: sudoku, b: box, v: value, k: candidate
             Auto solve not available</span>
       </p>
 
+      <!-- ===== Value Picker ===== -->
       <p *ngIf="!isAnySelectedCell()"><span>Select a cell</span></p>
       <div *ngIf="isAnySelectedCell()">
       <p>Click value for selected cell:</p>

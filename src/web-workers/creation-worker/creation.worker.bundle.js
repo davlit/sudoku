@@ -91,7 +91,7 @@
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
 var VERSION = '15';
-var SUB_VERSION = '0';
+var SUB_VERSION = '3';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -415,14 +415,17 @@ var Common = (function () {
         return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3);
     };
     // Translate view's box & row indexes to model row indexes (0..8)
+    // XXX
     Common.viewToModelRow = function (br, cr) {
         return (br * 3) + cr + 1;
     };
     // Translate view's box column indexes to model column indexes (0..8)
+    // XXX
     Common.viewToModelCol = function (bc, cc) {
         return (bc * 3) + cc + 1;
     };
     // Translate view's candidate cell indexes to model candidate (0..8)
+    // XXX
     Common.viewToModelCand = function (kr, kc) {
         return ((kr % 3) * 3) + kc + 1;
     };

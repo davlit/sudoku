@@ -361,16 +361,19 @@ export class Common {
   }
 
   // Translate view's box & row indexes to model row indexes (0..8)
+  // XXX
   static viewToModelRow(br: number, cr: number) : number {
     return (br * 3) + cr + 1;
   } 
   
   // Translate view's box column indexes to model column indexes (0..8)
+  // XXX
   static viewToModelCol(bc: number, cc: number) : number {
     return (bc * 3) + cc + 1;
   } 
   
   // Translate view's candidate cell indexes to model candidate (0..8)
+  // XXX
   static viewToModelCand(kr: number, kc: number) : number {
     return ((kr % 3) * 3) + kc + 1;
   }
