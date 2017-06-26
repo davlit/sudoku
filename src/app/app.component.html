@@ -63,47 +63,6 @@ s: sudoku, b: box, v: value, k: candidate
   </div> <!-- bcontainer -->
 </div> <!-- pcell -->
 
-
- <!-- OLD -->
-  <!--<div id="grid" class="sGrid" (keyup)="handleKeyPress($event)" 
-       oncontextmenu="return false;" tabindex="1">
-    <div class="bRow" *ngFor="let br of [0,1,2]">
-      <div class="box" *ngFor="let bc of [0,1,2]">
-        <div class="sRow" *ngFor="let cr of [0,1,2]">
-          <div class="sCell" *ngFor="let cc of [0,1,2]"
-              [ngClass]="{
-                'locked':   isCellLocked_(br, bc, cr, cc),
-                'selected': isSelectedCell_(br, bc, cr, cc),
-                'invalid':  isCellInvalid_(br, bc, cr, cc)}"
-              (mousedown)="handleCellClick_($event, br, bc, cr, cc)">
-            
-            -- opt 1: value --
-            <span class="value">
-              {{valueToChar_(br, bc, cr, cc)}}
-              <!--8--
-            </span>
-
-            <!-- opt 2: candidates --
-            <div class="kGrid"
-               [hidden]="getValue_(br, bc, cr, cc) > 0">
-              <div class="kRow" *ngFor="let kr of [0,1,2]">
-                <div class="kCell" *ngFor="let kc of [0,1,2]"
-                    (dblclick)="handleCandidateClick_(br, bc, cr, cc, kr, kc)">
-                  <span class="candidate"
-                      [hidden]="!candidatesShowing || !candidatesVisible_(kr, kc)">
-                    {{candToChar_(br, bc, cr, cc, kr, kc)}}
-                    <!--8--
-                  </span>
-                </div> <!-- kcell --
-              </div>
-            </div>
-              
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>-->
- 
 </section>
 
 <section id="controls" class="exec-text">
@@ -225,7 +184,7 @@ s: sudoku, b: box, v: value, k: candidate
         </div>
         <div class="clear-row">
           <div class="clear-cell"
-              (mousedown)="handleChoiceClearClick_()">
+              (mousedown)="handleChoiceClearClick()">
             <span class="clear-val">Clear</span>
           </div>
         </div>

@@ -119,7 +119,8 @@ export class AppComponent implements OnInit {
   currentPuzzle: Puzzle;
   hint: Hint;
   candidatesVisible: boolean[];
-  selectedCell: {r: number, c: number};
+  // xselectedCell: {r: number, c: number};
+  selectedCell: number;
 
   ngOnInit() {
     this.desiredDifficulty = Difficulty.MEDIUM;   // default
@@ -162,43 +163,49 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
     let value = 0;
 
     // get currently selected cell's row and column number
-    let r = this.selectedCell.r;
-    let c = this.selectedCell.c;
-console.info('key r/c: ' + r + '/' + c);
+    // let ur = this.xselectedCell.r;
+    // let uc = this.xselectedCell.c;
+    let ur = Common.userRow(this.selectedCell);
+    let uc = Common.userCol(this.selectedCell);
+console.info('key ur/uc: ' + ur + '/' + uc);
     
     // no key action if no cell selected
-    if (r == 0 && c == 0) {
+    if (ur == 0 && uc == 0) {
       return;
     }
 
     switch(keyCode) {
       case 37:		// left arrow - wrap to previous row
-        c--;
-        if (c < 1) {
-          r--;
-          if (r < 1) { r = 9; }
-          c = 9;
+        uc--;
+        if (uc < 1) {
+          ur--;
+          if (ur < 1) { ur = 9; }
+          uc = 9;
         }
-        this.setSelectedCell(r, c); 
+        // this.setSelectedCell(ur, uc); 
+        this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
         return;
       case 38:		// up arrow - wrap in column
-        r--;
-        if (r < 1) { r = 9; }
-        this.setSelectedCell(r, c); 
+        ur--;
+        if (ur < 1) { ur = 9; }
+        // this.setSelectedCell(ur, uc); 
+        this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
         return;
       case 39:		// right arrow - wrap to next row
-        c++;
-        if (c > 9) {
-          r++;
-          if (r > 9) { r = 1; }
-          c = 1;
+        uc++;
+        if (uc > 9) {
+          ur++;
+          if (ur > 9) { ur = 1; }
+          uc = 1;
         }
-        this.setSelectedCell(r, c); 
+        // this.setSelectedCell(ur, uc); 
+        this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
         return;
       case 40:		// down arrow - wrap in column
-        r++;
-        if (r > 9) { r = 1; }
-        this.setSelectedCell(r, c); 
+        ur++;
+        if (ur > 9) { ur = 1; }
+        // this.setSelectedCell(ur, uc); 
+        this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
         return;
       case 46:		// delete
       case 32:		// space
@@ -215,22 +222,25 @@ console.info('key r/c: ' + r + '/' + c);
 
     if (value >= 0 && value <= 9) {
       if (value > 0) {
-        this.setCellValue(r, c, value);
+        // this.setCellValue(ur, uc, value);
+        this.setCellValue(Common.urcToCellIdx(ur, uc), value);
       } else {
-        this.removeCellValue(r, c);
+        // this.removeCellValue(ur, uc);
+        this.removeCellValue(Common.urcToCellIdx(ur, uc));
       }
 
       this.initializeHintStates();
       
       // step selected cell right (wrap to next row) during entry
       if (this.playState === PlayStates.ENTRY) {
-        c++;
-        if (c > 9) {
-          r++;
-          if (r > 9) { r = 1; }
-          c = 1;
+        uc++;
+        if (uc > 9) {
+          ur++;
+          if (ur > 9) { ur = 1; }
+          uc = 1;
         }
-        this.setSelectedCell(r, c); 
+        // this.setSelectedCell(ur, uc); 
+        this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
       }
     } // if value 0..9
   } // handleKeyPress()
@@ -247,11 +257,19 @@ console.info('key r/c: ' + r + '/' + c);
    * 
    * Function based on view's cell indexes in html code.
    */
+  // isSelectedCell_(vb: number, vc: number) : boolean {
+  //   let cell = this.viewToCellIdx(vb, vc)
+  //   let row = Common.rowIdx(cell);
+  //   let col = Common.colIdx(cell);
+  //   return this.isSelectedCell(row, col);
+  // } // isSelectedCell_()
+  // TODO
   isSelectedCell_(vb: number, vc: number) : boolean {
-    let cell = this.viewToCellIdx(vb, vc)
-    let row = Common.rowIdx(cell);
-    let col = Common.colIdx(cell);
-    return this.isSelectedCell(row, col);
+    // let ci = this.viewToCellIdx(vb, vc)
+    // let row = Common.rowIdx(cell);
+    // let col = Common.colIdx(cell);
+    // return this.isSelectedCell(row, col);
+    return this.isSelectedCell(this.viewToCellIdx(vb, vc));
   } // isSelectedCell_()
   
   /**
@@ -272,19 +290,22 @@ console.info('key r/c: ' + r + '/' + c);
       return;
     }
     
-    let cell = this.viewToCellIdx(vb, vc);
-    if (this.sudokuService.isCellLocked(cell)) {
+    let ci = this.viewToCellIdx(vb, vc);
+console.info('Cell click vb/vc, ci: ' + vb + '/' + vc + ', ' + ci);
+    if (this.sudokuService.isCellLocked(ci)) {
       return;         // can't accept click on locked cell
     }
     // let r = Common.viewToModelRow(br, cr);
     // let c = Common.viewToModelCol(bc, cc);
-    let r = Common.rowIdx(cell);
-    let c = Common.colIdx(cell);
-console.info('mouse r/c: ' + r + '/' + c);
+    // let zr = Common.rowIdx(ci);
+    // let zc = Common.colIdx(ci);
+// console.info('Cell click ci, r/c: ' + ci + ', ' + zr + '/' + zc);
     switch(event.which) {
       case 1:   // left click
-        if (this.selectedCell.r != r || this.selectedCell.c != c) {
-          this.setSelectedCell(r, c); 
+        // if (this.xselectedCell.r != zr || this.xselectedCell.c != zc) {
+        //   this.setSelectedCell(zr, zc); 
+        if (this.selectedCell != ci) {
+          this.setSelectedCell(ci); 
         } else {
           this.unselectCell();
         }
@@ -292,10 +313,13 @@ console.info('mouse r/c: ' + r + '/' + c);
       case 2:   // middle click
         return;
       case 3:   // right click
-        let nakeds = this.sudokuService.getNakedCandidates_(r, c, NakedType.SINGLE);
+        // let nakeds = this.sudokuService.getNakedCandidates_(zr, zc, NakedType.SINGLE);
+        let nakeds = this.sudokuService.findNakedCandidates(ci, NakedType.SINGLE);
         if (nakeds.length === 1) {
-          this.setCellValue(r, c, nakeds[0]);
-          this.setSelectedCell(r, c);
+          // this.setCellValue(zr, zc, nakeds[0]);
+          // this.setSelectedCell(zr, zc);
+          this.setCellValue(ci, nakeds[0]);
+          this.setSelectedCell(ci);
         }
         return;
       default:
@@ -433,8 +457,12 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   /**
    * 
    */
+  // isAnySelectedCell() {
+  //   return this.xselectedCell.r != 0;
+  // } // isAnySelectedCell()
+  // TODO
   isAnySelectedCell() {
-    return this.selectedCell.r != 0;
+    return this.selectedCell >= 0 && this.selectedCell <= 80;
   } // isAnySelectedCell()
 
   /**
@@ -455,10 +483,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.initializeHintStates();
 
     // get currently selected cell's row and column number
-    let r = this.selectedCell.r;
-    let c = this.selectedCell.c;
+    // let r = this.xselectedCell.r;
+    // let c = this.xselectedCell.c;
     
-    this.setCellValue(r, c, choice);
+    // this.setCellValue(r, c, choice);
+    this.setCellValue(this.selectedCell, choice);
   } // handleChoiceClick_()
 
   /**
@@ -471,14 +500,15 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   /**
    * 
    */
-  handleChoiceClearClick_() {
+  handleChoiceClearClick() {
     this.initializeHintStates();
 
     // get currently selected cell's row and column number
-    let r = this.selectedCell.r;
-    let c = this.selectedCell.c;
+    // let r = this.xselectedCell.r;
+    // let c = this.xselectedCell.c;
     
-    this.removeCellValue(r, c);
+    // this.removeCellValue(r, c);
+    this.removeCellValue(this.selectedCell);
   } // handleChoiceClearClick_()
 
   /**
@@ -499,9 +529,11 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
 
     // set selected cell to that of last action
-    let lastCell = lastAction.cell;
-    let rc = Common.cellRC(lastCell);
-    this.setSelectedCell(rc.r, rc.c);
+    // let lastCell = lastAction.cell;
+    // let rc = Common.cellRC(lastCell);
+    // this.setSelectedCell(rc.r, rc.c);
+    // let rc = Common.cellRC(lastCell);
+    this.setSelectedCell(lastAction.cell);
     this.refreshActionLog();
   } // undoLastAction()
   
@@ -665,16 +697,19 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
    * @param r 
    * @param c 
    */
-  setSelectedCell(r: number, c: number) {
-    let cell = Common.cellIdx(r, c);
-console.log('cell: ' + cell);
-    if (this.sudokuService.isCellValid(cell)) {
-      this.selectedCell.r = r;
-      this.selectedCell.c = c;
-      // this.focus('grid');
-    } else {
-      this.unselectCell();
-    }
+//   setSelectedCell(r: number, c: number) {
+//     let cell = Common.cellIdx(r, c);
+// console.log('cell: ' + cell);
+//     if (this.sudokuService.isCellValid(cell)) {
+//       this.xselectedCell.r = r;
+//       this.xselectedCell.c = c;
+//       // this.focus('grid');
+//     } else {
+//       this.unselectCell();
+//     }
+//   }
+  setSelectedCell(ci: number) {
+    this.selectedCell = ci;
   }
     
   /**
@@ -682,8 +717,11 @@ console.log('cell: ' + cell);
    * @param r 
    * @param c 
    */
-  isSelectedCell(r: number, c: number) : boolean {
-    return this.selectedCell.r === r && this.selectedCell.c === c;
+  // isSelectedCell(r: number, c: number) : boolean {
+  //   return this.xselectedCell.r === r && this.xselectedCell.c === c;
+  // }
+  isSelectedCell(ci: number) : boolean {
+    return this.selectedCell === ci;
   }
   
   /**
@@ -717,8 +755,9 @@ console.log('cell: ' + cell);
       this.hintState = HintStates.ACTIVE
       this.hintsViewed++;
       this.hintMessage = this.hint.toString();
-      this.setSelectedCell(Common.userRow(this.hint.getCell()), 
-          Common.userCol(this.hint.getCell()));
+      // this.setSelectedCell(Common.userRow(this.hint.getCell()), 
+      //     Common.userCol(this.hint.getCell()));
+      this.setSelectedCell(this.hint.getCell());
     } else {
       this.hintState = HintStates.NO_HINT;
       // this.hintMessage = 'No hint available';
@@ -752,22 +791,39 @@ console.log('cell: ' + cell);
    * 
    */
   // can be set by key press, apply hint
-  setCellValue(r: number, c: number, v: number) {
-    this.sudokuService.setValue_(r, c, v);
+  // setCellValue(r: number, c: number, v: number) {
+  //   this.sudokuService.setValue_(r, c, v);
+  //   this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
+  //   if (this.sudokuService.isSolved()) {
+  //     this.handlePuzzleComplete();
+  //   }
+  //     this.refreshActionLog();
+  // }
+  setCellValue(ci: number, v: number) {
+    // this.sudokuService.setValue_(r, c, v);
+    this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     if (this.sudokuService.isSolved()) {
       this.handlePuzzleComplete();
     }
       this.refreshActionLog();
   }
-  
+
   /**
    * 
    */
-  removeCellValue(r: number, c: number) {
-    let oldValue = this.sudokuService.getValue_(r, c);
+  // removeCellValue(r: number, c: number) {
+  //   let oldValue = this.sudokuService.getValue_(r, c);
+  //   if (oldValue >= 1) {
+  //     this.sudokuService.removeValue_(r, c);
+  //     this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
+  //     this.refreshActionLog();
+  //   }
+  // }
+  removeCellValue(ci: number) {
+    let oldValue = this.sudokuService.getValue(ci);
     if (oldValue >= 1) {
-      this.sudokuService.removeValue_(r, c);
+      this.sudokuService.removeValue(ci);
       this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
       this.refreshActionLog();
     }
@@ -777,8 +833,9 @@ console.log('cell: ' + cell);
    * 
    */
   unselectCell() {
-    this.selectedCell.r = 0;
-    this.selectedCell.c = 0;
+    // this.xselectedCell.r = 0;
+    // this.xselectedCell.c = 0;
+    this.selectedCell = -1;
   }
     
   /**
@@ -823,7 +880,9 @@ console.log('cell: ' + cell);
   initializeUserInterface() {
     this.sudokuService.initializeModel();
     this.actualDifficulty = undefined;
-    this.selectedCell = {r: 0, c: 0};
+    // this.xselectedCell = {r: 0, c: 0};
+    // this.selectedCell = -1;   // no cell selected
+    this.unselectCell();   // no cell selected
 
     this.candidatesShowing = false;       // master switch
     for (let v = 1; v <= 9; v++) {

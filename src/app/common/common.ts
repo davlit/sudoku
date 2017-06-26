@@ -1,7 +1,7 @@
 export const TITLE = 'Sudoku Helper';
 export const MAJOR_VERSION = '0';
 export const VERSION = '16';
-export const SUB_VERSION = '0';
+export const SUB_VERSION = '1';
 export const COPYRIGHT = 
     'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 
@@ -156,14 +156,17 @@ export class Common {
     return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3) + 1;
   }
 
-  static cellRC(cellIdx: number) : {r: number, c: number} {
-    return {r: this.userRow(cellIdx), c: this.userCol(cellIdx)}
-  }
+  // static cellRC(cellIdx: number) : {r: number, c: number} {
+  //   return {r: this.userRow(cellIdx), c: this.userCol(cellIdx)}
+  // }
 
     /**
    * Translate cell's row and col (1..9) to cell index (0..80).
    */
-  static cellIdx(r: number, c: number) : number {
+  // static cellIdx(r: number, c: number) : number {
+  //   return 9 * r + c - 10;    // ((r - 1) * 9) + (c - 1)
+  // }
+static urcToCellIdx(r: number, c: number) : number {
     return 9 * r + c - 10;    // ((r - 1) * 9) + (c - 1)
   }
 

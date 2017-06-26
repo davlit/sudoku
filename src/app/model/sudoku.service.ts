@@ -148,7 +148,7 @@ export class SudokuService {
    * Gets givenValue in cell at given row and column (1..9).
    */
   public getValue_(r: number, c: number) : number {
-    return this.getValue(Common.cellIdx(r, c));
+    return this.getValue(Common.urcToCellIdx(r, c));
   } // getValue_()
 
   /**
@@ -162,7 +162,7 @@ export class SudokuService {
    * Sets givenValue in cell at given row and column (1..9).
    */
   public setValue_(r: number, c: number, newValue: number) : void {
-    this.setValue(Common.cellIdx(r, c), newValue, ActionType.SET_VALUE);       
+    this.setValue(Common.urcToCellIdx(r, c), newValue, ActionType.SET_VALUE);       
   } // setValue_()
 
   /**
@@ -256,7 +256,7 @@ export class SudokuService {
    * Removes givenValue in cell at given row and column (1..9).
    */
   public removeValue_(r: number, c: number) : void {
-    this.removeValue(Common.cellIdx(r, c));       
+    this.removeValue(Common.urcToCellIdx(r, c));       
   } // removeValue_()
 
 
@@ -347,7 +347,7 @@ export class SudokuService {
    * Removes given candidate from cell at given row and column (1..9).
    */
   public removeCandidate_(r: number, c: number, k: number) : void {
-    this.removeCandidate(Common.cellIdx(r, c), k, undefined);  // user action
+    this.removeCandidate(Common.urcToCellIdx(r, c), k, undefined);  // user action
   } // removeCandidate_()
 
   /**
@@ -574,7 +574,7 @@ export class SudokuService {
    * 
    */
   public isCandidate_(r: number, c: number, k: number) : boolean {
-    return this.isCandidate(Common.cellIdx(r, c), k);
+    return this.isCandidate(Common.urcToCellIdx(r, c), k);
   } // isCandidate_()
   
   /**
@@ -659,9 +659,9 @@ try {
   /**
    * 
    */
-  public getNakedCandidates_(r: number, c: number, maxCandidates: NakedType) {
-    return this.findNakedCandidates(Common.cellIdx(r, c), maxCandidates);
-  } // getNakedCandidates_()
+  // public getNakedCandidates_(r: number, c: number, maxCandidates: NakedType) {
+  //   return this.findNakedCandidates(Common.urcToCellIdx(r, c), maxCandidates);
+  // } // getNakedCandidates_()
 
   /**
    * 
@@ -990,7 +990,7 @@ try {
    * 
    */
   private getCandidates_(r: number, c: number) : number[] {
-    return this.getCandidates(Common.cellIdx(r, c));
+    return this.getCandidates(Common.urcToCellIdx(r, c));
   }
         
   /**
