@@ -91,9 +91,9 @@ export class ValueHint extends Hint {
   toString() : string {
 
     // convert 0-base rows, cols, boxs to 1-base (1..9)
-    let r = Common.rowNr(this._cell);
-    let c = Common.colNr(this._cell);
-    let b = Common.boxNr(this._cell);
+    let r = Common.userRow(this._cell);
+    let c = Common.userCol(this._cell);
+    let b = Common.userBox(this._cell);
 
     switch(this.type) {
       case HintType.NAKED_SINGLE:
@@ -167,9 +167,9 @@ export class CandidatesHint extends Hint {
   toString() : string {
 
     // convert 0-base rows, cols, boxs to 1-base (1..9)
-    let r = Common.rowNr(this._cells[0]);
-    let c = Common.colNr(this._cells[0]);
-    let b = Common.boxNr(this._cells[0]);
+    let r = Common.userRow(this._cells[0]);
+    let c = Common.userCol(this._cells[0]);
+    let b = Common.userBox(this._cells[0]);
 
     switch (this.type) {
       case HintType.NAKED_PAIRS_ROW:

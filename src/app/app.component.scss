@@ -19,7 +19,121 @@ html {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-*, *:before, *:after { box-sizing: inherit; }
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+span.appTitle {
+  float: left;
+  font-size: 30px;
+  font-weight: bold;
+  color: $green2;
+  line-height: 60px;
+}
+span.appVersion {
+  float: left;
+  font-size: 10px;
+  line-height: 75px;
+}
+
+#gridsection {
+  clear: left;
+  float: left;
+}
+
+// SUDOKU
+$k-size: 1.6vw;
+$k-font-size: 1.2vw;
+// $k-font-size: $k-size * 0.75;
+// $k-font-size: $k-size * 0.3;
+$s-size: $k-size * 3;
+$s-font-size: $k-font-size * 3;
+$b-size: $s-size * 3 + 0.3;
+$p-size: $b-size * 3 + 0.85;
+
+.pcell {
+  width: $p-size;
+// height: $p-size;
+// max-height: $p-size;
+  padding: 0.2vw;
+  background-color: $black;
+}
+
+.bcontainer {
+// max-height: $p-size;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-gap: 0.2vw;
+}
+
+.bcell {
+  background-color: $gray1;
+}
+
+.scontainer {
+// max-height: $s-size;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-gap: 0.1vw;
+}
+
+.scell {
+// max-height: $s-size;
+  font-size: $s-font-size;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  text-align: center;
+  line-height: $s-size;
+  background-color: $tan2;
+  color: $green3;
+}
+
+.sCell.locked {
+  color: $black;
+}
+.sCell.selected {
+  background-color: $green1;
+}
+.sCell.invalid {
+  background-color: $red1;
+  color: $red3;
+}
+
+.value {
+  cursor: default;
+}
+
+.kcontainer {
+// max-height: $k-size;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+
+.kcell {
+// max-height: $k-size;
+  width: $k-size;
+  height: $k-size;
+  font-size: $k-font-size;
+  font-weight: normal;
+  color: $gray2;
+  text-align: center;
+  line-height: $k-size;
+  background-color: $tan2;
+}
+
+.candidate {
+  // line-height: 22px;  /* better for numbers instead of vertical-align */
+  /*color: white;*/   /* disappearing ink */
+  cursor: default;
+  // color: $gray2;
+}
 
 .exec-text {
   font-size: 16px;
@@ -55,95 +169,160 @@ cands { margin-left: 1px; }
 
 
 
-span.appTitle {
-  float: left;
-  font-size: 30px;
-  font-weight: bold;
-  color: $green2;
-  line-height: 60px;
-}
-span.appVersion {
-  float: left;
-  font-size: 10px;
-  line-height: 75px;
-}
+// NEW
 
-.sGrid {    /* 1 */
-  display: table;
-  border: 2px solid $black;
-  background-color: $tan1;
-}
-.bRow {     /* 3/grid */
-  display: table-row;
-}
-.box {      /* 3/boxrow, 9/grid */
-  display: table-cell;
-  float: left;
-  border: 2px solid $gray2;
-}
-.sRow {     /* 3/box, 9/grid */
-  display: table-row;
-}
-.sCell {    /* 3/gridrow, 9/box, 81/grid */
-  display: table-cell;
-  float: left;
-  height: 66px;
-  width:  66px;
-  border: 1px solid $gray1;
-  margin: -1px -1px -1px -1px;
-  text-align: center;
-  font-size: 40px;
-  font-weight: bold;
-  color: $green3;
-}
-.sCell.locked {
-  color: $black;
-}
-.sCell.selected {
-  background-color: $green1;
-}
-.sCell.invalid {
-  background-color: $red1;
-  color: $red3;
-}
-.value {
-  line-height: 66px;
-  cursor: default;
-}
+// SUDOKU
+// $k-size: 1.6vw;
+// // $k-font-size: 1.2vw;
+// $k-font-size: $k-size * 0.75;
+// $s-size: $k-size * 3;
+// $s-font-size: $k-font-size * 3;
+// $b-size: $s-size * 3 + 0.3;
+// $p-size: $b-size * 3 + 0.85;
 
-.kGrid {
-  display: table;
-}
-.kRow {
-  display: table-row;
-}
-.kCell {
-  display: table-cell;
-  float: left;
-  height: 22px; /* 21 w/border */
-  width:  22px;
-  margin-right: -1px;
-  text-align: center;
-  font-size: 15px;
-  /*border: 1px solid pink; */
-}
-.candidate {
-  line-height: 22px;  /* better for numbers instead of vertical-align */
-  /*color: white;*/   /* disappearing ink */
-  cursor: default;
-  color: $gray2;
-}
+// html {
+//   box-sizing: border-box;
+//   // font-family: Arial, Helvetica, sans-serif;
+// }
+// *, *:before, *:after {
+//   box-sizing: inherit;
+// }
+
+// body {
+//   font-family: Arial, Helvetica, sans-serif;
+// }
+
+// .pcell {
+//   width: $p-size;
+//   padding: 0.2vw;
+//   background-color: $black;
+// }
+
+// .bcontainer {
+//   display: grid;
+//   grid-template-columns: 1fr 1fr 1fr;
+//   grid-gap: 0.2vw;
+// }
+
+// .bcell {
+//   background-color: $gray1;
+// }
+
+// .scontainer {
+//   display: grid;
+//   grid-template-columns: 1fr 1fr 1fr;
+//   grid-gap: 0.1vw;
+// }
+
+// .scell {
+//   font-size: $s-font-size;
+//   font-family: Arial, Helvetica, sans-serif;
+//   font-weight: bold;
+//   text-align: center;
+//   line-height: $s-size;
+//   background-color: $tan2;
+// }
+
+// .value {
+//   cursor: default;
+// }
+
+// .kcontainer {
+//   display: grid;
+//   grid-template-columns: 1fr 1fr 1fr;
+// }
+
+// .kcell {
+//   width: $k-size;
+//   height: $k-size;
+//   font-size: $k-font-size;
+//   font-weight: normal;
+//   color: $gray2;
+//   text-align: center;
+//   line-height: $k-size;
+//   background-color: $tan2;
+// }
+
+// .candidate {
+//   // line-height: 22px;  /* better for numbers instead of vertical-align */
+//   /*color: white;*/   /* disappearing ink */
+//   cursor: default;
+//   // color: $gray2;
+// }
+
+// OLD
+// .sGrid {    /* 1 */
+//   display: table;
+//   border: 2px solid $black;
+//   background-color: $tan1;
+// }
+// .bRow {     /* 3/grid */
+//   display: table-row;
+// }
+// .box {      /* 3/boxrow, 9/grid */
+//   display: table-cell;
+//   float: left;
+//   border: 2px solid $gray2;
+// }
+// .sRow {     /* 3/box, 9/grid */
+//   display: table-row;
+// }
+// .sCell {    /* 3/gridrow, 9/box, 81/grid */
+//   display: table-cell;
+//   float: left;
+//   height: 66px;
+//   width:  66px;
+//   border: 1px solid $gray1;
+//   margin: -1px -1px -1px -1px;
+//   text-align: center;
+//   font-size: 40px;
+//   font-weight: bold;
+//   color: $green3;
+// }
+// .sCell.locked {
+//   color: $black;
+// }
+// .sCell.selected {
+//   background-color: $green1;
+// }
+// .sCell.invalid {
+//   background-color: $red1;
+//   color: $red3;
+// }
+// .value {
+//   line-height: 66px;
+//   cursor: default;
+// }
+
+// .kGrid {
+//   display: table;
+// }
+// .kRow {
+//   display: table-row;
+// }
+// .kCell {
+//   display: table-cell;
+//   float: left;
+//   height: 22px; /* 21 w/border */
+//   width:  22px;
+//   margin-right: -1px;
+//   text-align: center;
+//   font-size: 15px;
+//   /*border: 1px solid pink; */
+// }
+// .candidate {
+//   line-height: 22px;  /* better for numbers instead of vertical-align */
+//   /*color: white;*/   /* disappearing ink */
+//   cursor: default;
+//   color: $gray2;
+// }
 /*.candidate.show {
   color: gray;
 }*/
-td.dim {
-  /*color: #b8b8b8;*/   /* a light gray */ 
-  color: $gray2;		/* a light gray */
-}
-#gridsection {
-  clear: left;
-  float: left;
-}
+// td.dim {
+//   /*color: #b8b8b8;*/   /* a light gray */ 
+//   color: $gray2;		/* a light gray */
+// }
 #controls {
   float: left;
   padding-left: 15px;

@@ -1,7 +1,7 @@
 export const TITLE = 'Sudoku Helper';
 export const MAJOR_VERSION = '0';
-export const VERSION = '15';
-export const SUB_VERSION = '3';
+export const VERSION = '16';
+export const SUB_VERSION = '0';
 export const COPYRIGHT = 
     'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 
@@ -118,26 +118,77 @@ export class Common {
 //     return {'r': r, 'c': c};
 //   };
 
+  /**
+   * LEGEND
+   * vb, vc - view (template/html) box, cell within box (zero-based 0..8)
+   * ur, uc, ub - user row, col, box (one-based 1..9)
+   * ci - cell index (zero-based 0..80)
+   * v - value (one-based 1..9, but zero --> no value)
+   * zr, zc, zb - internal row, col, box index (zero-based 0..8)
+   * 
+   * CONVERSIONS
+   * vb, vc --> ci
+   * ci --> ur, uc, ub -- userRow, ...
+   * ci --> zr, zc, zb
+   */
+
+  /**
+   * Convert view box/cell to cell idx
+   * @param vb the view box that contains the cell
+   * @param vc the position if the cell in the view box
+   */
+  // static cellIdx(vb: number, vc: number) : number {
+  //   return (Math.floor(vb / 3) * 18) + (vb * 3) + (Math.floor(vc / 3) * 6) + vc;
+  // } // cellIdx()
+
   /** Get row number 1..9 from cell index 0..80. */ 
-  static rowNr(cellIdx: number) : number {
+  static userRow(cellIdx: number) : number {
     return Math.floor(cellIdx / 9) + 1;
   }
 
   /** Get row number 1..9 from cell index 0..80. */ 
-  static colNr(cellIdx: number) : number {
+  static userCol(cellIdx: number) : number {
     return (cellIdx % 9) + 1;
   }
 
   /** Get row number 1..9 from cell index 0..80. */ 
-  static boxNr(cellIdx: number) : number {
+  static userBox(cellIdx: number) : number {
     return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3) + 1;
   }
 
   static cellRC(cellIdx: number) : {r: number, c: number} {
-    return {r: this.rowNr(cellIdx), c: this.colNr(cellIdx)}
+    return {r: this.userRow(cellIdx), c: this.userCol(cellIdx)}
+  }
+
+    /**
+   * Translate cell's row and col (1..9) to cell index (0..80).
+   */
+  static cellIdx(r: number, c: number) : number {
+    return 9 * r + c - 10;    // ((r - 1) * 9) + (c - 1)
   }
 
   /**
+   * Translate cell index (0..80) to row index (0..8).
+   */
+  static rowIdx(cellIdx: number) : number {
+    return Math.floor(cellIdx / 9);
+  }
+
+  /**
+   * Translate cell index (0..80) to col index (0..8).
+   */
+  static colIdx(cellIdx: number) : number {
+    return cellIdx % 9;
+  }
+
+  /** 
+   * Translate cell index (0..80) to box index (0..8).
+   */
+  static boxIdx(cellIdx: number) : number {
+    return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3);
+  }
+
+/**
    * Related cells share the same row, column, or box of the given cell. The 
    * given cell is not in the list of related cells. Any cell has 20 related 
    * cells: 8 from the row, 8 from the column and 4 from the box that are not 
@@ -331,34 +382,6 @@ export class Common {
   static toRowColString(idx: number) : string {
     return (Common.rowIdx(idx) + 1) + ',' + (Common.colIdx(idx) + 1);
   } // toRowColString()
-
-  /**
-   * Translate cell's row and col (1..9) to cell index (0..80).
-   */
-  static cellIdx(r: number, c: number) : number {
-    return 9 * r + c - 10;    // ((r - 1) * 9) + (c - 1)
-  }
-
-  /**
-   * Translate cell index (0..80) to row index (0..8).
-   */
-  static rowIdx(cellIdx: number) : number {
-    return Math.floor(cellIdx / 9);
-  }
-
-  /**
-   * Translate cell index (0..80) to col index (0..8).
-   */
-  static colIdx(cellIdx: number) : number {
-    return cellIdx % 9;
-  }
-
-  /** 
-   * Translate cell index (0..80) to box index (0..8).
-   */
-  static boxIdx(cellIdx: number) : number {
-    return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3);
-  }
 
   // Translate view's box & row indexes to model row indexes (0..8)
   // XXX

@@ -857,8 +857,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.hintState = HintStates.ACTIVE
       this.hintsViewed++;
       this.hintMessage = this.hint.toString();
-      this.setSelectedCell(Common.rowNr(this.hint.getCell()), 
-          Common.colNr(this.hint.getCell()));
+      this.setSelectedCell(Common.userRow(this.hint.getCell()), 
+          Common.userCol(this.hint.getCell()));
     } else {
       this.hintState = HintStates.NO_HINT;
       this.hintMessage = 'No hint available';

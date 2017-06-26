@@ -19,7 +19,53 @@ Sudoku grid based on
 Sudoku model is based on 9 rows and 9 columns of cells
 s: sudoku, b: box, v: value, k: candidate
  -->
-  <div id="grid" class="sGrid" (keyup)="handleKeyPress($event)" 
+ <!-- NEW -->
+ <div class="pcell" (keyup)="handleKeyPress($event)" 
+    oncontextmenu="return false;" tabindex="1">
+  <div class="bcontainer">
+    <div *ngFor="let vb of [0,1,2,3,4,5,6,7,8]">
+      <div class="bcell">
+        <div class="scontainer">
+          <div *ngFor="let vc of [0,1,2,3,4,5,6,7,8]">
+            <div class="scell"
+              [ngClass]="{
+                'locked':   isCellLocked_(vb, vc),
+                'selected': isSelectedCell_(vb, vc),
+                'invalid':  isCellInvalid_(vb, vc)}"
+              (mousedown)="handleCellClick_($event, vb, vc)">
+            
+              <!-- opt 1: value -->
+                {{valueToChar_(vb, vc)}}
+              <!-- end opt 1 -->
+
+              <!-- opt 2: candidates -->
+              <!--<div class="kcontainer"
+                  [hidden]="getValue_(vb, vc) > 0">-->
+              <div *ngIf="getValue_(vb, vc) == 0" class="kcontainer">
+                  <!--[hidden]="getValue_(vb, vc) > 0">-->
+                <div *ngFor="let k of [1,2,3,4,5,6,7,8,9]">
+                  <div class="kcell"
+                    (dblclick)="handleCandidateClick_(vb, vc, k)">
+                    <span class="candidate"
+                        [hidden]="!candidatesShowing || !candidatesVisible_(k)">
+                      {{candToChar_(vb, vc, k)}}
+                    </span>
+                  </div> <!-- kcell -->
+                </div> <!-- *ngFor -->
+              </div> <!-- kcontainer -->
+              <!-- end opt 2 -->
+
+            </div> <!-- scell -->
+          </div> <!-- *ngFor c -->
+        </div> <!-- scontainer -->
+      </div> <!-- bcell -->
+    </div> <!-- *ngFor b -->
+  </div> <!-- bcontainer -->
+</div> <!-- pcell -->
+
+
+ <!-- OLD -->
+  <!--<div id="grid" class="sGrid" (keyup)="handleKeyPress($event)" 
        oncontextmenu="return false;" tabindex="1">
     <div class="bRow" *ngFor="let br of [0,1,2]">
       <div class="box" *ngFor="let bc of [0,1,2]">
@@ -31,13 +77,13 @@ s: sudoku, b: box, v: value, k: candidate
                 'invalid':  isCellInvalid_(br, bc, cr, cc)}"
               (mousedown)="handleCellClick_($event, br, bc, cr, cc)">
             
-            <!-- opt 1: value -->
+            -- opt 1: value --
             <span class="value">
               {{valueToChar_(br, bc, cr, cc)}}
-              <!--8-->
+              <!--8--
             </span>
 
-            <!-- opt 2: candidates -->
+            <!-- opt 2: candidates --
             <div class="kGrid"
                [hidden]="getValue_(br, bc, cr, cc) > 0">
               <div class="kRow" *ngFor="let kr of [0,1,2]">
@@ -46,9 +92,9 @@ s: sudoku, b: box, v: value, k: candidate
                   <span class="candidate"
                       [hidden]="!candidatesShowing || !candidatesVisible_(kr, kc)">
                     {{candToChar_(br, bc, cr, cc, kr, kc)}}
-                    <!--8-->
+                    <!--8--
                   </span>
-                </div> <!-- kcell -->
+                </div> <!-- kcell --
               </div>
             </div>
               
@@ -56,7 +102,7 @@ s: sudoku, b: box, v: value, k: candidate
         </div>
       </div>
     </div>
-  </div>
+  </div>-->
  
 </section>
 

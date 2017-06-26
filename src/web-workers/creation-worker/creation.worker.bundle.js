@@ -90,8 +90,8 @@
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Common; });
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
-var VERSION = '15';
-var SUB_VERSION = '3';
+var VERSION = '16';
+var SUB_VERSION = '0';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -189,27 +189,72 @@ var Common = (function () {
     // // console.log('boxNr, cellNr, r, c: ' + boxNr +', ' + cellNr + ', ' + r + ', ' + c);
     //     return {'r': r, 'c': c};
     //   };
+    /**
+     * LEGEND
+     * vb, vc - view (template/html) box, cell within box (zero-based 0..8)
+     * ur, uc, ub - user row, col, box (one-based 1..9)
+     * ci - cell index (zero-based 0..80)
+     * v - value (one-based 1..9, but zero --> no value)
+     * zr, zc, zb - internal row, col, box index (zero-based 0..8)
+     *
+     * CONVERSIONS
+     * vb, vc --> ci
+     * ci --> ur, uc, ub -- userRow, ...
+     * ci --> zr, zc, zb
+     */
+    /**
+     * Convert view box/cell to cell idx
+     * @param vb the view box that contains the cell
+     * @param vc the position if the cell in the view box
+     */
+    // static cellIdx(vb: number, vc: number) : number {
+    //   return (Math.floor(vb / 3) * 18) + (vb * 3) + (Math.floor(vc / 3) * 6) + vc;
+    // } // cellIdx()
     /** Get row number 1..9 from cell index 0..80. */
-    Common.rowNr = function (cellIdx) {
+    Common.userRow = function (cellIdx) {
         return Math.floor(cellIdx / 9) + 1;
     };
     /** Get row number 1..9 from cell index 0..80. */
-    Common.colNr = function (cellIdx) {
+    Common.userCol = function (cellIdx) {
         return (cellIdx % 9) + 1;
     };
     /** Get row number 1..9 from cell index 0..80. */
-    Common.boxNr = function (cellIdx) {
+    Common.userBox = function (cellIdx) {
         return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3) + 1;
     };
     Common.cellRC = function (cellIdx) {
-        return { r: this.rowNr(cellIdx), c: this.colNr(cellIdx) };
+        return { r: this.userRow(cellIdx), c: this.userCol(cellIdx) };
     };
     /**
-     * Related cells share the same row, column, or box of the given cell. The
-     * given cell is not in the list of related cells. Any cell has 20 related
-     * cells: 8 from the row, 8 from the column and 4 from the box that are not
-     * in the row or column of the given cell.
+   * Translate cell's row and col (1..9) to cell index (0..80).
+   */
+    Common.cellIdx = function (r, c) {
+        return 9 * r + c - 10; // ((r - 1) * 9) + (c - 1)
+    };
+    /**
+     * Translate cell index (0..80) to row index (0..8).
      */
+    Common.rowIdx = function (cellIdx) {
+        return Math.floor(cellIdx / 9);
+    };
+    /**
+     * Translate cell index (0..80) to col index (0..8).
+     */
+    Common.colIdx = function (cellIdx) {
+        return cellIdx % 9;
+    };
+    /**
+     * Translate cell index (0..80) to box index (0..8).
+     */
+    Common.boxIdx = function (cellIdx) {
+        return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3);
+    };
+    /**
+       * Related cells share the same row, column, or box of the given cell. The
+       * given cell is not in the list of related cells. Any cell has 20 related
+       * cells: 8 from the row, 8 from the column and 4 from the box that are not
+       * in the row or column of the given cell.
+       */
     Common.getRelatedCells = function (idx) {
         var relatedCells = [];
         var r = Common.rowIdx(idx);
@@ -390,30 +435,6 @@ var Common = (function () {
     Common.toRowColString = function (idx) {
         return (Common.rowIdx(idx) + 1) + ',' + (Common.colIdx(idx) + 1);
     }; // toRowColString()
-    /**
-     * Translate cell's row and col (1..9) to cell index (0..80).
-     */
-    Common.cellIdx = function (r, c) {
-        return 9 * r + c - 10; // ((r - 1) * 9) + (c - 1)
-    };
-    /**
-     * Translate cell index (0..80) to row index (0..8).
-     */
-    Common.rowIdx = function (cellIdx) {
-        return Math.floor(cellIdx / 9);
-    };
-    /**
-     * Translate cell index (0..80) to col index (0..8).
-     */
-    Common.colIdx = function (cellIdx) {
-        return cellIdx % 9;
-    };
-    /**
-     * Translate cell index (0..80) to box index (0..8).
-     */
-    Common.boxIdx = function (cellIdx) {
-        return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3);
-    };
     // Translate view's box & row indexes to model row indexes (0..8)
     // XXX
     Common.viewToModelRow = function (br, cr) {
@@ -650,7 +671,7 @@ var ValueAction = (function (_super) {
     }
     ValueAction.prototype.toString = function () {
         var s = _super.prototype.toString.call(this)
-            + __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].formatString('Set {0} in {1},{2}', [this.value, __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowNr(this.cell), __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colNr(this.cell)]);
+            + __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].formatString('Set {0} in {1},{2}', [this.value, __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].userRow(this.cell), __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].userCol(this.cell)]);
         if (this.hint) {
             s += ' (' + this.hint.toString() + ')';
         }
@@ -678,7 +699,7 @@ var GuessAction = (function (_super) {
     });
     GuessAction.prototype.toString = function () {
         var s = _super.prototype.toString.call(this)
-            + __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].formatString('Guess {0} in {1},{2} with possibles {3}', [this.value, __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowNr(this.cell), __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colNr(this.cell),
+            + __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].formatString('Guess {0} in {1},{2} with possibles {3}', [this.value, __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].userRow(this.cell), __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].userCol(this.cell),
                 JSON.stringify(this._possibleValues)]);
         if (this.hint) {
             s += ' (' + this.hint.toString() + ')';
@@ -707,7 +728,7 @@ var RemoveAction = (function (_super) {
     });
     RemoveAction.prototype.toString = function () {
         var s = _super.prototype.toString.call(this)
-            + __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].formatString('Remove candidate {0} in {1},{2}', [this._candidate, __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].rowNr(this.cell), __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].colNr(this.cell)]);
+            + __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].formatString('Remove candidate {0} in {1},{2}', [this._candidate, __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].userRow(this.cell), __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].userCol(this.cell)]);
         if (this.hint) {
             s += ' (' + this.hint.toString() + ')';
         }
@@ -811,9 +832,9 @@ var ValueHint = (function (_super) {
     };
     ValueHint.prototype.toString = function () {
         // convert 0-base rows, cols, boxs to 1-base (1..9)
-        var r = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowNr(this._cell);
-        var c = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colNr(this._cell);
-        var b = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxNr(this._cell);
+        var r = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].userRow(this._cell);
+        var c = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].userCol(this._cell);
+        var b = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].userBox(this._cell);
         switch (this.type) {
             case __WEBPACK_IMPORTED_MODULE_0__hint_type__["a" /* HintType */].NAKED_SINGLE:
                 return __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].formatString('Naked single {0} in {1},{2}', [this._value, r, c]);
@@ -877,9 +898,9 @@ var CandidatesHint = (function (_super) {
     };
     CandidatesHint.prototype.toString = function () {
         // convert 0-base rows, cols, boxs to 1-base (1..9)
-        var r = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowNr(this._cells[0]);
-        var c = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colNr(this._cells[0]);
-        var b = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxNr(this._cells[0]);
+        var r = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].userRow(this._cells[0]);
+        var c = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].userCol(this._cells[0]);
+        var b = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].userBox(this._cells[0]);
         switch (this.type) {
             case __WEBPACK_IMPORTED_MODULE_0__hint_type__["a" /* HintType */].NAKED_PAIRS_ROW:
                 return __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].formatString('Naked pairs {0}/{1} in row {2}', [this._candidates[0], this._candidates[1], r]);
@@ -2929,9 +2950,16 @@ var SudokuService = (function () {
     /**
      *
      */
-    SudokuService.prototype.isCellLocked_ = function (r, c) {
-        return this.isCellLocked(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
-    }; // isCellLocked_()
+    // public isCellLocked_(r: number, c: number) : boolean {
+    //   return this.isCellLocked(Common.cellIdx(r, c));
+    // } // isCellLocked_()
+    /**
+     *
+     */
+    // public isCellLocked_(r: number, c: number) : boolean {
+    SudokuService.prototype.isCellLocked = function (c) {
+        return this.sudokuModel.cells[c].locked;
+    }; // isCellLocked()
     /**
      * Gets givenValue in cell at given row and column (1..9).
      */
@@ -3349,9 +3377,29 @@ var SudokuService = (function () {
     /**
      *
      */
-    SudokuService.prototype.isCellInvalid_ = function (r, c) {
-        return !this.isCellValid(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
-    }; // isCellInvalid_()
+    // public isCellInvalid_(r: number, c: number) : boolean {
+    //   return !this.isCellValid(Common.cellIdx(r, c));
+    // } // isCellInvalid_()
+    /**
+     * A cell is valid if its row, column, and box are all valid. In other words,
+     * no value occurs more than once in the cell's row, column, and box.
+     */
+    SudokuService.prototype.isCellValid = function (c) {
+        try {
+            if (this.isGroupValid(this.sudokuModel.rows[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowIdx(c)])
+                && this.isGroupValid(this.sudokuModel.cols[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colIdx(c)])
+                && this.isGroupValid(this.sudokuModel.boxs[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxIdx(c)])) {
+                return true;
+            }
+        }
+        catch (e) {
+            console.info('c: ' + c);
+            console.info('r: ' + __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowIdx(c));
+            console.info('c: ' + __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colIdx(c));
+            console.info('b: ' + __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxIdx(c));
+        }
+        return false;
+    };
     /**
      * Determines if the given givenValue appears 9 times.
      */
@@ -3484,12 +3532,6 @@ var SudokuService = (function () {
     /**
      *
      */
-    SudokuService.prototype.isCellLocked = function (c) {
-        return this.sudokuModel.cells[c].locked;
-    }; // isCellLocked()
-    /**
-     *
-     */
     // private removeCandidates(cell: Cell) {
     //   for (let k of CANDIDATES) {
     //     cell.candidates[k] = false;
@@ -3509,18 +3551,6 @@ var SudokuService = (function () {
         return (this.hasValue(c) && !this.hasCandidates(c))
             || (!this.hasValue(c) && this.hasCandidates(c));
     }; // isCellStateValid()
-    /**
-     * A cell is valid if its row, column, and box are all valid. In other words,
-     * no value occurs more than once in the cell's row, column, and box.
-     */
-    SudokuService.prototype.isCellValid = function (c) {
-        if (this.isGroupValid(this.sudokuModel.rows[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowIdx(c)])
-            && this.isGroupValid(this.sudokuModel.cols[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colIdx(c)])
-            && this.isGroupValid(this.sudokuModel.boxs[__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxIdx(c)])) {
-            return true;
-        }
-        return false;
-    };
     /**
      * A group (row, column, or box) is valid if values 1..9 occur no more than
      * once in the group.

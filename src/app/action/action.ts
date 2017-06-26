@@ -63,7 +63,7 @@ export class ValueAction extends BaseValueAction {
   toString() {
     let s = super.toString() 
         + Common.formatString('Set {0} in {1},{2}',
-        [this.value, Common.rowNr(this.cell), Common.colNr(this.cell)]);
+        [this.value, Common.userRow(this.cell), Common.userCol(this.cell)]);
     if (this.hint) {
       s += ' (' + this.hint.toString() + ')';
     } else {
@@ -91,7 +91,7 @@ export class GuessAction extends BaseValueAction {
     let s = super.toString()
         + Common.formatString(
         'Guess {0} in {1},{2} with possibles {3}',
-        [this.value, Common.rowNr(this.cell), Common.colNr(this.cell),
+        [this.value, Common.userRow(this.cell), Common.userCol(this.cell),
            JSON.stringify(this._possibleValues)]);
     if (this.hint) {
       s += ' (' + this.hint.toString() + ')';
@@ -118,7 +118,7 @@ export class RemoveAction extends Action {
   toString() {
     let s = super.toString() 
         + Common.formatString('Remove candidate {0} in {1},{2}',
-            [this._candidate, Common.rowNr(this.cell), Common.colNr(this.cell)]);
+            [this._candidate, Common.userRow(this.cell), Common.userCol(this.cell)]);
     if (this.hint) {
       s += ' (' + this.hint.toString() + ')';
     } else {

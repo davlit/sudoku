@@ -132,9 +132,17 @@ export class SudokuService {
   /**
    * 
    */
-  public isCellLocked_(r: number, c: number) : boolean {
-    return this.isCellLocked(Common.cellIdx(r, c));
-  } // isCellLocked_()
+  // public isCellLocked_(r: number, c: number) : boolean {
+  //   return this.isCellLocked(Common.cellIdx(r, c));
+  // } // isCellLocked_()
+  /**
+   * 
+   */
+  // public isCellLocked_(r: number, c: number) : boolean {
+  public isCellLocked(c: number) {
+    return this.sudokuModel.cells[c].locked;
+  } // isCellLocked()
+  
 
   /**
    * Gets givenValue in cell at given row and column (1..9).
@@ -579,9 +587,29 @@ export class SudokuService {
   /**
    * 
    */
-  public isCellInvalid_(r: number, c: number) : boolean {
-    return !this.isCellValid(Common.cellIdx(r, c));
-  } // isCellInvalid_()
+  // public isCellInvalid_(r: number, c: number) : boolean {
+  //   return !this.isCellValid(Common.cellIdx(r, c));
+  // } // isCellInvalid_()
+
+  /**
+   * A cell is valid if its row, column, and box are all valid. In other words,
+   * no value occurs more than once in the cell's row, column, and box.
+   */
+  public isCellValid(c: number) : boolean {
+try {
+    if (   this.isGroupValid(this.sudokuModel.rows[Common.rowIdx(c)])
+        && this.isGroupValid(this.sudokuModel.cols[Common.colIdx(c)]) 
+        && this.isGroupValid(this.sudokuModel.boxs[Common.boxIdx(c)])) {
+      return true;
+    }
+} catch (e) {
+  console.info('c: ' + c);
+  console.info('r: ' + Common.rowIdx(c));
+  console.info('c: ' + Common.colIdx(c));
+  console.info('b: ' + Common.boxIdx(c));
+}
+    return false;
+  }
 
   /**
    * Determines if the given givenValue appears 9 times.
@@ -724,13 +752,6 @@ export class SudokuService {
   /**
    * 
    */
-  private isCellLocked(c: number) {
-    return this.sudokuModel.cells[c].locked;
-  } // isCellLocked()
-  
-  /**
-   * 
-   */
   // private removeCandidates(cell: Cell) {
   //   for (let k of CANDIDATES) {
   //     cell.candidates[k] = false;
@@ -751,19 +772,6 @@ export class SudokuService {
     return ( this.hasValue(c) && !this.hasCandidates(c))
         || (!this.hasValue(c) &&  this.hasCandidates(c));
   } // isCellStateValid()
-
-  /**
-   * A cell is valid if its row, column, and box are all valid. In other words,
-   * no value occurs more than once in the cell's row, column, and box.
-   */
-  private isCellValid(c: number) : boolean {
-    if (   this.isGroupValid(this.sudokuModel.rows[Common.rowIdx(c)])
-        && this.isGroupValid(this.sudokuModel.cols[Common.colIdx(c)]) 
-        && this.isGroupValid(this.sudokuModel.boxs[Common.boxIdx(c)])) {
-      return true;
-    }
-    return false;
-  }
 
   /**
    * A group (row, column, or box) is valid if values 1..9 occur no more than
