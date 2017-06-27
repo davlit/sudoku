@@ -119,7 +119,6 @@ export class AppComponent implements OnInit {
   currentPuzzle: Puzzle;
   hint: Hint;
   candidatesVisible: boolean[];
-  // xselectedCell: {r: number, c: number};
   selectedCell: number;
 
   ngOnInit() {
@@ -167,7 +166,6 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
     // let uc = this.xselectedCell.c;
     let ur = Common.userRow(this.selectedCell);
     let uc = Common.userCol(this.selectedCell);
-console.info('key ur/uc: ' + ur + '/' + uc);
     
     // no key action if no cell selected
     if (ur == 0 && uc == 0) {
@@ -249,34 +247,22 @@ console.info('key ur/uc: ' + ur + '/' + uc);
    * 
    * Function based on view's cell indexes in html code.
    */
-  isCellLocked_(vb: number, vc: number) : boolean {
+  isCellLocked(vb: number, vc: number) : boolean {
     return this.sudokuService.isCellLocked(this.viewToCellIdx(vb, vc));
-  } // isCellLocked_()
+  } // isCellLocked()
+  
+  /**
+   * 
+   */
+  isSelectedCell(vb: number, vc: number) : boolean {
+    return this.selectedCell === this.viewToCellIdx(vb, vc);
+  }
   
   /**
    * 
    * Function based on view's cell indexes in html code.
    */
-  // isSelectedCell_(vb: number, vc: number) : boolean {
-  //   let cell = this.viewToCellIdx(vb, vc)
-  //   let row = Common.rowIdx(cell);
-  //   let col = Common.colIdx(cell);
-  //   return this.isSelectedCell(row, col);
-  // } // isSelectedCell_()
-  // TODO
-  isSelectedCell_(vb: number, vc: number) : boolean {
-    // let ci = this.viewToCellIdx(vb, vc)
-    // let row = Common.rowIdx(cell);
-    // let col = Common.colIdx(cell);
-    // return this.isSelectedCell(row, col);
-    return this.isSelectedCell(this.viewToCellIdx(vb, vc));
-  } // isSelectedCell_()
-  
-  /**
-   * 
-   * Function based on view's cell indexes in html code.
-   */
-  isCellInvalid_(vb: number, vc: number) : boolean {
+  isCellInvalid(vb: number, vc: number) : boolean {
     return !this.sudokuService.isCellValid(this.viewToCellIdx(vb, vc));
   } // isCellInvalid_()
   
@@ -284,26 +270,19 @@ console.info('key ur/uc: ' + ur + '/' + uc);
    * 
    * Function based on view's cell indexes in html code.
    */
-  handleCellClick_(event, vb: number, vc: number) : void {
+  handleCellClick(event, vb: number, vc: number) : void {
     if (this.playState != PlayStates.ENTRY 
         && this.playState != PlayStates.EXECUTE) {
       return;
     }
     
     let ci = this.viewToCellIdx(vb, vc);
-console.info('Cell click vb/vc, ci: ' + vb + '/' + vc + ', ' + ci);
     if (this.sudokuService.isCellLocked(ci)) {
       return;         // can't accept click on locked cell
     }
-    // let r = Common.viewToModelRow(br, cr);
-    // let c = Common.viewToModelCol(bc, cc);
-    // let zr = Common.rowIdx(ci);
-    // let zc = Common.colIdx(ci);
-// console.info('Cell click ci, r/c: ' + ci + ', ' + zr + '/' + zc);
+
     switch(event.which) {
       case 1:   // left click
-        // if (this.xselectedCell.r != zr || this.xselectedCell.c != zc) {
-        //   this.setSelectedCell(zr, zc); 
         if (this.selectedCell != ci) {
           this.setSelectedCell(ci); 
         } else {
@@ -326,7 +305,14 @@ console.info('Cell click vb/vc, ci: ' + vb + '/' + vc + ', ' + ci);
         alert("you have a strange mouse");
         return;
     } // switch
-  } // handleCellClick_()
+  } // handleCellClick()
+
+  /**
+   * 
+   */
+  hasValue(vb: number, vc: number) : boolean {
+    return this.sudokuService.hasValue(this.viewToCellIdx(vb, vc));
+  }
   
   /**
    * 
@@ -342,15 +328,15 @@ console.info('Cell click vb/vc, ci: ' + vb + '/' + vc + ', ' + ci);
    * 
    * Function based on view's cell indexes in html code.
    */
-  getValue_(vb: number, vc: number) : number {
+  getValue(vb: number, vc: number) : number {
     return this.sudokuService.getValue(this.viewToCellIdx(vb, vc));
-  } // getValue_()
+  } // getValue()
   
   /**
    * 
    * Function based on view's cell indexes in html code.
    */
-  handleCandidateClick_(vb: number, vc: number, k: number) : void {
+  handleCandidateClick(vb: number, vc: number, k: number) : void {
     if (this.playState != PlayStates.ENTRY 
         && this.playState != PlayStates.EXECUTE) {
       return;
@@ -359,9 +345,9 @@ console.info('Cell click vb/vc, ci: ' + vb + '/' + vc + ', ' + ci);
     this.removeCandidate(this.viewToCellIdx(vb, vc), k);
   } // handleCandidateClick_()
   
-  candidatesVisible_(k: number) {
+  candidatesVisible_(k: number) : boolean {
     return this.candidatesVisible[k];
-  } // candidatesVisible_()
+  } // candidatesVisible()
   
   /**
    * 
@@ -396,21 +382,27 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   /**
    * Button 'Show Candidates', 'Hide Candidates' EXECUTION state
    */
-  toggleCandidates() {
+  toggleCandidates() : void {
     this.candidatesShowing = !this.candidatesShowing;
     this.allCandidatesVisible();
   }
 
   // button '1' .. '9' EXECUTION state
-  candidateVisible(kand: number) {
+  /**
+   * 
+   */
+  candidateVisible(kand: number) : void {
     for (let k = 1; k <= 9; k++) {
       this.candidatesVisible[k] = false;
     }
     this.candidatesVisible[kand] = true;
   }
 
+  /**
+   * 
+   */
   // button 'All' EXECUTION state
-  allCandidatesVisible() {
+  allCandidatesVisible() : void {
     for (let k = 1; k <= 9; k++) {
       this.candidatesVisible[k] = true;
     }
@@ -425,7 +417,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * condition unchanged.
    */
   // button 'Get', 'Apply' EXECUTION state
-  handleHintClick() {
+  handleHintClick() : void {
     switch (this.hintState) {
     case HintStates.READY:
       this.findHint();
@@ -435,12 +427,18 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
   }
   
-  autoSolveButton() {
+  /**
+   * 
+   */
+  autoSolveButton() : boolean {
     return this.autoSolveState != AutoSolveStates.NO_HINT
         && this.hintState != HintStates.NO_HINT; 
   }
   
-  handleAutoSolveClick() {
+  /**
+   * 
+   */
+  handleAutoSolveClick() : void {
     switch (this.autoSolveState) {
       case AutoSolveStates.READY:     // start auto solve
         this.autoSolveState = AutoSolveStates.RUNNING;
@@ -457,10 +455,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   /**
    * 
    */
-  // isAnySelectedCell() {
-  //   return this.xselectedCell.r != 0;
-  // } // isAnySelectedCell()
-  // TODO
   isAnySelectedCell() {
     return this.selectedCell >= 0 && this.selectedCell <= 80;
   } // isAnySelectedCell()
@@ -481,12 +475,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       return;
     }
     this.initializeHintStates();
-
-    // get currently selected cell's row and column number
-    // let r = this.xselectedCell.r;
-    // let c = this.xselectedCell.c;
-    
-    // this.setCellValue(r, c, choice);
     this.setCellValue(this.selectedCell, choice);
   } // handleChoiceClick_()
 
@@ -500,7 +488,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   /**
    * 
    */
-  handleChoiceClearClick() {
+  handleChoiceClearClick() : void {
     this.initializeHintStates();
 
     // get currently selected cell's row and column number
@@ -529,10 +517,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
 
     // set selected cell to that of last action
-    // let lastCell = lastAction.cell;
-    // let rc = Common.cellRC(lastCell);
-    // this.setSelectedCell(rc.r, rc.c);
-    // let rc = Common.cellRC(lastCell);
     this.setSelectedCell(lastAction.cell);
     this.refreshActionLog();
   } // undoLastAction()
@@ -541,7 +525,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * button 'Restart Current Puzzle' EXECUTION, SOLVED states
    * TODO wipe non-locked cells (rollback?), refresh cands,
    */
-  restartCurrentPuzzle() {
+  restartCurrentPuzzle() : void {
     this.stopUserTimer();
     this.startUserTimer();
     this.sudokuService.initializeModel();
@@ -553,7 +537,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   }
   
   // button 'Start New Puzzle' EXECUTION, SOLVED state
-  startNewPuzzle() {
+  startNewPuzzle() : void {
     this.stopUserTimer();
     this.initializeUserInterface();
     this.sudokuService.initializeModel();
@@ -588,14 +572,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   // ----------------------------------------------------------------------
   // other methods
   // -----------------------------------------------------------------------
-
-  /**
-   * 
-   */
-  isSudokuAvailable(difficulty: Difficulty) {
-console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
-    return this.cacheService.isSudokuAvailable(difficulty);
-  }
 
   /**
    * Using puzzle statistics, prepare a solution clues string;
@@ -634,7 +610,7 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
     return s;
   } // createSolutionClues()
 
-  autoSolveLoop() {
+  autoSolveLoop() : void {
     setTimeout(() => {
       switch (this.hintState) {
         case HintStates.READY:
@@ -673,19 +649,19 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
   } // autoSolveLoop()
 
     // TODO embed this in handleCellClick
-  setGuessCell_(event: any, br: number, bc: number, cr: number, cc: number) {
-    let r = Common.viewToModelRow(br, cr);
-    let c = Common.viewToModelCol(bc, cc);
+  // setGuessCell_(event: any, br: number, bc: number, cr: number, cc: number) {
+  //   let r = Common.viewToModelRow(br, cr);
+  //   let c = Common.viewToModelCol(bc, cc);
     
-    console.log('setGuessCell_() r,c:' + r + ',' + c);
+  //   console.log('setGuessCell_() r,c:' + r + ',' + c);
 
-    event.preventDefault();
-  }
+  //   event.preventDefault();
+  // }
 
   /**
    * 
    */
-  initializeHintStates() {
+  initializeHintStates() : void {
     this.hintState = HintStates.READY;
     this.hintMessage = '';
     this.autoSolveState = AutoSolveStates.READY;
@@ -694,51 +670,15 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
 
   /**
    * 
-   * @param r 
-   * @param c 
    */
-//   setSelectedCell(r: number, c: number) {
-//     let cell = Common.cellIdx(r, c);
-// console.log('cell: ' + cell);
-//     if (this.sudokuService.isCellValid(cell)) {
-//       this.xselectedCell.r = r;
-//       this.xselectedCell.c = c;
-//       // this.focus('grid');
-//     } else {
-//       this.unselectCell();
-//     }
-//   }
-  setSelectedCell(ci: number) {
+  setSelectedCell(ci: number) : void {
     this.selectedCell = ci;
   }
     
   /**
    * 
-   * @param r 
-   * @param c 
    */
-  // isSelectedCell(r: number, c: number) : boolean {
-  //   return this.xselectedCell.r === r && this.xselectedCell.c === c;
-  // }
-  isSelectedCell(ci: number) : boolean {
-    return this.selectedCell === ci;
-  }
-  
-  /**
-   * 
-   * @param r 
-   * @param c 
-   * @param k 
-   */
-  // ng-dblclick candidate in grid EXECUTION state
-  // removeCandidate(r: number, c: number, k: number) {
-  //   this.initializeHintStates();
-  //   if (this.candidatesShowing) {
-  //     this.sudokuService.removeCandidate_(r, c, k);
-  //   }
-  //   this.refreshActionLog();
-  // }
-  removeCandidate(cell: number, k: number) {
+  removeCandidate(cell: number, k: number) : void {
     this.initializeHintStates();
     if (this.candidatesShowing) {
       this.sudokuService.removeCandidate(cell, k, undefined);
@@ -755,12 +695,9 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
       this.hintState = HintStates.ACTIVE
       this.hintsViewed++;
       this.hintMessage = this.hint.toString();
-      // this.setSelectedCell(Common.userRow(this.hint.getCell()), 
-      //     Common.userCol(this.hint.getCell()));
       this.setSelectedCell(this.hint.getCell());
     } else {
       this.hintState = HintStates.NO_HINT;
-      // this.hintMessage = 'No hint available';
     }
   }
     
@@ -768,7 +705,7 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
    * 
    */
   // apply hint toward solution
-  applyHint() {
+  applyHint() : void {
     this.hintMessage = '';
     this.hintState = HintStates.READY
     // WARNING - cannot set autoStartState to READY here
@@ -790,16 +727,7 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
   /**
    * 
    */
-  // can be set by key press, apply hint
-  // setCellValue(r: number, c: number, v: number) {
-  //   this.sudokuService.setValue_(r, c, v);
-  //   this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
-  //   if (this.sudokuService.isSolved()) {
-  //     this.handlePuzzleComplete();
-  //   }
-  //     this.refreshActionLog();
-  // }
-  setCellValue(ci: number, v: number) {
+  setCellValue(ci: number, v: number) : void {
     // this.sudokuService.setValue_(r, c, v);
     this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
@@ -812,15 +740,7 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
   /**
    * 
    */
-  // removeCellValue(r: number, c: number) {
-  //   let oldValue = this.sudokuService.getValue_(r, c);
-  //   if (oldValue >= 1) {
-  //     this.sudokuService.removeValue_(r, c);
-  //     this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
-  //     this.refreshActionLog();
-  //   }
-  // }
-  removeCellValue(ci: number) {
+  removeCellValue(ci: number) : void {
     let oldValue = this.sudokuService.getValue(ci);
     if (oldValue >= 1) {
       this.sudokuService.removeValue(ci);
@@ -832,16 +752,15 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
   /**
    * 
    */
-  unselectCell() {
-    // this.xselectedCell.r = 0;
-    // this.xselectedCell.c = 0;
+  unselectCell() : void {
     this.selectedCell = -1;
   }
     
   /**
    * 
    */
-  handlePuzzleComplete() {
+  handlePuzzleComplete() : void {
+    this.unselectCell();
     this.refreshActionLog();
     this.stopUserTimer();
     this.playState = PlayStates.SOLVED;
@@ -880,8 +799,6 @@ console.info('here ' + this.cacheService.isSudokuAvailable(difficulty));
   initializeUserInterface() {
     this.sudokuService.initializeModel();
     this.actualDifficulty = undefined;
-    // this.xselectedCell = {r: 0, c: 0};
-    // this.selectedCell = -1;   // no cell selected
     this.unselectCell();   // no cell selected
 
     this.candidatesShowing = false;       // master switch

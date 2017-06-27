@@ -1,7 +1,9 @@
+<header>
 <div class="appTitle">
   <span class="appTitle">&nbsp;{{title}}</span>
   <span class="appVersion">&nbsp;&nbsp;&nbsp;{{version}}</span>
 </div>
+</header>
 
 <!-- ANIMATED PROGRESS BAR - DEMO -->
 <!--<div class="progress-cont">
@@ -19,7 +21,6 @@ Sudoku grid based on
 Sudoku model is based on 9 rows and 9 columns of cells
 s: sudoku, b: box, v: value, k: candidate
  -->
- <!-- NEW -->
  <div class="pcell" (keyup)="handleKeyPress($event)" 
     oncontextmenu="return false;" tabindex="1">
   <div class="bcontainer">
@@ -27,25 +28,25 @@ s: sudoku, b: box, v: value, k: candidate
       <div class="bcell">
         <div class="scontainer">
           <div *ngFor="let vc of [0,1,2,3,4,5,6,7,8]">
-            <div class="scell"
-              [ngClass]="{
-                'locked':   isCellLocked_(vb, vc),
-                'selected': isSelectedCell_(vb, vc),
-                'invalid':  isCellInvalid_(vb, vc)}"
-              (mousedown)="handleCellClick_($event, vb, vc)">
+            <div class="scell" [ngSwitch]="hasValue(vb, vc)"
+                [ngClass]="{
+                  'selected': isSelectedCell(vb, vc)}"
+                (mousedown)="handleCellClick($event, vb, vc)">
             
               <!-- opt 1: value -->
+              <span *ngSwitchCase="true" class="value"
+                [ngClass]="{
+                  'locked':   isCellLocked(vb, vc),
+                  'invalid':  isCellInvalid(vb, vc)}">
                 {{valueToChar_(vb, vc)}}
+              </span>
               <!-- end opt 1 -->
 
               <!-- opt 2: candidates -->
-              <!--<div class="kcontainer"
-                  [hidden]="getValue_(vb, vc) > 0">-->
-              <div *ngIf="getValue_(vb, vc) == 0" class="kcontainer">
-                  <!--[hidden]="getValue_(vb, vc) > 0">-->
+              <div *ngSwitchCase="false" class="kcontainer">
                 <div *ngFor="let k of [1,2,3,4,5,6,7,8,9]">
-                  <div class="kcell"
-                    (dblclick)="handleCandidateClick_(vb, vc, k)">
+                  <div class="kcell" 
+                      (dblclick)="handleCandidateClick(vb, vc, k)">
                     <span class="candidate"
                         [hidden]="!candidatesShowing || !candidatesVisible_(k)">
                       {{candToChar_(vb, vc, k)}}

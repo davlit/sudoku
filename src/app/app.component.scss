@@ -24,7 +24,6 @@ html {
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 span.appTitle {
@@ -67,14 +66,14 @@ $p-size: $b-size * 3 + 0.85;
 }
 
 .bcell {
-  background-color: $gray1;
+  background-color: $gray2;
 }
 
 .scontainer {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
-  grid-gap: 0.1vw;
+  grid-gap: 0.15vw;
 }
 
 .scell {
@@ -83,18 +82,22 @@ $p-size: $b-size * 3 + 0.85;
   font-weight: bold;
   text-align: center;
   line-height: $s-size;
-  background-color: $tan2;
+  background-color: $tan1;
+}
+
+.sCell, .selected {
+  background-color: $green1;
+}
+
+span.value {
   color: $green3;
 }
 
-.sCell.locked {
+span.locked {
   color: $black;
 }
-.sCell.selected {
-  background-color: $green1;
-}
-.sCell.invalid {
-  background-color: $red1;
+
+span.invalid {
   color: $red3;
 }
 
@@ -116,14 +119,10 @@ $p-size: $b-size * 3 + 0.85;
   color: $gray2;
   text-align: center;
   line-height: $k-size;
-  background-color: $tan2;
 }
 
 .candidate {
-  // line-height: 22px;  /* better for numbers instead of vertical-align */
-  /*color: white;*/   /* disappearing ink */
   cursor: default;
-  // color: $gray2;
 }
 
 .exec-text {
@@ -163,11 +162,11 @@ cands { margin-left: 1px; }
   padding-left: 15px;
   font-size: 16px;
 }
+
 .metalabel {
   font-weight: bold;
 }
-/*.metadata {
-}*/
+
 textarea {
   font-family: monospace;
   font-size: 9px;
@@ -185,10 +184,12 @@ textarea {
   /*cellspacing:poor IE support for  this*/
   /* border-collapse: separate;*/
 }
+
 .val-row {
   display: table-row;
   /*width: auto;*/
 }
+
 .val-cell {
   float: left;  /*fix for  buggy browsers*/
   display: table-column;
@@ -197,17 +198,21 @@ textarea {
   border: 1px solid $black;
   margin: -1px -1px -1px -1px;
 }
+
 .dim {
   color: $gray1;
 }
+
 .val-val {
   line-height: 30px;
   cursor: default;
 }
+
 .clear-row{
   display: table-row;
   /*width: auto;*/
 }
+
 .clear-cell {
   /*float: left;  /*fix for  buggy browsers*/
   display: table-cell;
@@ -217,6 +222,7 @@ textarea {
   border-top: 1px solid $black;
   margin: -1px -1px -1px -1px;
 }
+
 .clear-val {
   line-height: 30px;
   text-align: center;
