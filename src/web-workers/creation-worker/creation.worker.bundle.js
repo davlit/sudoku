@@ -91,7 +91,7 @@
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
 var VERSION = '16';
-var SUB_VERSION = '0';
+var SUB_VERSION = '4';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -222,13 +222,16 @@ var Common = (function () {
     Common.userBox = function (cellIdx) {
         return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3) + 1;
     };
-    Common.cellRC = function (cellIdx) {
-        return { r: this.userRow(cellIdx), c: this.userCol(cellIdx) };
-    };
+    // static cellRC(cellIdx: number) : {r: number, c: number} {
+    //   return {r: this.userRow(cellIdx), c: this.userCol(cellIdx)}
+    // }
     /**
    * Translate cell's row and col (1..9) to cell index (0..80).
    */
-    Common.cellIdx = function (r, c) {
+    // static cellIdx(r: number, c: number) : number {
+    //   return 9 * r + c - 10;    // ((r - 1) * 9) + (c - 1)
+    // }
+    Common.urcToCellIdx = function (r, c) {
         return 9 * r + c - 10; // ((r - 1) * 9) + (c - 1)
     };
     /**
@@ -2950,34 +2953,15 @@ var SudokuService = (function () {
     /**
      *
      */
-    // public isCellLocked_(r: number, c: number) : boolean {
-    //   return this.isCellLocked(Common.cellIdx(r, c));
-    // } // isCellLocked_()
-    /**
-     *
-     */
-    // public isCellLocked_(r: number, c: number) : boolean {
     SudokuService.prototype.isCellLocked = function (c) {
         return this.sudokuModel.cells[c].locked;
     }; // isCellLocked()
-    /**
-     * Gets givenValue in cell at given row and column (1..9).
-     */
-    SudokuService.prototype.getValue_ = function (r, c) {
-        return this.getValue(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
-    }; // getValue_()
     /**
      * Return givenValue of cell. Zero means no givenValue;
      */
     SudokuService.prototype.getValue = function (c) {
         return this.sudokuModel.cells[c].value;
     }; // getValue()
-    /**
-     * Sets givenValue in cell at given row and column (1..9).
-     */
-    SudokuService.prototype.setValue_ = function (r, c, newValue) {
-        this.setValue(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), newValue, __WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].SET_VALUE);
-    }; // setValue_()
     /**
      * Sets value of a cell to the given value. In the specified cell, all candidates
      * are removed. The candidate, equal to the value being set, is removed from
@@ -3059,12 +3043,6 @@ var SudokuService = (function () {
         }
     }; // setValue()
     /**
-     * Removes givenValue in cell at given row and column (1..9).
-     */
-    SudokuService.prototype.removeValue_ = function (r, c) {
-        this.removeValue(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
-    }; // removeValue_()
-    /**
      * Removes the givenValue of the specified cell to make it empty. This
      * function also reestablishes appropriate candidates in the cell and
      * reestablishes the candidate, equal to the givenValue being removed, in
@@ -3105,7 +3083,6 @@ var SudokuService = (function () {
             return;
         }
         // get existing givenValue, exit if no existing givenValue
-        // let oldValue = this.getValue(c);
         var oldValue = cell.value;
         if (oldValue === 0) {
             return; // nothing to remove
@@ -3142,12 +3119,6 @@ var SudokuService = (function () {
             this.addCandidate(rc, oldValue);
         }
     }; // removeValue()
-    /**
-     * Removes given candidate from cell at given row and column (1..9).
-     */
-    SudokuService.prototype.removeCandidate_ = function (r, c, k) {
-        this.removeCandidate(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), k, undefined); // user action
-    }; // removeCandidate_()
     /**
      * Remove given candidate from given cell. This method is only
      * used for explicit independent candidate removal.
@@ -3363,23 +3334,11 @@ var SudokuService = (function () {
         return candidates;
     }; // getCandidates()
     /**
-     *
-     */
-    SudokuService.prototype.isCandidate_ = function (r, c, k) {
-        return this.isCandidate(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), k);
-    }; // isCandidate_()
-    /**
      * Returns true if cell contains the candidate.
      */
     SudokuService.prototype.isCandidate = function (c, k) {
         return this.sudokuModel.cells[c].candidates[k];
     }; // isCandidate()
-    /**
-     *
-     */
-    // public isCellInvalid_(r: number, c: number) : boolean {
-    //   return !this.isCellValid(Common.cellIdx(r, c));
-    // } // isCellInvalid_()
     /**
      * A cell is valid if its row, column, and box are all valid. In other words,
      * no value occurs more than once in the cell's row, column, and box.
@@ -3444,12 +3403,6 @@ var SudokuService = (function () {
         }
         return v;
     }; // cellsToValuesArray()
-    /**
-     *
-     */
-    SudokuService.prototype.getNakedCandidates_ = function (r, c, maxCandidates) {
-        return this.findNakedCandidates(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c), maxCandidates);
-    }; // getNakedCandidates_()
     /**
      *
      */
@@ -3530,14 +3483,6 @@ var SudokuService = (function () {
         }
     }; // setCellCandidates()
     /**
-     *
-     */
-    // private removeCandidates(cell: Cell) {
-    //   for (let k of CANDIDATES) {
-    //     cell.candidates[k] = false;
-    //   }
-    // } // removeCandidates()
-    /**
      * A cell's *state* is valid if has a value and no candidates,
      * OR has no value and one or more candidates. Conversely, a cell's state is
      * in valid it has no value and no candidates, or has both a value and one
@@ -3612,18 +3557,6 @@ var SudokuService = (function () {
         }
         return count;
     };
-    // /**
-    //  * Returns true if cell has a value;
-    //  */
-    // groupCandidateCounts(group: Group) : number[] {
-    //   let candidateCount = 0;
-    //   for (let c of group.cells) {
-    //     if (this.sudokuModel.cells[c].candidates[k]) {
-    //       candidateCount++;
-    //     }
-    //   }
-    //   return candidateCount;
-    // } // groupCandidateCount()
     /**
      * Returns true if cell has one or more candidates.
      */
@@ -3766,7 +3699,7 @@ var SudokuService = (function () {
      *
      */
     SudokuService.prototype.getCandidates_ = function (r, c) {
-        return this.getCandidates(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].cellIdx(r, c));
+        return this.getCandidates(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].urcToCellIdx(r, c));
     };
     /**
      * Add given candidate to given cell.

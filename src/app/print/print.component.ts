@@ -29,15 +29,15 @@ export class PrintComponent implements OnInit {
    */
   valueToChar_(br: number, bc: number, cr: number, cc: number) {
     var value = this.getValue_(br, bc, cr, cc);
-    return value == 0 ? '' : value.toString(); 
+    // return value == 0 ? '' : value.toString(); 
   }
 
   /**
    * Function based on view's cell indexes in html code.
    */
   getValue_(br: number, bc: number, cr: number, cc: number) {
-      return this.sudokuService.getValue_(Common.viewToModelRow(br, cr), 
-          Common.viewToModelCol(bc, cc));
+      // return this.sudokuService.getValue_(Common.viewToModelRow(br, cr), 
+      //     Common.viewToModelCol(bc, cc));
   }
   
   /**

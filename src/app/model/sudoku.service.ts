@@ -80,7 +80,7 @@ export class SudokuService {
   /**
    * 
    */
-  public getCurrentSudoku() {
+  public getCurrentSudoku() : Puzzle {
     return this.currentSudoku;
   } // getCurrentSudoku()
 
@@ -113,7 +113,7 @@ export class SudokuService {
   /**
    * Sets a given value in every cell and set all groups to complete.
    */
-  public setAllValues(values: number[]) {
+  public setAllValues(values: number[]) : void {
     for (let c of CELLS) {    // c is 0..80
       let cell = this.sudokuModel.cells[c];   // cell at [c] in cells array
       cell.locked = false;
@@ -132,38 +132,16 @@ export class SudokuService {
   /**
    * 
    */
-  // public isCellLocked_(r: number, c: number) : boolean {
-  //   return this.isCellLocked(Common.cellIdx(r, c));
-  // } // isCellLocked_()
-  /**
-   * 
-   */
-  // public isCellLocked_(r: number, c: number) : boolean {
-  public isCellLocked(c: number) {
+  public isCellLocked(c: number) : boolean {
     return this.sudokuModel.cells[c].locked;
   } // isCellLocked()
   
-
-  /**
-   * Gets givenValue in cell at given row and column (1..9).
-   */
-  public getValue_(r: number, c: number) : number {
-    return this.getValue(Common.urcToCellIdx(r, c));
-  } // getValue_()
-
   /**
    * Return givenValue of cell. Zero means no givenValue;
    */
   public getValue(c: number) : number {
     return this.sudokuModel.cells[c].value;
   } // getValue()
-
-  /**
-   * Sets givenValue in cell at given row and column (1..9).
-   */
-  public setValue_(r: number, c: number, newValue: number) : void {
-    this.setValue(Common.urcToCellIdx(r, c), newValue, ActionType.SET_VALUE);       
-  } // setValue_()
 
   /**
    * Sets value of a cell to the given value. In the specified cell, all candidates
@@ -253,14 +231,6 @@ export class SudokuService {
   } // setValue()
 
   /**
-   * Removes givenValue in cell at given row and column (1..9).
-   */
-  public removeValue_(r: number, c: number) : void {
-    this.removeValue(Common.urcToCellIdx(r, c));       
-  } // removeValue_()
-
-
-  /**
    * Removes the givenValue of the specified cell to make it empty. This 
    * function also reestablishes appropriate candidates in the cell and
    * reestablishes the candidate, equal to the givenValue being removed, in
@@ -304,7 +274,6 @@ export class SudokuService {
     }
 
     // get existing givenValue, exit if no existing givenValue
-    // let oldValue = this.getValue(c);
     let oldValue = cell.value;
     if (oldValue === 0) {
       return;			// nothing to remove
@@ -342,13 +311,6 @@ export class SudokuService {
       this.addCandidate(rc, oldValue);
     }
   } // removeValue()
-
-  /**
-   * Removes given candidate from cell at given row and column (1..9).
-   */
-  public removeCandidate_(r: number, c: number, k: number) : void {
-    this.removeCandidate(Common.urcToCellIdx(r, c), k, undefined);  // user action
-  } // removeCandidate_()
 
   /**
    * Remove given candidate from given cell. This method is only
@@ -571,26 +533,12 @@ export class SudokuService {
   } // getCandidates()
         
   /**
-   * 
-   */
-  public isCandidate_(r: number, c: number, k: number) : boolean {
-    return this.isCandidate(Common.urcToCellIdx(r, c), k);
-  } // isCandidate_()
-  
-  /**
    * Returns true if cell contains the candidate.
    */
   public isCandidate(c: number, k: number) : boolean {
     return this.sudokuModel.cells[c].candidates[k];
   } // isCandidate()
   
-  /**
-   * 
-   */
-  // public isCellInvalid_(r: number, c: number) : boolean {
-  //   return !this.isCellValid(Common.cellIdx(r, c));
-  // } // isCellInvalid_()
-
   /**
    * A cell is valid if its row, column, and box are all valid. In other words,
    * no value occurs more than once in the cell's row, column, and box.
@@ -659,14 +607,7 @@ try {
   /**
    * 
    */
-  // public getNakedCandidates_(r: number, c: number, maxCandidates: NakedType) {
-  //   return this.findNakedCandidates(Common.urcToCellIdx(r, c), maxCandidates);
-  // } // getNakedCandidates_()
-
-  /**
-   * 
-   */
-  public getLastAction() {
+  public getLastAction() : Action {
     return this.actionLog.getLastEntry();
   } // getLastAction()
 
@@ -682,7 +623,7 @@ try {
   /**
    * 
    */
-  public getActionLogAsString() {
+  public getActionLogAsString() : string {
     return this.actionLog.toStringLastFirst();
   } // getActionLogAsString()
 
@@ -749,15 +690,6 @@ try {
     }
   } // setCellCandidates()
 
-  /**
-   * 
-   */
-  // private removeCandidates(cell: Cell) {
-  //   for (let k of CANDIDATES) {
-  //     cell.candidates[k] = false;
-  //   }
-  // } // removeCandidates()
-        
   /**
    * A cell's *state* is valid if has a value and no candidates, 
    * OR has no value and one or more candidates. Conversely, a cell's state is
@@ -833,19 +765,6 @@ try {
     }
     return count;
   }
-
-  // /**
-  //  * Returns true if cell has a value;
-  //  */
-  // groupCandidateCounts(group: Group) : number[] {
-  //   let candidateCount = 0;
-  //   for (let c of group.cells) {
-  //     if (this.sudokuModel.cells[c].candidates[k]) {
-  //       candidateCount++;
-  //     }
-  //   }
-  //   return candidateCount;
-  // } // groupCandidateCount()
 
   /**
    * Returns true if cell has one or more candidates.
