@@ -16,6 +16,7 @@ import { ActionLogService }      from './action/action-log.service';
 import { HintService }        from './hint/hint.service';
 import { HintLogService }        from './hint/hint-log.service';
 // import { CreationService }        from '../web-workers/creation-worker/creation.service';
+import { TooltipModule } from 'ngx-bootstrap';
 
 @NgModule({
   declarations: [
@@ -28,8 +29,9 @@ import { HintLogService }        from './hint/hint-log.service';
   ],
   imports: [    
     BrowserModule,
-    FormsModule
+    FormsModule,
     // AppRoutingModule
+    TooltipModule.forRoot()
   ],
   providers: [
     CacheService

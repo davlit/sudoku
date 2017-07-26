@@ -61,16 +61,25 @@ group with 5 value and 4 open cells
 group 
 1 open => naked single
 2 open => 2 naked singles
-          1 naked pairs (not actionable)
-3 open => 3 naked singles
-          1 naked pairs??????????
-4 open: naked pairs => hidden pairs
-5 open: naked trips => hidden pairs
-6 open: naked quads => hidden pairs
+          1 naked pair (not actionable)
+3 open => 3 naked singles (x, y, z) (naked single caught first)
+          1 naked pair, 1 naked single (xy, xy, z) (naked single caught first)
+          xy xz yz
+          (hidden pair not possible)
+4 open => 4 naked singles (w, x, y, z)
 
-naked pairs   => 4+ open cells
-naked triples => 5+ open cells
-naked quads   => 6+ open cells
+wx, 
+naked pair => hidden pairs
+5 open: naked triple => hidden pairs
+6 open: naked quad => hidden pair
+
+naked pair   => 4+ open cells
+naked triple => 5+ open cells
+naked quad   => 6+ open cells
+
+hidden pair   => 4+ open cells
+hidden triple => 4+ open cells ???
+hidden quad   => 5+ open cells
 
 WebWorker Scheme
 ================

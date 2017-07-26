@@ -1521,20 +1521,24 @@ var Puzzle = (function () {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__creation_service__ = __webpack_require__(14);
-console.log('Creation web worker loaded.');
+// console.log('Creation web worker loaded.');
 
 // prevent TypeScript compile error
 var customPostMessage = postMessage;
 // the worker has an instance of the CPU-intensive service
 var creationService = new __WEBPACK_IMPORTED_MODULE_0__creation_service__["a" /* CreationService */]();
-// onmessage executes when a posted message is received by the web worker.
+/**
+ * onmessage executes when a posted message is received by the web worker.
+ */
 onmessage = function (event) {
     var difficulty = event.data;
     // let createdSudoku: string = undefined;
-    console.info('creation.worker.onmessage difficullty: ' + difficulty);
+    // console.info('creation.worker.onmessage difficullty: ' + difficulty);
+    console.info('\nCreation started in background ...');
     // perform CPU-intense task in web worker
     var createdSudoku = creationService.createSudoku(difficulty);
-    console.info('creation.worker created diff: ' + difficulty);
+    // console.info('creation.worker created diff: ' + difficulty);
+    console.info('\nCreation background completed');
     // post a message with result back to the requester (AppComponent)
     customPostMessage(createdSudoku);
     // customPostMessage('A B C');
