@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 15);
+/******/ 	return __webpack_require__(__webpack_require__.s = 18);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -91,7 +91,7 @@
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
 var VERSION = '16';
-var SUB_VERSION = '4';
+var SUB_VERSION = '5';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -1520,7 +1520,7 @@ var Puzzle = (function () {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__creation_service__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__creation_service__ = __webpack_require__(17);
 // console.log('Creation web worker loaded.');
 
 // prevent TypeScript compile error
@@ -2844,12 +2844,826 @@ var HintService = (function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Cell; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_common__ = __webpack_require__(0);
+
+/**
+ * Cell is one of the 81 cells in a standard sudoku.
+ *
+ * State:
+ * - value
+ * - candidates
+ * - locked (boolean)
+ */
+var Cell = (function () {
+    /**
+     * Initialize the cell to empty: no value and all candidates. Give the cell
+     * a reference to its row, column, and box.
+     * @param rowIndex
+     * @param colIndex
+     * @param boxIndex
+     */
+    function Cell(rowIndex, colIndex, boxIndex) {
+        this._value = 0; // no value
+        this._candidates = new Array(10);
+        this.setAllCandidates(); // every value is candidate
+        this._rowIndex = rowIndex;
+        this._colIndex = colIndex;
+        this._boxIndex = boxIndex;
+    }
+    Object.defineProperty(Cell.prototype, "value", {
+        get: function () {
+            return this._value;
+        },
+        set: function (value) {
+            this._value = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Cell.prototype, "candidates", {
+        get: function () {
+            return this._candidates;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Cell.prototype, "locked", {
+        get: function () {
+            return this._locked;
+        },
+        set: function (locked) {
+            this._locked = locked;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Cell.prototype, "rowIndex", {
+        get: function () {
+            return this._rowIndex;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Cell.prototype, "colIndex", {
+        get: function () {
+            return this._colIndex;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Cell.prototype, "boxIndex", {
+        get: function () {
+            return this._boxIndex;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    // set value(value: number) {
+    //   this._value = value;
+    // }
+    /**
+     * Make every value a candidate.
+     */
+    Cell.prototype.setAllCandidates = function () {
+        for (var _i = 0, CANDIDATES_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_1.length; _i++) {
+            var k = CANDIDATES_1[_i];
+            this._candidates[k] = true;
+        }
+    }; // setAllCandidates()
+    /**
+     * Clear all candidates.
+     */
+    Cell.prototype.unsetAllCandidates = function () {
+        for (var _i = 0, CANDIDATES_2 = __WEBPACK_IMPORTED_MODULE_0__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_2.length; _i++) {
+            var k = CANDIDATES_2[_i];
+            this._candidates[k] = false;
+        }
+    }; // unsetAllCandidates()
+    return Cell;
+}()); // class Cell
+
+//  export class Cell {
+//   private _value: number;
+//   private _candidates: boolean[];
+//   private _locked: boolean;
+//   private _rowIndex: number;
+//   private _colIndex: number;
+//   private _boxIndex: number;
+//   /**
+//    * Initialize the cell to empty: no value and all candidates. Give the cell
+//    * a reference to its row, column, and box.
+//    * @param row 
+//    * @param col 
+//    * @param box 
+//    */
+//   constructor(rowIndex: number, colIndex: number, boxIndex:number) {
+//     this._value = 0;   // no value
+//     this._candidates = new Array(10);
+//     this.setAllCandidates();  // every value is candidate
+//     this._rowIndex = rowIndex;
+//     this._colIndex = colIndex;
+//     this._boxIndex = boxIndex;
+//   }
+//   get rowIndex() {
+//     return this._rowIndex;
+//   }
+//   get colIndex() {
+//     return this._colIndex;
+//   }
+//   get boxIndex() {
+//     return this._boxIndex;
+//   }
+//   get value() {
+//     return this._value;
+//   }
+//   set value(value) {
+//     this._value = value;
+//   }
+//   get locked() {
+//     return this._locked
+//   }
+//   public isLocked() : boolean {
+//     return this._locked
+//   }
+//   public lock() : void {
+//     this._locked = true;
+//   }
+//   public unlock() : void {
+//     this._locked = false;
+//   }
+//   public isCandidate(k: number) : boolean {
+//     return this._candidates[k];
+//   }
+//   public setCandidate(k: number) : void {
+//     this._candidates[k] = true;
+//   }
+//   public removeCandidate(k: number) : void {
+//     this._candidates[k] = false;
+//   }
+//   /**
+//    * Make every value a candidate.
+//    */
+//   public setAllCandidates() : void {
+//     for (let k of CANDIDATES) {
+//       this._candidates[k] = true;
+//     }
+//   } // setAllCandidates()
+//   /**
+//    * Clear all candidates.
+//    */
+//   public unsetAllCandidates() : void {
+//     for (let k of CANDIDATES) {
+//       this._candidates[k] = false;
+//     }
+//   } // unsetAllCandidates()
+// } // class Cell
+// export class Cell {
+//   private value: number;
+//   private candidates: number[];
+//   private locked: boolean;
+//   constructor() {
+//     this.initialize();
+//   }
+//   /**
+//    * 
+//    */
+//   initialize() {
+//     this.value = 0;               // value 1..9, 0 means no value
+//     this.locked = false;          // cell has original given value
+//     this.initializeCandidates();
+//   }
+//   // TESTING ONLY
+//   setCandidates(candidates: number[]) {
+//     this.candidates = [0,  0, 0, 0,  0, 0, 0,  0, 0, 0];
+//     for (let k of candidates) {
+//       this.candidates[k] = 1;
+//     }
+//   }
+//   /**
+//    * Cell must have a value. candidates[0] is not used.
+//    */
+//   unsetAllCandidates() {
+//     if (this.value != 0) {
+//       this.candidates = [0,  0, 0, 0,  0, 0, 0,  0, 0, 0];
+//     }
+//   }
+//   /**
+//    * Every value is a candidate. candidates[0] is not used.
+//    */
+//   initializeCandidates() {
+//     if (this.value === 0) {
+//       this.candidates = [0,  1, 1, 1, 1, 1, 1, 1, 1, 1];
+//     }
+//   }
+//   /**
+//    * Set cell value to 1..9. Remove existing candidates.
+//    */
+//   setValue(newValue: number) {
+//     this.value = newValue;	// set cell's new value
+//     for (let k of CANDIDATES) {
+//       if (this.candidates[k] === 1) {
+//         this.candidates[k] = 0;
+//       }
+//     }
+//   }
+//   /**
+//    * Set cell value to 1..9. Remove existing candidates.
+//    */
+//   setInitialValue(newValue: number) {
+//     this.value = newValue;	// set cell's new value
+//     this.unsetAllCandidates();
+//     this.locked = true;
+//   }
+//   /**
+//    * Set cell value, unset all candidates and keep the cell unlocked.
+//    */
+//   setRawValue(newValue: number) {
+//     this.value = newValue;	// set cell's new value
+//     this.unsetAllCandidates();
+//     this.locked = false;
+//   }
+//   /**
+//    * Remove cell value. WARNING: 1 or more candidates must be added.
+//    */
+//   removeValue() {
+//     this.value = 0;
+//   }
+//   /**
+//    * Get the value in this cell. Zero means no value.
+//    */
+//   getValue() {
+//     return this.value;
+//   }
+//   /**
+//    * Determine if cell is valid. If the cell has a value, it cannot have any
+//    * candidates. If the cell does not have a value, it must have one or more
+//    * candidates.
+//    */
+//   isValid() : boolean {
+//     let cands = false;
+//     for (let k of CANDIDATES) {
+//       if (this.candidates[k] === 1) {
+//         cands = true;
+//         break;
+//       }
+//     }
+//     let value = this.hasValue();
+//     if (value && cands) {
+//       // console.log('Cell has value and candidate(s)!');
+//       return false;
+//     }
+//     if (!value && !cands) {
+//       // console.log('Cell has no value and no candidate(s)!');
+//       return false;
+//     }
+//     return true;
+//   } // isValid()
+//   /**
+//    * 
+//    */
+//   isImpossible() {
+//     return this.value === 0 && this.getNumberOfCandidates() === 0;
+//   }
+//   /**
+//    * Get an array of candidates.
+//    */
+//   getCandidates() : number[] {
+//     if (this.hasValue()) {
+//       return [];
+//     }
+//     let candidates: number[] = [];
+//     for (let k of CANDIDATES) {
+//       if (this.candidates[k] === 1) {
+//         candidates.push(k);
+//       }
+//     }
+//     return candidates;
+//   }
+//   /**
+//    * Returns the number of candidates in cell.
+//    */
+//   getNumberOfCandidates() {
+//     if (this.hasValue()) {
+//       return 0;
+//     }
+//     let count = 0;
+//     for (let k of CANDIDATES) {
+//       if (this.candidates[k] === 1) {
+//         count++;
+//       }
+//     }
+//     return count;
+//   }
+//   /**
+//    * Determine if the cell is locked. A locked cell has a value that cannot
+//    * be changed. Cells with initial or given values are locked.
+//    */
+//   isLocked() {
+//     return this.locked;
+//   }
+//   /**
+//    * Lock the cell. When initialized, the cell is not locked.
+//    */
+//   setLocked() {
+//     if (this.hasValue()) {
+//       this.locked = true; 
+//     }
+//   }
+//   /**
+//    * Determines if cell has a value 1..9.
+//    */
+//   hasValue() : boolean {
+//     return this.value > 0;
+//   }
+//   /**
+//    * Add a cell candidate.
+//    * - candidate cannot add candidate if cell has a value
+//    */
+//   addCandidate(k: number) {
+//     if (this.value > 0) {
+//       console.error('Cannot add candidate; cell has a value.')
+//       return;
+//     }
+//     if (this.candidates[k] < 1) {
+//       this.candidates[k] = 1;
+//     }
+//   }
+//   /**
+//    * 
+//    */
+//   // new
+//   // removeCandidate(k: number, round: number) {
+//   removeCandidate(k: number) : void {
+//     if (this.candidates[k] === 1) {
+//       this.candidates[k] = 0;
+//     }
+//   }
+//   /**
+//    * 
+//    */
+//   restoreCandidate(k: number) {
+//     this.candidates[k] = 1;
+//   }
+//   /**
+//    * 
+//    */
+//   isCandidate(k: number) {
+//     return this.candidates[k] === 1;
+//   }
+//   /**
+//    * Given a candidate, or zero if none, return the next available candidate.
+//    */
+//   getNextCandidate(n: number) : number {
+//     for (let k = n + 1; k < CANDIDATES.length; k++) {
+//       if (this.candidates[k] === 1) {
+//         return k;
+//       }
+//     }
+//     return undefined;
+//   }
+//   /**
+//    * Returns an array of cell's candidates where the number of candidates is
+//    * is greater than 0 but less than or equal to the number specified by the
+//    * naked type. For NakedType.SINGLE, PAIR, TRIPLE, QUAD the number of 
+//    * candidates in the array are 1, 1..2, 1..3, and 1..4.
+//    */
+//   findNakedCandidates(nakedType: NakedType) : number[] {
+//     let maxCandidates = 0;
+//     switch (nakedType) {
+//       case NakedType.SINGLE:
+//         maxCandidates = 1;
+//         break;
+//       case NakedType.PAIR:
+//         maxCandidates = 2;
+//         break;
+//       case NakedType.TRIPLE:
+//         maxCandidates = 3;
+//         break;
+//       case NakedType.QUAD:
+//         maxCandidates = 4;
+//     }
+//     let nakeds: number[] = [];
+//     if (this.value > 0) {   // no candidates in cell
+//       return nakeds;
+//     }
+//     for (let k of CANDIDATES) {
+//       if (this.candidates[k] === 1) {
+//         nakeds.push(k);
+//         if (nakeds.length > maxCandidates) {
+//           return [];  // to many k's in this cell
+//         }
+//       }
+//     } // next k
+//     return nakeds;  // cell has maxCandidates or fewer
+//   }
+//   /**
+//    * Represent the state of the cell as a string.
+//    */
+//   toString() : string {
+//     let s = 'v:' + (this.value != 0 ? this.value : '.');
+//     s += ' k:';
+//     for (let k of CANDIDATES) {
+//       s += (this.candidates[k] === 1) ? k : '.';
+//     }
+//     if (!this.isValid()) {
+//       s += ' * * *';
+//     }
+//     return s;
+//   }
+// }
+//# sourceMappingURL=cell.js.map
+
+/***/ }),
+/* 14 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Group; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__common_common__ = __webpack_require__(0);
+
+/*
+ * A Group is a sub-element of a sudoku. A Group can be a sudoku row, column,
+ * or box. A Group contains 9 integer values called occurrences. Each
+ * occurrence represents a value 1..9 and the integer value (0..n) of each
+ * occurrence is the count of the number of times the value appears in the
+ * group. (The occurrences array size is 10 but occurrencs[0] is not used.)
+ *
+ * A sudoku will have 27 groups (9 each of rows, columns, and boxes).
+ *
+ * - If a Group at, say, index 4 (occurrences[4]) has a value of 0, that
+ * means the cell value of 4 does not appear in the Group object.
+ * - If the Group value at index 4 is 1. The cell value of 4 appears once
+ * in the Group object. Note that every sudoku cell containing will appear
+ * in 3 Group objects: the row, column, and box that contain the cell.
+ * - If the Group value at index 4 is greater than 1. The cell value of 4
+ * appears more than once in the Group object -- possibly in the row,
+ * column, and box. This is an invalid entry and must be corrected.
+ *
+ * Again, index 0 is not used.
+ *
+ * State:
+ * - vOccurrences (can be derived from cells)
+ */
+var Group = (function () {
+    function Group(groupCells) {
+        this.vOccurrences = new Array(10);
+        for (var _i = 0, VALUES_1 = __WEBPACK_IMPORTED_MODULE_0__common_common__["c" /* VALUES */]; _i < VALUES_1.length; _i++) {
+            var v = VALUES_1[_i];
+            this.vOccurrences[v] = 0;
+        }
+        this.cells = groupCells;
+    }
+    return Group;
+}()); // class Group
+
+// export class Group {
+//   private _vOccurrences: number[];  // number of occurrences of each value
+//   // private cells: number[];
+//   private _cellIndexes: number[];   // cell indexes of cells in group
+//   constructor(groupCells: number[]) {
+//     // this.vOccurrences = new Array(10);
+//     // for (let v of VALUES) {
+//     //   this.vOccurrences[v] = 0;
+//     // }
+//     this.initialize();
+//     // this.cells = groupCells;
+//     this._cellIndexes = groupCells;
+//   }
+//   /**
+//    * Initialize to all empty cells -- no cells in group have a value.
+//    * _vOccurrences[0] is not used. Indexes [1]..[9] corresponde to
+//    * sudoku values 1..9. The value of each _vOccurrences[x] will be
+//    * - vOccurrences[x] = 0 --> the value x (1..9) is not in any cell
+//    * - vOccurrences[x] = 1 --> the value x (1..9) is in one group cell
+//    * - vOccurrences[x] = 2 --> the value x (1..9) is in two group cells
+//    * The last case means the group (row, column, or box) is in an 
+//    * invalid state.
+//    */
+//   initialize() {
+//     this._vOccurrences = [0,  0, 0, 0,  0, 0, 0,  0, 0, 0];
+//   }
+//   /**
+//    * 
+//    */
+//   setValue(v) {
+//     this._vOccurrences[v] = 1;
+//   }
+//   /**
+//    * 
+//    */
+//   incrementOccurrence(v) {
+//     this._vOccurrences[v]++;
+//   }
+//   /**
+//    * 
+//    */
+//   decrementOccurrence(v) {
+//     this._vOccurrences[v]--;
+//   }
+//   /**
+//    * 
+//    */
+//   containsValue(v: number) : boolean {
+//     // return this.vOccurrences[v] == 1;
+//     return this._vOccurrences[v] > 0;
+//   }
+//   /**
+//    * 
+//    */
+//   isValid() {
+//     for (let v of VALUES) {
+//       if (this._vOccurrences[v] > 1) {
+//         return false;
+//       }
+//     }
+//     return true;
+//   }
+//   /**
+//    * 
+//    */
+//   openCellsCount() : number {
+//     let count = 0;
+//     for (let v of VALUES) {
+//       if (this._vOccurrences[v] === 0) {
+//         count++;
+//       }
+//     }
+//     return count;
+//   }
+//   /**
+//    * 
+//    */
+//   valueCellsCount() : number {
+//     return 9 - this.openCellsCount();
+//   }
+//   /**
+//    * 
+//    */
+//   get cellIndexes() : number[] {
+//     return this._cellIndexes;
+//   }
+//   /**
+//    * Represent the state of a row, column, or box as a string. The "group"
+//    * parameter is the individual row, column, or box.
+//    */
+//   public toString() : string {
+//     let s = '';
+//     for (let v of VALUES) {
+//       // s += (group.vOccurrences[v] === 0) ? '.' : group.vOccurrences[v];
+//       s += (!this.containsValue(v)) ? '.' : v;
+//       if (v == 3 || v == 6) {
+//         s += ' ';
+//       }
+//     }
+//     s += ' ';
+//     for (let i = 0; i < this._cellIndexes.length; i++) {
+//       s += Common.pad(this._cellIndexes[i], 2) + ' ';
+//       if (i == 2 || i == 5) {
+//         s += ' ';
+//       }
+//     }
+//     return s;
+//   }
+// } // class Group
+// export class Group {
+//   private _vOccurrences: number[];
+//   private _kOccurrences: number[];
+//   private _groupCells: number[];
+//   constructor(groupCells: number[]) {
+//     this.initialize();
+//     this._groupCells = groupCells;
+//   }
+//   get groupCells() : number[] {
+//     return this._groupCells;
+//   }
+//   /**
+//    * Initialize value occurrences to no values in group. 
+//    * _vOccurrences[0] is not used.
+//    */
+//   initialize() : void {
+//     this._vOccurrences = [0,  0, 0, 0,  0, 0, 0,  0, 0, 0];
+//     this._kOccurrences = [0,  9, 9, 9,  9, 9, 9,  9, 9, 9];
+//   }
+//   // TESTING ONLY
+//   setVOccurrences(vOccurrences: number[]) {
+//     this._vOccurrences = vOccurrences;
+//   }
+//   /**
+//    * Increment the count of times corresponding value is in group. 
+//    * Typically this will be 0 -> 1.
+//    */
+//   addValue(value: number) : void { 	
+//     this._vOccurrences[value]++;
+//   }
+//   /**
+//    * Decrement number of times corresponding value is in group. 
+//    * Typically this will be 1 -> 0.
+//    */
+//   removeValue(value: number) : void {   
+//     this._vOccurrences[value]--;
+//   }
+//   /**
+//    * Returns true if given value appears in the group.
+//    */
+//   containsValue(value: number) : boolean {
+//     return this._vOccurrences[value] > 0;
+//   }
+//   /**
+//    * A group is valid if any value if no values occur more than once 
+//    * in the group.
+//    */
+//   isValid() : boolean {
+//     for (let v of VALUES) {
+//       if (this._vOccurrences[v] > 1) {
+//         return false;    // stop and return group not valid
+//       }
+//     }
+//     return true;
+//   }
+//   /**
+//    * Determines if group is complete. That is, if any occurrence in 
+//    * the group does not hold a value of 1, then the group is not 
+//    * complete or is invalid. Equivalently, if every occurrence (1..9) 
+//    * contains a 1, the group is complete (and valid).
+//    * 
+//    * Returns true if group is complete (and valid).
+//    */
+//   isComplete() : boolean {
+//     for (let v of VALUES) {
+//       if (this._vOccurrences[v] != 1) {
+//         return false;
+//       }
+//     }
+//     return true;
+//   }
+//   /**
+//    * Return the number of closed cells in the group.
+//    * A closed cell has a value. Sometimes called a value cell. It can be closed
+//    * by having an initial given value or by having a value assigned in solving
+//    * the sudoku. A closed cell cannot have any candidates.
+//    */
+//   getClosedCellsCount() {
+//     let count = 0;
+//     for (let v of VALUES) {
+//       if (this._vOccurrences[v] > 0) {
+//         count++;
+//       }
+//     }
+//     return count;
+//   }
+//   /**
+//    * Return the number of open cells in the group.
+//    * An open cell does not have a value and will normally have 1 or more 
+//    * candidates. If a cell does not have a value and has no candidates the
+//    * sudoku cannot be solved in its current state.
+//    */
+//   getOpenCellsCount() {
+//     return 9 - this.getOpenCellsCount();
+//   }
+//   /**
+//    * Increment the count of times corresponding candidate is in group. 
+//    */
+//   addCandidate(candidate: number) : void { 	
+//     this._kOccurrences[candidate]++;
+//   }
+//   /**
+//    * Decrement number of times corresponding candidate is in group. 
+//    */
+//   removeCandidate(candidate: number) : void {   
+//     this._kOccurrences[candidate]--;
+//   }
+//   /**
+//    * Make the group full. Every value 1..9 is present once in the group
+//    */
+//   setComplete() {
+//     this._vOccurrences = [0,  1, 1, 1,  1, 1, 1,  1, 1, 1];
+//   }
+//   /**
+//    * Represent the state of the group as a string.
+//    */
+//   toString() : string {
+//     let s = '';
+//     for (let v of VALUES) {
+//       s += (this._vOccurrences[v] === 0) ? '.' : this._vOccurrences[v];
+//       if (v == 3 || v == 6) {
+//         s += ' ';
+//       }
+//     }
+//     s += '|';
+//     for (let k of VALUES) {
+//       s += (this._kOccurrences[k] === 0) ? '.' : this._kOccurrences[k];
+//       if (k == 3 || k == 6) {
+//         s += ' ';
+//       }
+//     }
+//     if (!this.isValid()) {
+//       s += ' * * *';
+//     }
+//     return s;
+//   }
+// }
+//# sourceMappingURL=group.js.map
+
+/***/ }),
+/* 15 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SudokuModel; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__cell__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__group__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__common_common__ = __webpack_require__(0);
+
+
+
+var SudokuModel = (function () {
+    function SudokuModel() {
+        this._cells = new Array(81);
+        this._rows = new Array(9);
+        this._cols = new Array(9);
+        this._boxs = new Array(9);
+        for (var _i = 0, GROUPS_1 = __WEBPACK_IMPORTED_MODULE_2__common_common__["k" /* GROUPS */]; _i < GROUPS_1.length; _i++) {
+            var g = GROUPS_1[_i];
+            this._rows[g] = new __WEBPACK_IMPORTED_MODULE_1__group__["a" /* Group */](__WEBPACK_IMPORTED_MODULE_2__common_common__["h" /* ROW_CELLS */][g]);
+            this._cols[g] = new __WEBPACK_IMPORTED_MODULE_1__group__["a" /* Group */](__WEBPACK_IMPORTED_MODULE_2__common_common__["i" /* COL_CELLS */][g]);
+            this._boxs[g] = new __WEBPACK_IMPORTED_MODULE_1__group__["a" /* Group */](__WEBPACK_IMPORTED_MODULE_2__common_common__["j" /* BOX_CELLS */][g]);
+        }
+        for (var _a = 0, CELLS_1 = __WEBPACK_IMPORTED_MODULE_2__common_common__["b" /* CELLS */]; _a < CELLS_1.length; _a++) {
+            var c = CELLS_1[_a];
+            this._cells[c] = new __WEBPACK_IMPORTED_MODULE_0__cell__["a" /* Cell */](__WEBPACK_IMPORTED_MODULE_2__common_common__["a" /* Common */].rowIdx(c), __WEBPACK_IMPORTED_MODULE_2__common_common__["a" /* Common */].colIdx(c), __WEBPACK_IMPORTED_MODULE_2__common_common__["a" /* Common */].boxIdx(c));
+        }
+    } // constructor
+    Object.defineProperty(SudokuModel.prototype, "cells", {
+        get: function () {
+            return this._cells;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SudokuModel.prototype, "rows", {
+        get: function () {
+            return this._rows;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SudokuModel.prototype, "cols", {
+        get: function () {
+            return this._cols;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SudokuModel.prototype, "boxs", {
+        get: function () {
+            return this._boxs;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return SudokuModel;
+}()); // class SudokuModel
+
+// export class SudokuModel {
+//   cells: Cell[]
+//   rows: Group[];
+//   cols: Group[];
+//   boxs: Group[];
+//   constructor() {
+//     this.cells = new Array(81);
+//     this.rows = new Array(9);
+//     this.cols = new Array(9);
+//     this.boxs = new Array(9);
+//     for (let g of GROUPS) {
+//       this.rows[g] = new Group(ROW_CELLS[g]);
+//       this.cols[g] = new Group(COL_CELLS[g]);
+//       this.boxs[g] = new Group(BOX_CELLS[g]);
+//     }
+//     for (let c of CELLS) {
+//       this.cells[c] = new Cell(
+//           Common.rowIdx(c), Common.colIdx(c), Common.boxIdx(c));
+//     }
+//   }
+//   public isCellLocked(c: number) : boolean {
+//     // return this.cells[c].isLocked();
+//     return this.cells[c].locked;
+//   }
+// } // class SudokuModel
+//# sourceMappingURL=sudoku.model.js.map
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return SudokuService; });
-/* unused harmony export Group */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__puzzle__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__naked_type__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__action_action__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__common_common__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__sudoku_model__ = __webpack_require__(15);
+
 
 
 
@@ -2876,7 +3690,7 @@ var SudokuService = (function () {
         this.currentSudoku = undefined;
         this.sudokuModel = undefined;
         this.actionLog = undefined;
-        this.sudokuModel = new SudokuModel();
+        this.sudokuModel = new __WEBPACK_IMPORTED_MODULE_4__sudoku_model__["a" /* SudokuModel */]();
         // this.actionLog = new ActionLogService();
         this.actionLog = actionLog;
         this.initializeModel();
@@ -3023,9 +3837,9 @@ var SudokuService = (function () {
         cell.value = newValue;
         this.removeAllCellCandidates(c);
         // increment occurrences in groups
-        this.sudokuModel.rows[cell.row].vOccurrences[newValue]++;
-        this.sudokuModel.cols[cell.col].vOccurrences[newValue]++;
-        this.sudokuModel.boxs[cell.box].vOccurrences[newValue]++;
+        this.sudokuModel.rows[cell.rowIndex].vOccurrences[newValue]++;
+        this.sudokuModel.cols[cell.colIndex].vOccurrences[newValue]++;
+        this.sudokuModel.boxs[cell.boxIndex].vOccurrences[newValue]++;
         // log action
         var action;
         switch (actionType) {
@@ -3092,9 +3906,9 @@ var SudokuService = (function () {
             return; // nothing to remove
         }
         cell.value = 0;
-        var row = this.sudokuModel.rows[cell.row];
-        var col = this.sudokuModel.cols[cell.col];
-        var box = this.sudokuModel.boxs[cell.box];
+        var row = this.sudokuModel.rows[cell.rowIndex];
+        var col = this.sudokuModel.cols[cell.colIndex];
+        var box = this.sudokuModel.boxs[cell.boxIndex];
         row.vOccurrences[oldValue]--;
         col.vOccurrences[oldValue]--;
         box.vOccurrences[oldValue]--;
@@ -3112,9 +3926,9 @@ var SudokuService = (function () {
         for (var _a = 0, _b = __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].getRelatedCells(c); _a < _b.length; _a++) {
             var rc = _b[_a];
             var relatedCell = this.sudokuModel.cells[rc];
-            var rcRow = this.sudokuModel.rows[relatedCell.row];
-            var rcCol = this.sudokuModel.cols[relatedCell.col];
-            var rcBox = this.sudokuModel.boxs[relatedCell.box];
+            var rcRow = this.sudokuModel.rows[relatedCell.rowIndex];
+            var rcCol = this.sudokuModel.cols[relatedCell.colIndex];
+            var rcBox = this.sudokuModel.boxs[relatedCell.boxIndex];
             if (rcRow.vOccurrences[oldValue] > 0
                 || rcCol.vOccurrences[oldValue] > 0
                 || rcBox.vOccurrences[oldValue] > 0) {
@@ -3473,9 +4287,9 @@ var SudokuService = (function () {
             return;
         }
         var cell = this.sudokuModel.cells[c];
-        var row = this.sudokuModel.rows[cell.row];
-        var col = this.sudokuModel.cols[cell.col];
-        var box = this.sudokuModel.boxs[cell.box];
+        var row = this.sudokuModel.rows[cell.rowIndex];
+        var col = this.sudokuModel.cols[cell.colIndex];
+        var box = this.sudokuModel.boxs[cell.boxIndex];
         // add candidates to cell when value
         for (var _i = 0, VALUES_7 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_7.length; _i++) {
             var v = VALUES_7[_i];
@@ -3658,7 +4472,7 @@ var SudokuService = (function () {
             var k = CANDIDATES_6[_i];
             s += (cell.candidates[k]) ? k : '.';
         }
-        s += ' r' + (cell.row + 1) + ' c' + (cell.col + 1) + ' b' + (cell.box + 1);
+        s += ' r' + (cell.rowIndex + 1) + ' c' + (cell.colIndex + 1) + ' b' + (cell.boxIndex + 1);
         // if (!this.isValid()) {
         //   s += ' * * *';
         // }
@@ -3771,77 +4585,10 @@ var SudokuService = (function () {
     return SudokuService;
 }()); // class SudokuService
 
-var SudokuModel = (function () {
-    function SudokuModel() {
-        this.cells = new Array(81);
-        this.rows = new Array(9);
-        this.cols = new Array(9);
-        this.boxs = new Array(9);
-        for (var _i = 0, GROUPS_4 = __WEBPACK_IMPORTED_MODULE_3__common_common__["k" /* GROUPS */]; _i < GROUPS_4.length; _i++) {
-            var g = GROUPS_4[_i];
-            this.rows[g] = new Group(__WEBPACK_IMPORTED_MODULE_3__common_common__["h" /* ROW_CELLS */][g]);
-            this.cols[g] = new Group(__WEBPACK_IMPORTED_MODULE_3__common_common__["i" /* COL_CELLS */][g]);
-            this.boxs[g] = new Group(__WEBPACK_IMPORTED_MODULE_3__common_common__["j" /* BOX_CELLS */][g]);
-        }
-        for (var _a = 0, CELLS_12 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _a < CELLS_12.length; _a++) {
-            var c = CELLS_12[_a];
-            this.cells[c] = new Cell(__WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].rowIdx(c), __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].colIdx(c), __WEBPACK_IMPORTED_MODULE_3__common_common__["a" /* Common */].boxIdx(c));
-        }
-    }
-    return SudokuModel;
-}()); // class SudokuModel
-var Cell = (function () {
-    /**
-     * Initialize the cell to empty: no value and all candidates. Give the cell
-     * a reference to its row, column, and box.
-     * @param row
-     * @param col
-     * @param box
-     */
-    function Cell(row, col, box) {
-        this.value = 0; // no value
-        this.candidates = new Array(10);
-        this.setAllCandidates(); // every value is candidate
-        this.row = row;
-        this.col = col;
-        this.box = box;
-    }
-    /**
-     * Make every value a candidate.
-     */
-    Cell.prototype.setAllCandidates = function () {
-        for (var _i = 0, CANDIDATES_7 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_7.length; _i++) {
-            var k = CANDIDATES_7[_i];
-            this.candidates[k] = true;
-        }
-    }; // setAllCandidates()
-    /**
-     * Clear all candidates.
-     */
-    Cell.prototype.unsetAllCandidates = function () {
-        for (var _i = 0, CANDIDATES_8 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_8.length; _i++) {
-            var k = CANDIDATES_8[_i];
-            this.candidates[k] = false;
-        }
-    }; // unsetAllCandidates()
-    return Cell;
-}()); // class Cell
-var Group = (function () {
-    function Group(groupCells) {
-        this.vOccurrences = new Array(10);
-        for (var _i = 0, VALUES_11 = __WEBPACK_IMPORTED_MODULE_3__common_common__["c" /* VALUES */]; _i < VALUES_11.length; _i++) {
-            var v = VALUES_11[_i];
-            this.vOccurrences[v] = 0;
-        }
-        this.cells = groupCells;
-    }
-    return Group;
-}()); // class Group
-
 //# sourceMappingURL=sudoku.service.js.map
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3854,7 +4601,7 @@ var Group = (function () {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__app_hint_hint__ = __webpack_require__(4);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__app_hint_hint_type__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__app_hint_hint_service__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__app_model_sudoku_service__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__app_model_sudoku_service__ = __webpack_require__(16);
 
 
 
@@ -4231,7 +4978,7 @@ var CreationService = (function () {
 //# sourceMappingURL=creation.service.js.map
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(9);

@@ -2,7 +2,8 @@
 
 import { SudokuService } from '../model/sudoku.service';
 // import { Group } from '../model/sudoku.model';
-import { Group } from '../model/sudoku.service';
+// import { Group } from '../model/sudoku.service';
+import { Group } from '../model/group';
 import { Common } from '../common/common';
 import { CombinationIterator } from '../common/combination.iterator';
 import { NakedType }  from '../model/naked.type';

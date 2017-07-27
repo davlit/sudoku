@@ -20,11 +20,11 @@ export class Cell {
   /**
    * Initialize the cell to empty: no value and all candidates. Give the cell
    * a reference to its row, column, and box.
-   * @param row 
-   * @param col 
-   * @param box 
+   * @param rowIndex 
+   * @param colIndex 
+   * @param boxIndex 
    */
-  constructor(rowIndex: number, colIndex: number, boxIndex:number) {
+  constructor(rowIndex: number, colIndex:number, boxIndex:number) {
     this._value = 0;   // no value
     this._candidates = new Array(10);
     this.setAllCandidates();  // every value is candidate
@@ -33,53 +33,41 @@ export class Cell {
     this._boxIndex = boxIndex;
   }
 
-  get rowIndex() {
-    return this._rowIndex;
-  }
-
-  get colIndex() {
-    return this._colIndex;
-  }
-
-  get boxIndex() {
-    return this._boxIndex;
-  }
-
-  get value() {
+  get value() : number {
     return this._value;
   }
 
-  set value(value) {
+  set value(value: number) {
     this._value = value;
   }
 
-  get locked() {
-    return this._locked
+  get candidates() : boolean[] {
+    return this._candidates;
   }
 
-  public isLocked() : boolean {
-    return this._locked
+  get locked() : boolean {
+    return this._locked;
   }
 
-  public lock() : void {
-    this._locked = true;
+  set locked(locked: boolean) {
+    this._locked = locked;
   }
 
-  public unlock() : void {
-    this._locked = false;
+  get rowIndex() : number {
+    return this._rowIndex;
   }
 
-  public isCandidate(k: number) : boolean {
-    return this._candidates[k];
+  get colIndex() : number {
+    return this._colIndex;
   }
 
-  public setCandidate(k: number) : void {
-    this._candidates[k] = true;
+  get boxIndex() : number {
+    return this._boxIndex;
   }
 
-  public removeCandidate(k: number) : void {
-    this._candidates[k] = false;
-  }
+  // set value(value: number) {
+  //   this._value = value;
+  // }
 
   /**
    * Make every value a candidate.
@@ -99,7 +87,102 @@ export class Cell {
     }
   } // unsetAllCandidates()
 
+  
+
 } // class Cell
+
+
+//  export class Cell {
+//   private _value: number;
+//   private _candidates: boolean[];
+//   private _locked: boolean;
+//   private _rowIndex: number;
+//   private _colIndex: number;
+//   private _boxIndex: number;
+
+//   /**
+//    * Initialize the cell to empty: no value and all candidates. Give the cell
+//    * a reference to its row, column, and box.
+//    * @param row 
+//    * @param col 
+//    * @param box 
+//    */
+//   constructor(rowIndex: number, colIndex: number, boxIndex:number) {
+//     this._value = 0;   // no value
+//     this._candidates = new Array(10);
+//     this.setAllCandidates();  // every value is candidate
+//     this._rowIndex = rowIndex;
+//     this._colIndex = colIndex;
+//     this._boxIndex = boxIndex;
+//   }
+
+//   get rowIndex() {
+//     return this._rowIndex;
+//   }
+
+//   get colIndex() {
+//     return this._colIndex;
+//   }
+
+//   get boxIndex() {
+//     return this._boxIndex;
+//   }
+
+//   get value() {
+//     return this._value;
+//   }
+
+//   set value(value) {
+//     this._value = value;
+//   }
+
+//   get locked() {
+//     return this._locked
+//   }
+
+//   public isLocked() : boolean {
+//     return this._locked
+//   }
+
+//   public lock() : void {
+//     this._locked = true;
+//   }
+
+//   public unlock() : void {
+//     this._locked = false;
+//   }
+
+//   public isCandidate(k: number) : boolean {
+//     return this._candidates[k];
+//   }
+
+//   public setCandidate(k: number) : void {
+//     this._candidates[k] = true;
+//   }
+
+//   public removeCandidate(k: number) : void {
+//     this._candidates[k] = false;
+//   }
+
+//   /**
+//    * Make every value a candidate.
+//    */
+//   public setAllCandidates() : void {
+//     for (let k of CANDIDATES) {
+//       this._candidates[k] = true;
+//     }
+//   } // setAllCandidates()
+
+//   /**
+//    * Clear all candidates.
+//    */
+//   public unsetAllCandidates() : void {
+//     for (let k of CANDIDATES) {
+//       this._candidates[k] = false;
+//     }
+//   } // unsetAllCandidates()
+
+// } // class Cell
 
 // export class Cell {
 //   private value: number;

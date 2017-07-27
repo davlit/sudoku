@@ -24,6 +24,10 @@ import { Common,
          COL_CELLS,
          BOX_CELLS } from  '../common/common';
 
+import { SudokuModel } from './sudoku.model';
+import { Cell } from './cell';
+import { Group } from './group';
+
 /**
  * This service maintains the sudoku's state: essentially cell values and
  * cell candidates. This class's public methods provide the only access to
@@ -204,9 +208,9 @@ export class SudokuService {
     this.removeAllCellCandidates(c);
 
     // increment occurrences in groups
-    this.sudokuModel.rows[cell.row].vOccurrences[newValue]++;
-    this.sudokuModel.cols[cell.col].vOccurrences[newValue]++;
-    this.sudokuModel.boxs[cell.box].vOccurrences[newValue]++;
+    this.sudokuModel.rows[cell.rowIndex].vOccurrences[newValue]++;
+    this.sudokuModel.cols[cell.colIndex].vOccurrences[newValue]++;
+    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[newValue]++;
 
     // log action
     let action: ValueAction;
@@ -280,9 +284,9 @@ export class SudokuService {
     }
 
     cell.value = 0;
-    let row = this.sudokuModel.rows[cell.row];
-    let col = this.sudokuModel.cols[cell.col];
-    let box = this.sudokuModel.boxs[cell.box];
+    let row = this.sudokuModel.rows[cell.rowIndex];
+    let col = this.sudokuModel.cols[cell.colIndex];
+    let box = this.sudokuModel.boxs[cell.boxIndex];
     row.vOccurrences[oldValue]--;
     col.vOccurrences[oldValue]--;
     box.vOccurrences[oldValue]--;
@@ -300,9 +304,9 @@ export class SudokuService {
     // add candidate (this cell's old givenValue) to related cells
     for (let rc of Common.getRelatedCells(c)) {
       let relatedCell = this.sudokuModel.cells[rc];
-      let rcRow = this.sudokuModel.rows[relatedCell.row];
-      let rcCol = this.sudokuModel.cols[relatedCell.col];
-      let rcBox = this.sudokuModel.boxs[relatedCell.box];
+      let rcRow = this.sudokuModel.rows[relatedCell.rowIndex];
+      let rcCol = this.sudokuModel.cols[relatedCell.colIndex];
+      let rcBox = this.sudokuModel.boxs[relatedCell.boxIndex];
       if (   rcRow.vOccurrences[oldValue] > 0
           || rcCol.vOccurrences[oldValue] > 0
           || rcBox.vOccurrences[oldValue] > 0) {
@@ -676,9 +680,9 @@ try {
     }
 
     let cell = this.sudokuModel.cells[c];
-    let row = this.sudokuModel.rows[cell.row];
-    let col = this.sudokuModel.cols[cell.col];
-    let box = this.sudokuModel.boxs[cell.box];
+    let row = this.sudokuModel.rows[cell.rowIndex];
+    let col = this.sudokuModel.cols[cell.colIndex];
+    let box = this.sudokuModel.boxs[cell.boxIndex];
     
     // add candidates to cell when value
     for (let v of VALUES) {
@@ -866,7 +870,7 @@ try {
     for (let k of CANDIDATES) {
       s += (cell.candidates[k]) ? k : '.';
     }
-    s += ' r' + (cell.row + 1) + ' c' + (cell.col + 1) + ' b' + (cell.box + 1);
+    s += ' r' + (cell.rowIndex + 1) + ' c' + (cell.colIndex + 1) + ' b' + (cell.boxIndex + 1);
     // if (!this.isValid()) {
     //   s += ' * * *';
     // }
@@ -981,88 +985,3 @@ try {
   } // arrayToGridString()
 
 } // class SudokuService
-
-class SudokuModel {
-  cells: Cell[]
-  rows: Group[];
-  cols: Group[];
-  boxs: Group[];
-  
-  constructor() {
-    this.cells = new Array(81);
-    this.rows = new Array(9);
-    this.cols = new Array(9);
-    this.boxs = new Array(9);
-
-    for (let g of GROUPS) {
-      this.rows[g] = new Group(ROW_CELLS[g]);
-      this.cols[g] = new Group(COL_CELLS[g]);
-      this.boxs[g] = new Group(BOX_CELLS[g]);
-    }
-
-    for (let c of CELLS) {
-      this.cells[c] = new Cell(
-          Common.rowIdx(c), Common.colIdx(c), Common.boxIdx(c));
-    }
-  }
-} // class SudokuModel
-
-class Cell {
-  value: number;
-  candidates: boolean[];
-  locked: boolean;
-  row: number;
-  col: number;
-  box: number;
-
-  /**
-   * Initialize the cell to empty: no value and all candidates. Give the cell
-   * a reference to its row, column, and box.
-   * @param row 
-   * @param col 
-   * @param box 
-   */
-  constructor(row: number, col:number, box:number) {
-    this.value = 0;   // no value
-    this.candidates = new Array(10);
-    this.setAllCandidates();  // every value is candidate
-    this.row = row;
-    this.col = col;
-    this.box = box;
-  }
-
-  /**
-   * Make every value a candidate.
-   */
-  public setAllCandidates() : void {
-    for (let k of CANDIDATES) {
-      this.candidates[k] = true;
-    }
-  } // setAllCandidates()
-
-  /**
-   * Clear all candidates.
-   */
-  public unsetAllCandidates() : void {
-    for (let k of CANDIDATES) {
-      this.candidates[k] = false;
-    }
-  } // unsetAllCandidates()
-
-  
-
-} // class Cell
-
-export class Group {
-  vOccurrences: number[];
-  cells: number[]
-
-  constructor(groupCells: number[]) {
-    this.vOccurrences = new Array(10);
-    for (let v of VALUES) {
-      this.vOccurrences[v] = 0;
-    }
-    this.cells = groupCells;
-  }
-
-} // class Group

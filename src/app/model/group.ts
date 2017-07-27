@@ -25,126 +25,140 @@ import { VALUES } from '../common/common';
  * - vOccurrences (can be derived from cells)
  */
 export class Group {
-  private _vOccurrences: number[];  // number of occurrences of each value
-  // private cells: number[];
-  private _cellIndexes: number[];   // cell indexes of cells in group
+  vOccurrences: number[];
+  cells: number[]
 
   constructor(groupCells: number[]) {
-    // this.vOccurrences = new Array(10);
-    // for (let v of VALUES) {
-    //   this.vOccurrences[v] = 0;
-    // }
-    this.initialize();
-    // this.cells = groupCells;
-    this._cellIndexes = groupCells;
-  }
-
-  /**
-   * Initialize to all empty cells -- no cells in group have a value.
-   * _vOccurrences[0] is not used. Indexes [1]..[9] corresponde to
-   * sudoku values 1..9. The value of each _vOccurrences[x] will be
-   * - vOccurrences[x] = 0 --> the value x (1..9) is not in any cell
-   * - vOccurrences[x] = 1 --> the value x (1..9) is in one group cell
-   * - vOccurrences[x] = 2 --> the value x (1..9) is in two group cells
-   * The last case means the group (row, column, or box) is in an 
-   * invalid state.
-   */
-  initialize() {
-    this._vOccurrences = [0,  0, 0, 0,  0, 0, 0,  0, 0, 0];
-  }
-
-  /**
-   * 
-   */
-  setValue(v) {
-    this._vOccurrences[v] = 1;
-  }
-
-  /**
-   * 
-   */
-  incrementOccurrence(v) {
-    this._vOccurrences[v]++;
-  }
-
-  /**
-   * 
-   */
-  decrementOccurrence(v) {
-    this._vOccurrences[v]--;
-  }
-
-  /**
-   * 
-   */
-  containsValue(v: number) : boolean {
-    // return this.vOccurrences[v] == 1;
-    return this._vOccurrences[v] > 0;
-  }
-
-  /**
-   * 
-   */
-  isValid() {
+    this.vOccurrences = new Array(10);
     for (let v of VALUES) {
-      if (this._vOccurrences[v] > 1) {
-        return false;
-      }
+      this.vOccurrences[v] = 0;
     }
-    return true;
-  }
-
-  /**
-   * 
-   */
-  openCellsCount() : number {
-    let count = 0;
-    for (let v of VALUES) {
-      if (this._vOccurrences[v] === 0) {
-        count++;
-      }
-    }
-    return count;
-  }
-
-  /**
-   * 
-   */
-  valueCellsCount() : number {
-    return 9 - this.openCellsCount();
-  }
-
-  /**
-   * 
-   */
-  get cellIndexes() : number[] {
-    return this._cellIndexes;
-  }
-
-  /**
-   * Represent the state of a row, column, or box as a string. The "group"
-   * parameter is the individual row, column, or box.
-   */
-  public toString() : string {
-    let s = '';
-    for (let v of VALUES) {
-      // s += (group.vOccurrences[v] === 0) ? '.' : group.vOccurrences[v];
-      s += (!this.containsValue(v)) ? '.' : v;
-      if (v == 3 || v == 6) {
-        s += ' ';
-      }
-    }
-    s += ' ';
-    for (let i = 0; i < this._cellIndexes.length; i++) {
-      s += Common.pad(this._cellIndexes[i], 2) + ' ';
-      if (i == 2 || i == 5) {
-        s += ' ';
-      }
-    }
-    return s;
+    this.cells = groupCells;
   }
 
 } // class Group
+
+// export class Group {
+//   private _vOccurrences: number[];  // number of occurrences of each value
+//   // private cells: number[];
+//   private _cellIndexes: number[];   // cell indexes of cells in group
+
+//   constructor(groupCells: number[]) {
+//     // this.vOccurrences = new Array(10);
+//     // for (let v of VALUES) {
+//     //   this.vOccurrences[v] = 0;
+//     // }
+//     this.initialize();
+//     // this.cells = groupCells;
+//     this._cellIndexes = groupCells;
+//   }
+
+//   /**
+//    * Initialize to all empty cells -- no cells in group have a value.
+//    * _vOccurrences[0] is not used. Indexes [1]..[9] corresponde to
+//    * sudoku values 1..9. The value of each _vOccurrences[x] will be
+//    * - vOccurrences[x] = 0 --> the value x (1..9) is not in any cell
+//    * - vOccurrences[x] = 1 --> the value x (1..9) is in one group cell
+//    * - vOccurrences[x] = 2 --> the value x (1..9) is in two group cells
+//    * The last case means the group (row, column, or box) is in an 
+//    * invalid state.
+//    */
+//   initialize() {
+//     this._vOccurrences = [0,  0, 0, 0,  0, 0, 0,  0, 0, 0];
+//   }
+
+//   /**
+//    * 
+//    */
+//   setValue(v) {
+//     this._vOccurrences[v] = 1;
+//   }
+
+//   /**
+//    * 
+//    */
+//   incrementOccurrence(v) {
+//     this._vOccurrences[v]++;
+//   }
+
+//   /**
+//    * 
+//    */
+//   decrementOccurrence(v) {
+//     this._vOccurrences[v]--;
+//   }
+
+//   /**
+//    * 
+//    */
+//   containsValue(v: number) : boolean {
+//     // return this.vOccurrences[v] == 1;
+//     return this._vOccurrences[v] > 0;
+//   }
+
+//   /**
+//    * 
+//    */
+//   isValid() {
+//     for (let v of VALUES) {
+//       if (this._vOccurrences[v] > 1) {
+//         return false;
+//       }
+//     }
+//     return true;
+//   }
+
+//   /**
+//    * 
+//    */
+//   openCellsCount() : number {
+//     let count = 0;
+//     for (let v of VALUES) {
+//       if (this._vOccurrences[v] === 0) {
+//         count++;
+//       }
+//     }
+//     return count;
+//   }
+
+//   /**
+//    * 
+//    */
+//   valueCellsCount() : number {
+//     return 9 - this.openCellsCount();
+//   }
+
+//   /**
+//    * 
+//    */
+//   get cellIndexes() : number[] {
+//     return this._cellIndexes;
+//   }
+
+//   /**
+//    * Represent the state of a row, column, or box as a string. The "group"
+//    * parameter is the individual row, column, or box.
+//    */
+//   public toString() : string {
+//     let s = '';
+//     for (let v of VALUES) {
+//       // s += (group.vOccurrences[v] === 0) ? '.' : group.vOccurrences[v];
+//       s += (!this.containsValue(v)) ? '.' : v;
+//       if (v == 3 || v == 6) {
+//         s += ' ';
+//       }
+//     }
+//     s += ' ';
+//     for (let i = 0; i < this._cellIndexes.length; i++) {
+//       s += Common.pad(this._cellIndexes[i], 2) + ' ';
+//       if (i == 2 || i == 5) {
+//         s += ' ';
+//       }
+//     }
+//     return s;
+//   }
+
+// } // class Group
 
 
 // export class Group {
