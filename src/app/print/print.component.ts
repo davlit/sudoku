@@ -40,18 +40,6 @@ export class PrintComponent implements OnInit {
       //     Common.viewToModelCol(bc, cc));
   }
   
-  /**
-   * Function based on view's cell indexes in html code.
-   */
-  // isCellLocked_(br: number, bc: number, cr: number, cc: number) {
-  //   // return this.isCellLocked(Common.viewToModelRow(br, cr), Common.viewToModelCol(bc, cc));
-  //   return this.sudokuService.isCellLocked(Common.viewToModelRow(br, cr), Common.viewToModelCol(bc, cc));
-  // }
-  
-  // private isCellLocked(r: number, c: number) : boolean {
-  //   return this.sudokuService.isCellLocked_(r, c);
-  // }
-  
   printGrid() {
     var printContents = document.getElementById('printcontent').innerHTML;     
     var originalContents = document.body.innerHTML;       

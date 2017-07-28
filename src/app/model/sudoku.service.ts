@@ -105,9 +105,8 @@ export class SudokuService {
         continue;
       }
 
-      // set cell, update row/col/box, lock cell
+      // set cell, update row/col/box
       this.setValue(c, givenValue, ActionType.SET_VALUE);
-      cell.locked = true;
     } // for
 
     this.initializeActionLog();
@@ -120,7 +119,6 @@ export class SudokuService {
   public setAllValues(values: number[]) : void {
     for (let c of CELLS) {    // c is 0..80
       let cell = this.sudokuModel.cells[c];   // cell at [c] in cells array
-      cell.locked = false;
       cell.value = values[c];   // value at [c] in values array
       this.removeAllCellCandidates(c);
     }
@@ -133,13 +131,6 @@ export class SudokuService {
     }
   } // setAllValues()
 
-  /**
-   * 
-   */
-  public isCellLocked(c: number) : boolean {
-    return this.sudokuModel.cells[c].locked;
-  } // isCellLocked()
-  
   /**
    * Return givenValue of cell. Zero means no givenValue;
    */
@@ -191,9 +182,6 @@ export class SudokuService {
   public setValue(c: number, newValue: number, actionType: ActionType, 
       guessPossibles? : number[], hint?: ValueHint) : void {
     let cell = this.sudokuModel.cells[c];
-    if (cell.locked) {
-      return;		// can't change locked cell
-    }
 
     // if cell has givenValue, remove it first
     if (cell.value != 0) {
@@ -272,11 +260,6 @@ export class SudokuService {
 
     let cell = this.sudokuModel.cells[c];
     
-    // cannot change locked cell
-    if (cell.locked) {
-      return;
-    }
-
     // get existing givenValue, exit if no existing givenValue
     let oldValue = cell.value;
     if (oldValue === 0) {
@@ -653,7 +636,6 @@ try {
    */
   private initializeCell(cell: Cell) : void {
     cell.value = 0;
-    cell.locked = false;
     for (let k of CANDIDATES) {
       cell.candidates[k] = true;
     }

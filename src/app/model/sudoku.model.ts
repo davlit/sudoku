@@ -79,9 +79,5 @@ export class SudokuModel {
 //     }
 //   }
 
-//   public isCellLocked(c: number) : boolean {
-//     // return this.cells[c].isLocked();
-//     return this.cells[c].locked;
-//   }
 // } // class SudokuModel
 

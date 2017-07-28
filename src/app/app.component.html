@@ -36,7 +36,7 @@ s: sudoku, b: box, v: value, k: candidate
               <!-- opt 1: value -->
               <span *ngSwitchCase="true" class="value"
                 [ngClass]="{
-                  'locked':   isCellLocked(vb, vc),
+                  'locked':   isCellLocked_(vb, vc),
                   'invalid':  isCellInvalid(vb, vc)}">
                 {{valueToChar_(vb, vc)}}
               </span>

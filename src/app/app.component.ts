@@ -247,8 +247,17 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
    * 
    * Function based on view's cell indexes in html code.
    */
-  isCellLocked(vb: number, vc: number) : boolean {
-    return this.sudokuService.isCellLocked(this.viewToCellIdx(vb, vc));
+  isCellLocked_(vb: number, vc: number) : boolean {
+    return this.isCellLocked(this.viewToCellIdx(vb, vc));
+  } // isCellLocked()
+  
+  /**
+   * 
+   * Function based on view's cell indexes in html code.
+   */
+  isCellLocked(ci: number) : boolean {
+    return this.currentPuzzle &&
+        this.currentPuzzle.initialValues[ci] > 0
   } // isCellLocked()
   
   /**
@@ -277,7 +286,7 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
     }
     
     let ci = this.viewToCellIdx(vb, vc);
-    if (this.sudokuService.isCellLocked(ci)) {
+    if (this.isCellLocked(ci)) {
       return;         // can't accept click on locked cell
     }
 
@@ -523,7 +532,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   
   /**
    * button 'Restart Current Puzzle' EXECUTION, SOLVED states
-   * TODO wipe non-locked cells (rollback?), refresh cands,
    */
   restartCurrentPuzzle() : void {
     this.stopUserTimer();
@@ -968,13 +976,4 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
   // ----- SOLVED state methods ------
 
-  // /**
-  //  * 
-  //  * @param r 
-  //  * @param c 
-  //  */
-  // isCellLocked(r: number, c: number) : boolean {
-  //   return this.sudokuService.isCellLocked_(r, c);
-  // }
-  
 } // class PlayComponent

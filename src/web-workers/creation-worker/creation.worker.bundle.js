@@ -91,7 +91,7 @@
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
 var VERSION = '16';
-var SUB_VERSION = '5';
+var SUB_VERSION = '6';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -2853,7 +2853,6 @@ var HintService = (function () {
  * State:
  * - value
  * - candidates
- * - locked (boolean)
  */
 var Cell = (function () {
     /**
@@ -2884,16 +2883,6 @@ var Cell = (function () {
     Object.defineProperty(Cell.prototype, "candidates", {
         get: function () {
             return this._candidates;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Cell.prototype, "locked", {
-        get: function () {
-            return this._locked;
-        },
-        set: function (locked) {
-            this._locked = locked;
         },
         enumerable: true,
         configurable: true
@@ -2946,7 +2935,6 @@ var Cell = (function () {
 //  export class Cell {
 //   private _value: number;
 //   private _candidates: boolean[];
-//   private _locked: boolean;
 //   private _rowIndex: number;
 //   private _colIndex: number;
 //   private _boxIndex: number;
@@ -2980,18 +2968,6 @@ var Cell = (function () {
 //   set value(value) {
 //     this._value = value;
 //   }
-//   get locked() {
-//     return this._locked
-//   }
-//   public isLocked() : boolean {
-//     return this._locked
-//   }
-//   public lock() : void {
-//     this._locked = true;
-//   }
-//   public unlock() : void {
-//     this._locked = false;
-//   }
 //   public isCandidate(k: number) : boolean {
 //     return this._candidates[k];
 //   }
@@ -3021,7 +2997,6 @@ var Cell = (function () {
 // export class Cell {
 //   private value: number;
 //   private candidates: number[];
-//   private locked: boolean;
 //   constructor() {
 //     this.initialize();
 //   }
@@ -3030,7 +3005,6 @@ var Cell = (function () {
 //    */
 //   initialize() {
 //     this.value = 0;               // value 1..9, 0 means no value
-//     this.locked = false;          // cell has original given value
 //     this.initializeCandidates();
 //   }
 //   // TESTING ONLY
@@ -3073,15 +3047,13 @@ var Cell = (function () {
 //   setInitialValue(newValue: number) {
 //     this.value = newValue;	// set cell's new value
 //     this.unsetAllCandidates();
-//     this.locked = true;
 //   }
 //   /**
-//    * Set cell value, unset all candidates and keep the cell unlocked.
+//    * Set cell value, unset all candidates.
 //    */
 //   setRawValue(newValue: number) {
 //     this.value = newValue;	// set cell's new value
 //     this.unsetAllCandidates();
-//     this.locked = false;
 //   }
 //   /**
 //    * Remove cell value. WARNING: 1 or more candidates must be added.
@@ -3154,21 +3126,6 @@ var Cell = (function () {
 //       }
 //     }
 //     return count;
-//   }
-//   /**
-//    * Determine if the cell is locked. A locked cell has a value that cannot
-//    * be changed. Cells with initial or given values are locked.
-//    */
-//   isLocked() {
-//     return this.locked;
-//   }
-//   /**
-//    * Lock the cell. When initialized, the cell is not locked.
-//    */
-//   setLocked() {
-//     if (this.hasValue()) {
-//       this.locked = true; 
-//     }
 //   }
 //   /**
 //    * Determines if cell has a value 1..9.
@@ -3645,10 +3602,6 @@ var SudokuModel = (function () {
 //           Common.rowIdx(c), Common.colIdx(c), Common.boxIdx(c));
 //     }
 //   }
-//   public isCellLocked(c: number) : boolean {
-//     // return this.cells[c].isLocked();
-//     return this.cells[c].locked;
-//   }
 // } // class SudokuModel
 //# sourceMappingURL=sudoku.model.js.map
 
@@ -3740,9 +3693,8 @@ var SudokuService = (function () {
             if (givenValue === 0) {
                 continue;
             }
-            // set cell, update row/col/box, lock cell
+            // set cell, update row/col/box
             this.setValue(c, givenValue, __WEBPACK_IMPORTED_MODULE_2__action_action__["a" /* ActionType */].SET_VALUE);
-            cell.locked = true;
         } // for
         this.initializeActionLog();
         return puzzle;
@@ -3754,7 +3706,6 @@ var SudokuService = (function () {
         for (var _i = 0, CELLS_3 = __WEBPACK_IMPORTED_MODULE_3__common_common__["b" /* CELLS */]; _i < CELLS_3.length; _i++) {
             var c = CELLS_3[_i];
             var cell = this.sudokuModel.cells[c]; // cell at [c] in cells array
-            cell.locked = false;
             cell.value = values[c]; // value at [c] in values array
             this.removeAllCellCandidates(c);
         }
@@ -3768,12 +3719,6 @@ var SudokuService = (function () {
             }
         }
     }; // setAllValues()
-    /**
-     *
-     */
-    SudokuService.prototype.isCellLocked = function (c) {
-        return this.sudokuModel.cells[c].locked;
-    }; // isCellLocked()
     /**
      * Return givenValue of cell. Zero means no givenValue;
      */
@@ -3823,9 +3768,6 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.setValue = function (c, newValue, actionType, guessPossibles, hint) {
         var cell = this.sudokuModel.cells[c];
-        if (cell.locked) {
-            return; // can't change locked cell
-        }
         // if cell has givenValue, remove it first
         if (cell.value != 0) {
             if (cell.value === newValue) {
@@ -3896,10 +3838,6 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.removeValue = function (c) {
         var cell = this.sudokuModel.cells[c];
-        // cannot change locked cell
-        if (cell.locked) {
-            return;
-        }
         // get existing givenValue, exit if no existing givenValue
         var oldValue = cell.value;
         if (oldValue === 0) {
@@ -4262,7 +4200,6 @@ var SudokuService = (function () {
      */
     SudokuService.prototype.initializeCell = function (cell) {
         cell.value = 0;
-        cell.locked = false;
         for (var _i = 0, CANDIDATES_4 = __WEBPACK_IMPORTED_MODULE_3__common_common__["g" /* CANDIDATES */]; _i < CANDIDATES_4.length; _i++) {
             var k = CANDIDATES_4[_i];
             cell.candidates[k] = true;

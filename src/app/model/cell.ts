@@ -7,12 +7,10 @@ import { CANDIDATES } from '../common/common';
  * State:
  * - value
  * - candidates
- * - locked (boolean)
  */
 export class Cell {
   private _value: number;
   private _candidates: boolean[];
-  private _locked: boolean;
   private _rowIndex: number;
   private _colIndex: number;
   private _boxIndex: number;
@@ -43,14 +41,6 @@ export class Cell {
 
   get candidates() : boolean[] {
     return this._candidates;
-  }
-
-  get locked() : boolean {
-    return this._locked;
-  }
-
-  set locked(locked: boolean) {
-    this._locked = locked;
   }
 
   get rowIndex() : number {
@@ -95,7 +85,6 @@ export class Cell {
 //  export class Cell {
 //   private _value: number;
 //   private _candidates: boolean[];
-//   private _locked: boolean;
 //   private _rowIndex: number;
 //   private _colIndex: number;
 //   private _boxIndex: number;
@@ -136,22 +125,6 @@ export class Cell {
 //     this._value = value;
 //   }
 
-//   get locked() {
-//     return this._locked
-//   }
-
-//   public isLocked() : boolean {
-//     return this._locked
-//   }
-
-//   public lock() : void {
-//     this._locked = true;
-//   }
-
-//   public unlock() : void {
-//     this._locked = false;
-//   }
-
 //   public isCandidate(k: number) : boolean {
 //     return this._candidates[k];
 //   }
@@ -187,7 +160,6 @@ export class Cell {
 // export class Cell {
 //   private value: number;
 //   private candidates: number[];
-//   private locked: boolean;
 
 //   constructor() {
 //     this.initialize();
@@ -198,7 +170,6 @@ export class Cell {
 //    */
 //   initialize() {
 //     this.value = 0;               // value 1..9, 0 means no value
-//     this.locked = false;          // cell has original given value
 //     this.initializeCandidates();
 //   }
 
@@ -246,16 +217,14 @@ export class Cell {
 //   setInitialValue(newValue: number) {
 //     this.value = newValue;	// set cell's new value
 //     this.unsetAllCandidates();
-//     this.locked = true;
 //   }
 
 //   /**
-//    * Set cell value, unset all candidates and keep the cell unlocked.
+//    * Set cell value, unset all candidates.
 //    */
 //   setRawValue(newValue: number) {
 //     this.value = newValue;	// set cell's new value
 //     this.unsetAllCandidates();
-//     this.locked = false;
 //   }
   
 //   /**
@@ -334,23 +303,6 @@ export class Cell {
 //       }
 //     }
 //     return count;
-//   }
-
-//   /**
-//    * Determine if the cell is locked. A locked cell has a value that cannot
-//    * be changed. Cells with initial or given values are locked.
-//    */
-//   isLocked() {
-//     return this.locked;
-//   }
-
-//   /**
-//    * Lock the cell. When initialized, the cell is not locked.
-//    */
-//   setLocked() {
-//     if (this.hasValue()) {
-//       this.locked = true; 
-//     }
 //   }
 
 //   /**
