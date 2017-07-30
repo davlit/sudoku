@@ -46,7 +46,7 @@ export class CreationService {
    * 
    */
   public createSudoku(difficulty: Difficulty) : string {
-console.info('In creationService.createSudoku() difficulty: ' + difficulty);
+// console.info('In creationService.createSudoku() difficulty: ' + difficulty);
 
     let sudoku = new Puzzle();
     sudoku.desiredDifficulty = difficulty;
@@ -63,7 +63,7 @@ console.info('In creationService.createSudoku() difficulty: ' + difficulty);
       pass++;
 
       // step 2 - create starting values by paring cells
-console.log('Pass: ' + pass);
+// console.log('Pass: ' + pass);
       this.getStartingValues(sudoku);
 
       if (sudoku.initialValues === undefined) {
@@ -73,14 +73,14 @@ console.log('Pass: ' + pass);
       // step 3 - solve puzzle to get stats and actual difficulty
       this.completePuzzle(sudoku);
 
-console.log('Pass ' + pass + ' diff ' +  sudoku.actualDifficulty);
+// console.log('Pass ' + pass + ' diff ' +  sudoku.actualDifficulty);
 
     } // while not getting desired difficulty
 
     sudoku.generatePasses = pass;
 // console.info('In creationService.createSudoku() sudoku: ' + sudoku);
 // console.info('In creationService.createSudoku() serialized: ' + sudoku.serialize());
-console.info('Created difficulty: ' + sudoku.actualDifficulty 
+console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty) 
     + ' in ' + sudoku.generatePasses + ' passes');
     return sudoku.serialize();
   } // createSudoku()
@@ -116,7 +116,7 @@ console.info('Created difficulty: ' + sudoku.actualDifficulty
     this.solve();
 
     let elapsed: number = Date.now() - start;
-    console.info('Step 1 elapsed: ' + elapsed + 'ms');
+// console.info('Step 1 elapsed: ' + elapsed + 'ms');
 
     return this.sudokuService.cellsToValuesArray();
   } // makeRandomSolution()

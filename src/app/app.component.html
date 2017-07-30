@@ -76,13 +76,13 @@ s: sudoku, b: box, v: value, k: candidate
       <p>Select a new Sudoku:</p>
       <button (click)="generate(0)" class="diff easy" 
         tooltip="Solvable finding naked or hidden singles" 
-        placement="bottom">Easy</button>
+        placement="bottom">Easy</button>&nbsp;
       <button (click)="generate(1)" class="diff medium" 
         tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions" 
-        placement="bottom">Medium</button>
+        placement="bottom">Medium</button>&nbsp;
       <button (click)="generate(2)" class="diff hard" 
         tooltip="Solvable finding naked triples/quads or hidden pairs/triples" 
-        placement="bottom">Hard</button>
+        placement="bottom">Hard</button>&nbsp;
       <button (click)="generate(3)" class="diff hardest" 
         tooltip="Solvable using more advanced techniques or guessing" 
         placement="bottom">Hardest</button>
@@ -133,12 +133,21 @@ s: sudoku, b: box, v: value, k: candidate
 
       <p>
         <button *ngIf="!candidatesShowing" class="exec start" 
-            (click)="toggleCandidates()">Show candidates</button>
+            (click)="toggleCandidates()"
+            tooltip="Display the candidates in open cells" 
+            placement="top">
+            Show candidates</button>
         <button *ngIf="candidatesShowing" class="exec stop" 
-            (click)="toggleCandidates()">Hide candidates</button>
+            (click)="toggleCandidates()"
+            tooltip="Hide the candidates in open cells" 
+            placement="top">
+            Hide candidates</button>
         <span [hidden]="!candidatesShowing">
           <span *ngFor="let k of [1,2,3,4,5,6,7,8,9]" class="cands">
-            <button class="general" (click)="candidateVisible(k)">{{k}}</button>
+            <button class="general" (click)="candidateVisible(k)"
+            tooltip="Show only candidate {{k}}" 
+            placement="top">
+            {{k}}</button>
           </span>
         </span>
       </p>
@@ -208,7 +217,9 @@ s: sudoku, b: box, v: value, k: candidate
       </p>
 
       <p>
-        <button class="general" (click)="restartCurrentPuzzle()">Restart sudoku</button>
+        <button class="general" (click)="restartCurrentPuzzle()"
+            tooltip="Start over on same sudoku" 
+            placement="bottom">Restart sudoku</button>&nbsp;
         <button class="general" (click)="startNewPuzzle()">New sudoku</button>
         <button class="general" (click)="printGrid()">Print</button>
       </p>
@@ -230,9 +241,13 @@ s: sudoku, b: box, v: value, k: candidate
       <p>Hints viewed/applied: {{hintsViewed}}/{{hintsApplied}}</p>
 
       <p>
-        <button class="general" (click)="restartCurrentPuzzle()">
-            Restart sudoku</button>
-        <button class="general" (click)="startNewPuzzle()">
+        <button class="general" (click)="restartCurrentPuzzle()"
+            tooltip="Start over on same sudoku" 
+            placement="top">
+            Restart sudoku</button>&nbsp;
+        <button class="general" (click)="startNewPuzzle()"
+            tooltip="Get a new sudoku" 
+            placement="top">
             New sudoku</button>
       </p>
 

@@ -140,16 +140,18 @@ export class Puzzle {
 
   toString() : string {
     let s = '';
-    s += '-Initial given/empty/total cells: ' 
+    s += '-Given/empty/total cells: ' 
         + this.getInitialFilledCells() + '/'
         + this.getInitialEmptyCells()  + '/'
         + (this.getInitialFilledCells() + this.getInitialEmptyCells()) + '\n';
     s += '-Initial & finished values:\n';
     s += Common.valuesArrayToString(this._initialValues) + '\n';
     s += Common.valuesArrayToString(this._completedPuzzle) + '\n';
-    s += '-Creation passes: ' + this._generatePasses + '\n';
-    s += '-Difficulty desired/actual: ' 
-        + Puzzle.getDifficultyLabel(this._desiredDifficulty) + '/'
+    // s += '-Creation passes: ' + this._generatePasses + '\n';
+    // s += '-Difficulty desired/actual: ' 
+    //     + Puzzle.getDifficultyLabel(this._desiredDifficulty) + '/'
+    //     + Puzzle.getDifficultyLabel(this._actualDifficulty) + '\n';
+    s += '-Difficulty: ' 
         + Puzzle.getDifficultyLabel(this._actualDifficulty) + '\n';
     if (this._solutionsCount) {
       s += '-Solutions count: ' + this._solutionsCount + '\n';

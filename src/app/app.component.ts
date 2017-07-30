@@ -106,6 +106,7 @@ export class AppComponent implements OnInit {
   // ----- execute properties -----
   actualDifficulty: string;
   valuesComplete: boolean[];
+  candidatesModified: boolean;
   hintMessage: string;
   // autoSolveMessage: string;
   actionLog: string;
@@ -352,7 +353,15 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
     }
     this.initializeHintStates();
     this.removeCandidate(this.viewToCellIdx(vb, vc), k);
+    this.candidatesModified = true;
   } // handleCandidateClick_()
+
+  refreshCandidates() {
+
+    // TODO
+
+    this.candidatesModified = false;
+  }
   
   candidatesVisible_(k: number) : boolean {
     return this.candidatesVisible[k];
@@ -736,7 +745,12 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * 
    */
   setCellValue(ci: number, v: number) : void {
-    // this.sudokuService.setValue_(r, c, v);
+
+    // check for new values not that of solution
+    if (v != this.currentPuzzle.completedPuzzle[ci]) {
+      console.warn('Not the solution value');
+    }
+
     this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     if (this.sudokuService.isSolved()) {
@@ -814,6 +828,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.candidatesVisible[v] = true;
       this.valuesComplete[v] = false;
     }
+
+    this.candidatesModified = false;
 
     // this.passCount = undefined;
     this.playState = PlayStates.NEW;

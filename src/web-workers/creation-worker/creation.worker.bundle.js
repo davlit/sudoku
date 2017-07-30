@@ -91,7 +91,7 @@
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
 var VERSION = '16';
-var SUB_VERSION = '6';
+var SUB_VERSION = '7';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -1490,16 +1490,18 @@ var Puzzle = (function () {
     };
     Puzzle.prototype.toString = function () {
         var s = '';
-        s += '-Initial given/empty/total cells: '
+        s += '-Given/empty/total cells: '
             + this.getInitialFilledCells() + '/'
             + this.getInitialEmptyCells() + '/'
             + (this.getInitialFilledCells() + this.getInitialEmptyCells()) + '\n';
         s += '-Initial & finished values:\n';
         s += __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].valuesArrayToString(this._initialValues) + '\n';
         s += __WEBPACK_IMPORTED_MODULE_0__common_common__["a" /* Common */].valuesArrayToString(this._completedPuzzle) + '\n';
-        s += '-Creation passes: ' + this._generatePasses + '\n';
-        s += '-Difficulty desired/actual: '
-            + Puzzle.getDifficultyLabel(this._desiredDifficulty) + '/'
+        // s += '-Creation passes: ' + this._generatePasses + '\n';
+        // s += '-Difficulty desired/actual: ' 
+        //     + Puzzle.getDifficultyLabel(this._desiredDifficulty) + '/'
+        //     + Puzzle.getDifficultyLabel(this._actualDifficulty) + '\n';
+        s += '-Difficulty: '
             + Puzzle.getDifficultyLabel(this._actualDifficulty) + '\n';
         if (this._solutionsCount) {
             s += '-Solutions count: ' + this._solutionsCount + '\n';
@@ -4561,7 +4563,7 @@ var CreationService = (function () {
      *
      */
     CreationService.prototype.createSudoku = function (difficulty) {
-        console.info('In creationService.createSudoku() difficulty: ' + difficulty);
+        // console.info('In creationService.createSudoku() difficulty: ' + difficulty);
         var sudoku = new __WEBPACK_IMPORTED_MODULE_2__app_model_puzzle__["a" /* Puzzle */]();
         sudoku.desiredDifficulty = difficulty;
         // step 1 - generate random finished sudoku
@@ -4573,19 +4575,19 @@ var CreationService = (function () {
         while (sudoku.actualDifficulty != desiredDifficulty) {
             pass++;
             // step 2 - create starting values by paring cells
-            console.log('Pass: ' + pass);
+            // console.log('Pass: ' + pass);
             this.getStartingValues(sudoku);
             if (sudoku.initialValues === undefined) {
                 continue; // desired difficulty has not been attained
             }
             // step 3 - solve puzzle to get stats and actual difficulty
             this.completePuzzle(sudoku);
-            console.log('Pass ' + pass + ' diff ' + sudoku.actualDifficulty);
+            // console.log('Pass ' + pass + ' diff ' +  sudoku.actualDifficulty);
         } // while not getting desired difficulty
         sudoku.generatePasses = pass;
         // console.info('In creationService.createSudoku() sudoku: ' + sudoku);
         // console.info('In creationService.createSudoku() serialized: ' + sudoku.serialize());
-        console.info('Created difficulty: ' + sudoku.actualDifficulty
+        console.info('\nCreated ' + __WEBPACK_IMPORTED_MODULE_2__app_model_puzzle__["a" /* Puzzle */].getDifficultyLabel(sudoku.actualDifficulty)
             + ' in ' + sudoku.generatePasses + ' passes');
         return sudoku.serialize();
     }; // createSudoku()
@@ -4617,7 +4619,7 @@ var CreationService = (function () {
         }
         this.solve();
         var elapsed = Date.now() - start;
-        console.info('Step 1 elapsed: ' + elapsed + 'ms');
+        // console.info('Step 1 elapsed: ' + elapsed + 'ms');
         return this.sudokuService.cellsToValuesArray();
     }; // makeRandomSolution()
     /**
