@@ -75,17 +75,17 @@ s: sudoku, b: box, v: value, k: candidate
 
       <p>Select a new Sudoku:</p>
       <button (click)="generate(0)" class="diff easy" 
-        tooltip="Solvable finding naked or hidden singles" 
-        placement="bottom">Easy</button>&nbsp;
-      <button (click)="generate(1)" class="diff medium" 
-        tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions" 
-        placement="bottom">Medium</button>&nbsp;
+        tooltip="Solvable finding naked or hidden singles">
+        Easy</button>&nbsp;
+      <button (click)="generate(1)" class="diff medium"
+        tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions">
+        Medium</button>&nbsp;
       <button (click)="generate(2)" class="diff hard" 
-        tooltip="Solvable finding naked triples/quads or hidden pairs/triples" 
-        placement="bottom">Hard</button>&nbsp;
+        tooltip="Solvable finding naked triples/quads or hidden pairs/triples">
+        Hard</button>&nbsp;
       <button (click)="generate(3)" class="diff hardest" 
-        tooltip="Solvable using more advanced techniques or guessing" 
-        placement="bottom">Hardest</button>
+        tooltip="Solvable using more advanced techniques or guessing">
+        Hardest</button>
 
       <!-- SAVE these tests -->
       <!--<br/><br/><br/><br/><br/>
@@ -134,38 +134,41 @@ s: sudoku, b: box, v: value, k: candidate
       <p>
         <button *ngIf="!candidatesShowing" class="exec start" 
             (click)="toggleCandidates()"
-            tooltip="Display the candidates in open cells" 
-            placement="top">
+            tooltip="Display the candidates in open cells">
             Show candidates</button>
         <button *ngIf="candidatesShowing" class="exec stop" 
             (click)="toggleCandidates()"
-            tooltip="Hide the candidates in open cells" 
-            placement="top">
+            tooltip="Hide the candidates in open cells">
             Hide candidates</button>
         <span [hidden]="!candidatesShowing">
           <span *ngFor="let k of [1,2,3,4,5,6,7,8,9]" class="cands">
             <button class="general" (click)="candidateVisible(k)"
-            tooltip="Show only candidate {{k}}" 
-            placement="top">
-            {{k}}</button>
+                tooltip="Show only candidate {{k}}">
+                {{k}}</button>
           </span>
         </span>
       </p>
 
       <p>
         <button *ngIf="candidatesModified" class="general" 
-            (click)="refreshCandidates()">Refresh candidates</button>
+            (click)="refreshCandidates()"
+            tooltip="Candidates have been manually removed -- this will restore them">
+            Refresh candidates</button>
       </p>
 
       <!-- ===== Hints ===== -->
       <div [ngSwitch]="hintState">
         <p *ngSwitchCase="hintStates.READY">
           <button class="exec start" 
-              (click)="handleHintClick()">Get hint</button>
+              (click)="handleHintClick()"
+              tooltip="Suggest a valid move">
+              Get hint</button>
         </p>
         <p *ngSwitchCase="hintStates.ACTIVE">
           <button class="exec stop" 
-              (click)="handleHintClick()">Apply hint</button>
+              (click)="handleHintClick()"
+              tooltip="Automatically execute the suggested move">
+              Apply hint</button>
           {{hintMessage}}              
         </p>
         <p *ngSwitchCase="hintStates.NO_HINT">
@@ -176,11 +179,13 @@ s: sudoku, b: box, v: value, k: candidate
       <!-- ===== Auto Solve ===== -->
       <p [ngSwitch]="autoSolveState">
         <button *ngSwitchCase="autoSolveStates.READY" 
-            class="exec start" (click)="handleAutoSolveClick()">
+            class="exec start" (click)="handleAutoSolveClick()"
+            tooltip="Automatically solve the sudoku using hints">
             Auto solve start</button>
         <button *ngSwitchCase="autoSolveStates.RUNNING
             || autoSolveStates.PENDING_STOP" 
-            class="exec stop" (click)="handleAutoSolveClick()">
+            class="exec stop" (click)="handleAutoSolveClick()"
+            tooltip="Stop the action">
             Auto solve stop</button>
         <span *ngSwitchCase="autoSolveStates.NO_HINT
             || autoSolveStates.PENDING_STOP">

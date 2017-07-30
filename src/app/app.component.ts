@@ -357,9 +357,7 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
   } // handleCandidateClick_()
 
   refreshCandidates() {
-
-    // TODO
-
+    this.sudokuService.refreshAllCandidates();
     this.candidatesModified = false;
   }
   
