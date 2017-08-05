@@ -2,6 +2,10 @@
 <div class="appTitle">
   <span class="appTitle">&nbsp;{{title}}</span>
   <span class="appVersion">&nbsp;&nbsp;&nbsp;{{version}}</span>
+
+  <!-- testing -->
+  <button (click)="emptyCache()">Empty cache</button>
+
 </div>
 </header>
 
@@ -74,18 +78,31 @@ s: sudoku, b: box, v: value, k: candidate
     <div *ngSwitchCase="PlayStates.NEW">
 
       <p>Select a new Sudoku:</p>
-      <button (click)="generate(0)" class="diff easy" 
+
+      <button *ngIf="easyAvailable" (click)="generate(0)" class="diff easy" 
         tooltip="Solvable finding naked or hidden singles">
+        Easy</button>
+      <button *ngIf="!easyAvailable" class="diff easy strike">
         Easy</button>&nbsp;
-      <button (click)="generate(1)" class="diff medium"
+
+      <button *ngIf="mediumAvailable" (click)="generate(1)" class="diff medium"
         tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions">
+        Medium</button>
+      <button *ngIf="!mediumAvailable" class="diff medium strike">
         Medium</button>&nbsp;
-      <button (click)="generate(2)" class="diff hard" 
+
+      <button *ngIf="hardAvailable" (click)="generate(2)" class="diff hard" 
         tooltip="Solvable finding naked triples/quads or hidden pairs/triples">
+        Hard</button>
+      <button *ngIf="!hardAvailable" class="diff hard strike">
         Hard</button>&nbsp;
-      <button (click)="generate(3)" class="diff hardest" 
+
+      <button *ngIf="hardestAvailable" (click)="generate(3)" class="diff hardest" 
         tooltip="Solvable using more advanced techniques or guessing">
         Hardest</button>
+      <button *ngIf="!hardestAvailable" class="diff hardest strike">
+        Hardest</button>
+      <!-- <br/> -->
 
       <!-- SAVE these tests -->
       <!--<br/><br/><br/><br/><br/>

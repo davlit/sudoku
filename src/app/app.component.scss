@@ -149,6 +149,8 @@ button.medium  { background-color: $green3; }
 button.hard    { background-color: $blue2; } 
 button.hardest { background-color: $red3; }
 
+.strike {text-decoration: line-through}
+
 button.exec { width: 140px; }
 button.start   { background-color: $green2; } 
 button.stop    { background-color: $red2 }

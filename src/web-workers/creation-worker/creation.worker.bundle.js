@@ -91,7 +91,7 @@
 var TITLE = 'Sudoku Helper';
 var MAJOR_VERSION = '0';
 var VERSION = '16';
-var SUB_VERSION = '7';
+var SUB_VERSION = '8';
 var COPYRIGHT = 'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 var VALUES = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 var CANDIDATES = VALUES;
@@ -1536,11 +1536,11 @@ onmessage = function (event) {
     var difficulty = event.data;
     // let createdSudoku: string = undefined;
     // console.info('creation.worker.onmessage difficullty: ' + difficulty);
-    console.info('\nCreation started in background ...');
+    // console.info('\nCreation started in background ...')
     // perform CPU-intense task in web worker
     var createdSudoku = creationService.createSudoku(difficulty);
     // console.info('creation.worker created diff: ' + difficulty);
-    console.info('\nCreation background completed');
+    // console.info('\nCreation background completed')
     // post a message with result back to the requester (AppComponent)
     customPostMessage(createdSudoku);
     // customPostMessage('A B C');

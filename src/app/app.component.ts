@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { ChangeDetectorRef } from '@angular/core';
 import { ChangeDetectionStrategy } from '@angular/core';
 import { NgZone } from '@angular/core';
@@ -24,6 +24,8 @@ import { CombinationIterator } from './common/combination.iterator';
 
 import { ActionLogService } from './action/action-log.service';
 
+import { MessageService } from './common/message.service';
+ 
 // test
 // import { ROOT_VALUES } from './common/common';
 
@@ -52,7 +54,7 @@ enum AutoSolveStates {
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = TITLE;
   version = 'v' + MAJOR_VERSION + '.' + VERSION + '.' + SUB_VERSION;
   copyright = COPYRIGHT;
@@ -66,6 +68,9 @@ export class AppComponent implements OnInit {
   autoSolveStates = AutoSolveStates;
   autoSolveState = AutoSolveStates.NO_HINT;
 
+  message: any;
+  messageSubscription: Subscription;
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
@@ -73,10 +78,27 @@ export class AppComponent implements OnInit {
     /** */
     // sudokuService: SudokuService,
     // hintService: HintService,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+
+    private messageService: MessageService
   ) {
     this.sudokuService = new SudokuService(new ActionLogService());
     this.hintService = new HintService(this.sudokuService);
+
+    this.messageSubscription = this.messageService.getMessage()
+        .subscribe(message => { 
+          this.message = message; 
+          // console.info('\nMessage received: ' + this.message.text);
+
+          if (this.message.text === 'Cache changed') {
+            this.easyAvailable = this.cacheService.isSudokuAvailable(Difficulty.EASY);
+            this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
+            this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);
+            this.hardestAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARDEST);
+            
+            this.changeDetectorRef.detectChanges();
+          }
+        });
   }
 
   // -----------------------------------------------------------------------
@@ -102,6 +124,10 @@ export class AppComponent implements OnInit {
 
   // ----- new properties -----
   desiredDifficulty: Difficulty;
+  easyAvailable: boolean;
+  mediumAvailable: boolean;
+  hardAvailable: boolean;
+  hardestAvailable: boolean;
 
   // ----- execute properties -----
   actualDifficulty: string;
@@ -122,6 +148,8 @@ export class AppComponent implements OnInit {
   candidatesVisible: boolean[];
   selectedCell: number;
 
+  subscription: Subscription;
+
   ngOnInit() {
     this.desiredDifficulty = Difficulty.MEDIUM;   // default
     this.valuesComplete = new Array(10);
@@ -132,7 +160,7 @@ export class AppComponent implements OnInit {
 
     let cacheKeys: string[] = this.cacheService.getCacheKeys();
 
-console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
+// console.info('\nCache keys before replenishment: ' + JSON.stringify(cacheKeys));
 
     // activate for maintenance
     // this.cacheService.removeCacheItem('undefined');
@@ -140,11 +168,21 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
     // cacheKeys = this.cacheService.getCacheKeys();
     // console.info('Cache keys after maintenance:  + JSON.stringify(cacheKeys));
 
+    this.easyAvailable = this.cacheService.isSudokuAvailable(Difficulty.EASY);
+    this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
+    this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);
+    this.hardestAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARDEST);
+
     this.cacheService.replenishCache();
 
   } // ngOnInit()
 
-  // -----------------------------------------------------------------------
+  ngOnDestroy() {
+    // unsubscribe to ensure no memory leaks
+    this.subscription.unsubscribe();
+  }
+
+// -----------------------------------------------------------------------
   // methods called from UI
   // -----------------------------------------------------------------------
 
@@ -243,6 +281,13 @@ console.info('Cache keys before replenishment: ' + JSON.stringify(cacheKeys));
       }
     } // if value 0..9
   } // handleKeyPress()
+
+  /**
+   * TESTING
+   */
+  emptyCache() {
+    this.cacheService.emptyCache();
+  }
 
   /**
    * 

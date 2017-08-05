@@ -18,6 +18,8 @@ import { HintLogService }        from './hint/hint-log.service';
 // import { CreationService }        from '../web-workers/creation-worker/creation.service';
 import { TooltipModule } from 'ngx-bootstrap';
 
+import { MessageService } from './common/message.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -34,7 +36,8 @@ import { TooltipModule } from 'ngx-bootstrap';
     TooltipModule.forRoot()
   ],
   providers: [
-    CacheService
+    CacheService,
+    MessageService
   ],
   bootstrap: [AppComponent]
 })

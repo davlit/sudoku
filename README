@@ -25,6 +25,15 @@ https://github.com/ReactiveX/rxjs/blob/master/MIGRATION.md
 
 https://www.youtube.com/watch?v=ei7FsoXKPl0 -- 34:20 into it
 
+Publish app on github pages
+---------------------------
+https://github.com/angular-buch/angular-cli-ghpages
+$ npm i -g angular-cli-ghpages
+$ ng build --prod --base-href "https://USERNAME.github.io/REPOSITORY_NAME/"
+$ angular-cli-ghpages
+https://davlit.github.io/sudoku
+
+
 Run:
 $ ng serve
 
@@ -49,6 +58,31 @@ https://git-scm.com/book/en/v2/
 Local Storage
 -------------
 http://diveraj.com/lets-make-tiny-gradebook-angular2-storage/
+
+WebWorker Details
+-----------------
+AppComponent      CacheService                  CreationWorker         CreationService
+  ngOnInit()  -->   replenishCache()
+                    startWebworkerCreation() -->  postMessage(diff)
+                                                      |
+                                                      V
+                                                  onMessage() -->       createSudoku(diff)
+                                                                          [actual work]
+                                                    customPostMessage()   <--
+                      init()                      onmessage()
+
+
+    cacheService.replenishCache()
+      startWebworkerCreation()
+        creationWorker.postMessage(diff)
+CreationWorker        
+  onmessage()
+    creationService.createSudoku()
+    customPostMessage()
+CacheService
+  init()
+    creationWorker.onmessage()
+
 
 A group with 3 value and 6 open cells
 - if it has a naked quad, it also has a hidden pair

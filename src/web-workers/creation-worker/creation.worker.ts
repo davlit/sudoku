@@ -17,13 +17,13 @@ onmessage = (event: any) => {
   // let createdSudoku: string = undefined;
 
 // console.info('creation.worker.onmessage difficullty: ' + difficulty);
-console.info('\nCreation started in background ...')
+// console.info('\nCreation started in background ...')
 
   // perform CPU-intense task in web worker
   let createdSudoku: string = creationService.createSudoku(difficulty);
 
 // console.info('creation.worker created diff: ' + difficulty);
-console.info('\nCreation background completed')
+// console.info('\nCreation background completed')
 
   // post a message with result back to the requester (AppComponent)
   customPostMessage(createdSudoku);
