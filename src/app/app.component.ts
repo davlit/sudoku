@@ -402,26 +402,27 @@ export class AppComponent implements OnInit, OnDestroy {
     if (this.candidatesShowing) {
       let cellIdx = this.viewToCellIdx(vb, vc);
       if (this.sudokuService.isCandidate(cellIdx, k)) {
-        // this.removeCandidate(cellIdx, k);
         this.sudokuService.removeCandidate(cellIdx, k, undefined);
       } else {
-        // this.restoreCandidate(cellIdx, k);
         this.sudokuService.restoreCandidate(cellIdx, k);
       }
     }
-    // // else restore if cand viable
-
-    // this.removeCandidate(this.viewToCellIdx(vb, vc), k);
-
     this.candidatesModified = true;
     this.refreshActionLog();
   } // handleCandidateClick_()
 
+  /**
+   * 
+   */
   refreshCandidates() {
     this.sudokuService.refreshAllCandidates();
     this.candidatesModified = false;
-  }
+  } // refreshCandidates()
   
+  /**
+   * 
+   * @param k 
+   */
   candidatesVisible_(k: number) : boolean {
     return this.candidatesVisible[k];
   } // candidatesVisible()
