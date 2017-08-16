@@ -1,21 +1,23 @@
-<header>
-<div class="appTitle">
+<div id="appContainer">
+
+<div id="header">
   <span class="appTitle">&nbsp;{{title}}</span>
-  <span class="appVersion">&nbsp;&nbsp;&nbsp;{{version}}</span>
+  <!-- <span class="appVersion">&nbsp;&nbsp;&nbsp;{{version}}</span> -->
 
   <!-- testing -->
   <button (click)="emptyCache()">Empty cache</button>
 
-</div>
-</header>
-
 <!-- ANIMATED PROGRESS BAR - DEMO -->
-<!--<div class="progress-cont">
+<!--
+<div class="progress-cont">
   <div class="progress"></div>
 </div>
-<br/>-->
+<br/>
+-->
 
-<section id="gridsection">
+</div> <!-- #header -->
+
+<div id="gridsection">
 <!--
 Sudoku grid based on
 - 3 rows and 3 columns of boxes
@@ -68,9 +70,9 @@ s: sudoku, b: box, v: value, k: candidate
   </div> <!-- bcontainer -->
 </div> <!-- pcell -->
 
-</section>
+</div> <!-- id="gridsection" -->
 
-<section id="controls" class="exec-text">
+<div id="controls" class="exec-text">
   
   <div [ngSwitch]="playState">
 
@@ -79,28 +81,84 @@ s: sudoku, b: box, v: value, k: candidate
 
       <p>Select a new Sudoku:</p>
 
+      <!-- <div>
+      <span *ngIf="easyAvailable; else easyNotAvailable">
+        <button (click)="generate(0)" class="diff easy" 
+          tooltip="Solvable finding naked or hidden singles">
+          Easy</button>
+      </span>
+      <ng-template #easyNotAvailable>
+        <button class="diff easy strike"
+          tooltip="Loading ...">
+          Easy</button>
+      </ng-template>
+      &nbsp;
+
+      <span *ngIf="mediumAvailable; else mediumNotAvailable">
+        <button (click)="generate(1)" class="diff medium" 
+          tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions">
+          medium</button>
+      </span>
+      <ng-template #mediumNotAvailable>
+        <button class="diff medium strike"
+          tooltip="Loading ...">
+          medium</button>
+      </ng-template>
+      &nbsp;
+
+      <span *ngIf="hardAvailable; else hardNotAvailable">
+        <button (click)="generate(2)" class="diff hard" 
+          tooltip="Solvable finding naked triples/quads or hidden pairs/triples">
+          hard</button>
+      </span>
+      <ng-template #hardNotAvailable>
+        <button class="diff hard strike"
+          tooltip="Loading ...">
+          hard</button>
+      </ng-template>
+      &nbsp;
+
+      <span *ngIf="hardestAvailable; else hardestNotAvailable">
+        <button (click)="generate(3)" class="diff hardest" 
+          tooltip="Solvable using more advanced techniques or guessing">
+          hardest</button>
+      </span>
+      <ng-template #hardestNotAvailable>
+        <button class="diff hardest strike"
+          tooltip="Loading ...">
+          hardest</button>
+      </ng-template>
+      </div> -->
+
       <button *ngIf="easyAvailable" (click)="generate(0)" class="diff easy" 
         tooltip="Solvable finding naked or hidden singles">
         Easy</button>
-      <button *ngIf="!easyAvailable" class="diff easy strike">
-        Easy</button>&nbsp;
+      <button *ngIf="!easyAvailable" class="diff easy strike"
+        tooltip="Loading ...">
+        Easy</button>
+      &nbsp;
 
       <button *ngIf="mediumAvailable" (click)="generate(1)" class="diff medium"
         tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions">
         Medium</button>
-      <button *ngIf="!mediumAvailable" class="diff medium strike">
-        Medium</button>&nbsp;
+      <button *ngIf="!mediumAvailable" class="diff medium strike"
+        tooltip="Loading ...">
+        Medium</button>
+      &nbsp;
 
       <button *ngIf="hardAvailable" (click)="generate(2)" class="diff hard" 
         tooltip="Solvable finding naked triples/quads or hidden pairs/triples">
         Hard</button>
-      <button *ngIf="!hardAvailable" class="diff hard strike">
-        Hard</button>&nbsp;
+      <button *ngIf="!hardAvailable" class="diff hard strike"
+        tooltip="Loading ...">
+        Hard</button>
+      &nbsp;
 
       <button *ngIf="hardestAvailable" (click)="generate(3)" class="diff hardest" 
         tooltip="Solvable using more advanced techniques or guessing">
         Hardest</button>
-      <button *ngIf="!hardestAvailable" class="diff hardest strike">
+      <button *ngIf="!hardestAvailable" class="diff hardest strike"
+        tooltip="Loading ...">
         Hardest</button>
       <!-- <br/> -->
 
@@ -235,7 +293,8 @@ s: sudoku, b: box, v: value, k: candidate
       <p><span>Action Log:</span>
         <button [hidden]="actionLog === ''" class="general"
                 (click)="undoLastAction()">Undo Last Action</button><br/>
-        <textarea [ngModel]="actionLog" rows="8" cols="55"></textarea>
+        <!-- <textarea [ngModel]="actionLog" rows="8" cols="55"></textarea> -->
+        <textarea [ngModel]="actionLog"></textarea>
       </p>
 
       <p>
@@ -246,10 +305,32 @@ s: sudoku, b: box, v: value, k: candidate
         <button class="general" (click)="printGrid()">Print</button>
       </p>
 
-      <p>
+      <!-- <p>
         <span>Solution Clues:</span><br/>
         <textarea [ngModel]="solutionClues" rows="5" cols="55"></textarea>
-      </p>
+        <textarea [ngModel]="solutionClues"></textarea>
+      </p> -->
+
+      <!-- <p> -->
+      <table class="clues">
+      <tr>   
+        <td>     
+        <button *ngIf="!cluesShowing" class="exec start" 
+            (click)="toggleClues()"
+            tooltip="Show clues to this sudoku">
+            Show clues</button>
+        <button *ngIf="cluesShowing" class="exec stop" 
+            (click)="toggleClues()"
+            tooltip="Hide clues to this sudoku">
+            Hide clues</button>
+        </td>
+        <td class="clues">
+         <!-- <span [hidden]="!cluesShowing" class="clues">{{solutionClues}}</span>  -->
+         <textarea [hidden]="!cluesShowing" class="clues">{{solutionClues}}</textarea> 
+        </td>
+      </tr>
+      </table>
+      <!-- </p> -->
 
     </div>  <!-- *ngSwitchCase="PlayStates.EXECUTE" -->
 
@@ -280,9 +361,10 @@ s: sudoku, b: box, v: value, k: candidate
 
   </div>  <!-- [ngSwitch]="playState" --> 
 
-</section>
+</div> <!-- id="controls" -->
 
-<!-- FOOTER -->
-<footer style="font-size: 10px">
-  {{copyright}}
-</footer>
+<div id="footer">
+  {{version}}<span class="tab">{{copyright}}</span>
+</div>
+
+</div> <!-- id="appContainer" -->

@@ -5,6 +5,7 @@ import { Action,
          GuessAction,
          ActionType,
          RemoveAction,
+         RestoreAction,
          ValueAction } from '../action/action';
 
 import { ActionLogService } from '../action/action-log.service';
@@ -208,7 +209,7 @@ export class SudokuService {
         break;
       case ActionType.GUESS_VALUE:
         action = new GuessAction(ActionType.GUESS_VALUE, c, newValue,
-            guessPossibles, hint);
+            guessPossibles);
         break;
     } // switch
     this.actionLog.addEntry(action);
@@ -320,9 +321,17 @@ export class SudokuService {
    */
   public removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
-    let action = new RemoveAction(ActionType.REMOVE_CANDIDATE, c, k, hint);
-    this.actionLog.addEntry(action);
+    this.actionLog.addEntry(
+        new RemoveAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
   } // removeCandidate()
+
+  public restoreCandidate(c: number, k: number) : void {
+    if (this.isPossibleCandidate(c, k)) {
+      this.sudokuModel.cells[c].candidates[k] = true;
+      this.actionLog.addEntry(
+          new RestoreAction(ActionType.RESTORE_CANDIDATE, c, k));
+    }
+  }
 
   /**
    * Undoes the last logged action. If the last action resulted from a complex
@@ -925,6 +934,18 @@ try {
     // add candidate
     this.sudokuModel.cells[c].candidates[k] = true;
   } // addCandidate()
+
+  /**
+   * 
+   */
+  private isPossibleCandidate(c: number, k: number) : boolean {
+    for (let rc of Common.getRelatedCells(c)) {
+      if (this.sudokuModel.cells[rc].value === k) {
+        return false;
+      }
+    }
+    return true;
+  } // isPossilbleCandidate()
 
   /**
    * Make every value a candidate because all initialized cells do not have

@@ -136,6 +136,7 @@ export class AppComponent implements OnInit, OnDestroy {
   hintMessage: string;
   // autoSolveMessage: string;
   actionLog: string;
+  cluesShowing: boolean;
   solutionClues: string;
   timerSubscription: Subscription;
   elapsedTime: string;
@@ -397,8 +398,23 @@ export class AppComponent implements OnInit, OnDestroy {
       return;
     }
     this.initializeHintStates();
-    this.removeCandidate(this.viewToCellIdx(vb, vc), k);
+
+    if (this.candidatesShowing) {
+      let cellIdx = this.viewToCellIdx(vb, vc);
+      if (this.sudokuService.isCandidate(cellIdx, k)) {
+        // this.removeCandidate(cellIdx, k);
+        this.sudokuService.removeCandidate(cellIdx, k, undefined);
+      } else {
+        // this.restoreCandidate(cellIdx, k);
+        this.sudokuService.restoreCandidate(cellIdx, k);
+      }
+    }
+    // // else restore if cand viable
+
+    // this.removeCandidate(this.viewToCellIdx(vb, vc), k);
+
     this.candidatesModified = true;
+    this.refreshActionLog();
   } // handleCandidateClick_()
 
   refreshCandidates() {
@@ -469,6 +485,13 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
   }
   
+  /**
+   * Button 'Show Clues', 'Hide Clues' EXECUTION state
+   */
+  toggleClues() : void {
+    this.cluesShowing = !this.cluesShowing;
+  }
+
   /**
    * Respond to the 'Get/Apply hint' button. If a hint is already displayed,
    * apply the hint, render the board, remove the hint, and toggle the button.
@@ -667,6 +690,9 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     if (stats.getGuesses() > 0) {
         s += stats.getGuesses() + ' Guesses\n';
     }
+
+    s += '*';
+
     return s;
   } // createSolutionClues()
 
@@ -735,16 +761,27 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.selectedCell = ci;
   }
     
-  /**
-   * 
-   */
-  removeCandidate(cell: number, k: number) : void {
-    this.initializeHintStates();
-    if (this.candidatesShowing) {
-      this.sudokuService.removeCandidate(cell, k, undefined);
-    }
-    this.refreshActionLog();
-  }
+  // /**
+  //  * 
+  //  */
+  // removeCandidate(cell: number, k: number) : void {
+  //   this.initializeHintStates();
+  //   if (this.candidatesShowing) {
+  //     this.sudokuService.removeCandidate(cell, k, undefined);
+  //   }
+  //   this.refreshActionLog();
+  // }
+  
+  // /**
+  //  * 
+  //  */
+  // restoreCandidate(cell: number, k: number) : void {
+  //   this.initializeHintStates();
+  //   if (this.candidatesShowing) {
+  //     this.sudokuService.restoreCandidate(cell, k);
+  //   }
+  //   this.refreshActionLog();
+  // }
   
   /**
    * 
@@ -881,6 +918,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.initializeHintStates();
     this.actionLog = '';
     this.desiredDifficulty = this.DEFAULT_DIFFICULTY;
+
+    this.cluesShowing = false;
 
     this.actionLog = '';
     this.hintsViewed = 0;

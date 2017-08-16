@@ -8,7 +8,8 @@ export const enum ActionType {
   SET_VALUE,
   GUESS_VALUE,
   // SET_INITIAL,
-  REMOVE_CANDIDATE
+  REMOVE_CANDIDATE,
+  RESTORE_CANDIDATE
 }
 
 export abstract class Action {
@@ -38,7 +39,7 @@ export abstract class Action {
     return '';
   }
 
-}
+} // class Action
 
 abstract class BaseValueAction extends Action {
   private _value: number;
@@ -52,7 +53,7 @@ abstract class BaseValueAction extends Action {
     return this._value;
   }
 
-}
+} // class BaseValueAction
 
 export class ValueAction extends BaseValueAction {
 
@@ -72,14 +73,14 @@ export class ValueAction extends BaseValueAction {
     return s;
   }
 
-}
+} // class ValueAction
 
 export class GuessAction extends BaseValueAction {
   private _possibleValues: number[];
 
   constructor(type: ActionType, cell: number, value: number,
-      possibleValues: number[], hint?: ValueHint) {
-    super(type, cell, value, hint);
+      possibleValues: number[]) {
+    super(type, cell, value);
     this._possibleValues = possibleValues;
   }
 
@@ -90,35 +91,38 @@ export class GuessAction extends BaseValueAction {
   toString() : string {
     let s = super.toString()
         + Common.formatString(
-        'Guess {0} in {1},{2} with possibles {3}',
+        'Guess {0} in {1},{2} with possibles {3} (User action)',
         [this.value, Common.userRow(this.cell), Common.userCol(this.cell),
            JSON.stringify(this._possibleValues)]);
-    if (this.hint) {
-      s += ' (' + this.hint.toString() + ')';
-    } else {
-      s += ' (User action)';
-    }
     return s;
   }
     
-}
+} // class GuessAction
 
-export class RemoveAction extends Action {
+abstract class BaseCandidateAction extends Action {
   private _candidate: number;
 
-  constructor(type: ActionType, cell: number, candidate: number, hint?: CandidatesHint) {
+  constructor(type: ActionType, cell: number, candidate: number, hint?: Hint) {
     super(type, cell, hint);
     this._candidate = candidate;
   }
 
-  get candidate() {
+  get candidate() : number {
     return this._candidate;
+  }
+
+} // class BaseCandidateAction
+
+export class RemoveAction extends BaseCandidateAction {
+
+  constructor(type: ActionType, cell: number, candidate: number, hint?: CandidatesHint) {
+    super(type, cell, candidate, hint);
   }
 
   toString() {
     let s = super.toString() 
         + Common.formatString('Remove candidate {0} in {1},{2}',
-            [this._candidate, Common.userRow(this.cell), Common.userCol(this.cell)]);
+            [this.candidate, Common.userRow(this.cell), Common.userCol(this.cell)]);
     if (this.hint) {
       s += ' (' + this.hint.toString() + ')';
     } else {
@@ -127,4 +131,18 @@ export class RemoveAction extends Action {
     return s;
   }
     
-}
+} // class RemoveAction
+
+export class RestoreAction extends BaseCandidateAction {
+
+  constructor(type: ActionType, cell: number, candidate: number) {
+    super(type, cell, candidate);
+  }
+
+  toString() {
+    return super.toString() 
+        + Common.formatString('Restore candidate {0} in {1},{2} (User action)',
+            [this.candidate, Common.userRow(this.cell), Common.userCol(this.cell)]);
+  }
+    
+} // class RestoreAction
