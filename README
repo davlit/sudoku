@@ -27,11 +27,14 @@ https://www.youtube.com/watch?v=ei7FsoXKPl0 -- 34:20 into it
 
 Publish app on github pages
 ---------------------------
-https://github.com/angular-buch/angular-cli-ghpages
-$ npm i -g angular-cli-ghpages
-$ ng build --prod --base-href "https://USERNAME.github.io/REPOSITORY_NAME/"
-$ angular-cli-ghpages
-https://davlit.github.io/sudoku
+Ref: https://github.com/angular-buch/angular-cli-ghpages
+One-time: $ npm i -g angular-cli-ghpages
+          $ cd <project-dir>/
+          $ cd sudoku/
+General:  $ ng build --prod --base-href "https://USERNAME.github.io/REPOSITORY_NAME/"
+Specific: $ ng build --prod --base-href "https://davlit.github.io/sudoku/"
+          $ angular-cli-ghpages
+Browser:  https://davlit.github.io/sudoku
 
 
 Run:
@@ -319,110 +322,6 @@ console.log('Pass: ' + pass);
     return sudoku.serialize();
   } // createSudoku()
 
-const sudoku: string = '{"_initialValues":[4,9,0,0,0,0,0,6,7,0,2,0,3,0,7,0,0,0,0,0,7,0,8,0,0,0,0,0,0,0,0,0,2,0,4,0,7,8,4,0,0,0,2,1,6,0,5,0,7,0,0,0,0,0,0,0,0,0,9,0,6,0,0,0,0,0,4,0,8,0,3,0,9,3,0,0,0,0,0,5,4],"_completedPuzzle":[4,9,3,5,2,1,8,6,7,8,2,6,3,4,7,5,9,1,5,1,7,6,8,9,4,2,3,3,6,9,8,1,2,7,4,5,7,8,4,9,3,5,2,1,6,1,5,2,7,6,4,3,8,9,2,4,5,1,9,3,6,7,8,6,7,1,4,5,8,9,3,2,9,3,8,2,7,6,1,5,4],"_desiredDifficulty":0,"_actualDifficulty":0,"_generatePasses":1,"_stats":"{\"nakedSingles\":36,\"hiddenSinglesRow\":12,\"hiddenSinglesCol\":4,\"hiddenSinglesBox\":1,\"nakedPairsRow\":0,\"nakedPairsCol\":0,\"nakedPairsBox\":0,\"pointingRows\":0,\"pointingCols\":0,\"rowBoxReductions\":0,\"colBoxReductions\":0,\"nakedTriplesRow\":0,\"nakedTriplesCol\":0,\"nakedTriplesBox\":0,\"nakedQuadsRow\":0,\"nakedQuadsCol\":0,\"nakedQuadsBox\":0,\"hiddenPairsRow\":0,\"hiddenPairsCol\":0,\"hiddenPairsBox\":0,\"hiddenTriplesRow\":0,\"hiddenTriplesCol\":0,\"hiddenTriplesBox\":0,\"hiddenQuadsRow\":0,\"hiddenQuadsCol\":0,\"hiddenQuadsBox\":0,\"guesses\":0}"}';
-
-{"_initialValues":[4,9,0,0,0,0,0,6,7,0,2,0,3,0,7,0,0,0,0,0,7,0,8,0,0,0,0,0,0,0,0,0,2,0,4,0,7,8,4,0,0,0,2,1,6,0,5,0,7,0,0,0,0,0,0,0,0,0,9,0,6,0,0,0,0,0,4,0,8,0,3,0,9,3,0,0,0,0,0,5,4],
-"_completedPuzzle":[4,9,3,5,2,1,8,6,7,8,2,6,3,4,7,5,9,1,5,1,7,6,8,9,4,2,3,3,6,9,8,1,2,7,4,5,7,8,4,9,3,5,2,1,6,1,5,2,7,6,4,3,8,9,2,4,5,1,9,3,6,7,8,6,7,1,4,5,8,9,3,2,9,3,8,2,7,6,1,5,4],
-"_desiredDifficulty":0,
-"_actualDifficulty":0,
-"_generatePasses":1,
-"_stats":"{
-	\"nakedSingles\":36,
-	\"hiddenSinglesRow\":12,
-	\"hiddenSinglesCol\":4,
-	\"hiddenSinglesBox\":1,
-	\"nakedPairsRow\":0,
-	\"nakedPairsCol\":0,
-	\"nakedPairsBox\":0,
-	\"pointingRows\":0,
-	\"pointingCols\":0,
-	\"rowBoxReductions\":0,
-	\"colBoxReductions\":0,
-	\"nakedTriplesRow\":0,
-	\"nakedTriplesCol\":0,
-	\"nakedTriplesBox\":0,
-	\"nakedQuadsRow\":0,
-	\"nakedQuadsCol\":0,
-	\"nakedQuadsBox\":0,
-	\"hiddenPairsRow\":0,
-	\"hiddenPairsCol\":0,
-	\"hiddenPairsBox\":0,
-	\"hiddenTriplesRow\":0,
-	\"hiddenTriplesCol\":0,
-	\"hiddenTriplesBox\":0,
-	\"hiddenQuadsRow\":0,
-	\"hiddenQuadsCol\":0,
-	\"hiddenQuadsBox\":0,
-	\"guesses\":0}"
-}
-
-GridLayout Notes
-----------------
-HTML
-<div class="box">
-  <div class="cell">
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-  <div>
-  <div class="cell">
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-    <div class="cand">8</div>
-  <div>
-<div>
-
-CSS
-body {
-  margin: 10px;
-}
-
-.box {
-  width: 600px;
-  height: 600px;
-  display: grid;
-  grid-template-columns: repeat(3, 66px);
-  /* grid-gap: 10px; */
-  background-color: lightgreen;
-  /* color: lightgreen; */
-}
-
-.cell {
-  width: 90px;
-  height: 100px;
-  display: grid;
-  grid-template-columns: repeat(3, 32px);
-  border: 1px solid black;
-  /* grid-gap: 10px; */
-  background-color: lightblue;
-  color: lightgreen;
-  line-height: 20px;
-}
-
-.cand {
-  width: 20px;
-  height: 20px;
-  background-color: pink;
-  color: black;
-  /* border: 1px solid black; */
-  /* border-radius: 5px; */
-  /* padding: 5px; */
-  font-size: 75%;
-  text-align: center;
-}
-
 6/5/17
 ======Trigger: 
 play.component.html - "Generate" button
@@ -463,3 +362,43 @@ cacheService.ts - this.cacheService.getSudoku(difficulty) : Puzzle
 [background]
 creation.service.ts - 
   createSudokuZ(difficulty: Difficulty) : string
+
+Actions & Undos
+===============
+Actions                                   component                         Sservice
+-------                                   ---------                         --------
+Set value (keyboard)                      handleKeyPress(keyEvent)          setValue(c, v)
+                                                                              w/removeValue(c)
+Set value (value picker)                  handleChoiceClick(v)              setValue(c, v)
+                                                                              w/removeValue(c)
+Set value (R click naked single)          handleCellClick(event, vb, vc)    setValue(c, naked)
+Remove value (0 keyboard)                 handleKeyPress(keyEvent)          removeValue(c)
+Remove value (value picker clear)         handleChoiceClearClick()          removeValue(c)
+Replace value (kb) -- Remove/Set          handleKeyPress(keyEvent)          setValue(c, v)
+Replace value (picker) -- Remove/Set      handleChoiceClick(v)              setValue(c, v)
+Remove candidate (dbl click cand)         handleCandidateClick(vb, vc, k)   removeCandidate(c, k)
+Restore candidate (dbl click empty cand)  handleCandidateClick(vb, vc, k)   restoreCandidate(c, k)
+Refresh all candidates                    refreshCandidates()               refreshAllCandidates()
+Undo last action                          undoLastAction()
+
+actions:
+  SET_VALUE,
+  GUESS_VALUE,
+  REMOVE_VALUE,
+  REMOVE_CANDIDATE,
+  RESTORE_CANDIDATE
+
+
+setValue(c, v)
+removeValue(c)
+removeCandidate(c, k)
+restoreCandidate(c, k)
+
+undoLastAction()
+  undo setValue -> removeValue (no log)
+  undo removeValue -> setValue (no log)
+  undo removeCandidate -> restoreCandidate (no log)
+  undo restoreCandidate -> removeCandidate (no log)
+  ...
+  remove last action log entry
+  refresh action log

@@ -6,7 +6,8 @@ import { Action,
          ActionType,
          RemoveAction,
          RestoreAction,
-         ValueAction } from '../action/action';
+         ValueAction,
+         RemoveValueAction } from '../action/action';
 
 import { ActionLogService } from '../action/action-log.service';
 
@@ -267,7 +268,9 @@ export class SudokuService {
       return;			// nothing to remove
     }
 
-    cell.value = 0;
+    cell.value = 0;     // remove cell's value
+
+    // decrement value count for cell's 3 groups
     let row = this.sudokuModel.rows[cell.rowIndex];
     let col = this.sudokuModel.cols[cell.colIndex];
     let box = this.sudokuModel.boxs[cell.boxIndex];
@@ -275,7 +278,7 @@ export class SudokuService {
     col.vOccurrences[oldValue]--;
     box.vOccurrences[oldValue]--;
 
-    // add applicable candidates to cell
+    // add candidates to cell that don't appear as related cell value
     for (let v of VALUES) {
       if (   row.vOccurrences[oldValue] > 0
           || col.vOccurrences[oldValue] > 0
@@ -298,6 +301,13 @@ export class SudokuService {
       }
       this.addCandidate(rc, oldValue);
     }
+
+    // log action
+    // let action: RemoveValueAction;
+    // action = new RemoveValueAction(ActionType.REMOVE_VALUE, c, oldValue);
+    // this.actionLog.addEntry(
+    //   new RemoveValueAction(ActionType.REMOVE_VALUE, c, oldValue));
+
   } // removeValue()
 
   /**
@@ -319,7 +329,7 @@ export class SudokuService {
    * - restore the candidate
    * - remove log entry, don't create new one
    */
-  public removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
+  public removeCandidate(c: number, k: number, hint?: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
     this.actionLog.addEntry(
         new RemoveAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
@@ -372,10 +382,17 @@ export class SudokuService {
       case ActionType.SET_VALUE:
       case ActionType.GUESS_VALUE:
         this.removeValue(action.cell);
+      //   break;
+      // case ActionType.REMOVE_VALUE:
+      //   this.setValue(action.cell, (<RemoveValueAction> action).value, ActionType.SET_VALUE);
         break;
       case ActionType.REMOVE_CANDIDATE:
         this.addCandidate(action.cell, (<RemoveAction> action).candidate);
-    }
+     }
+      //   break;
+      // case ActionType.RESTORE_CANDIDATE:
+      //   // this.removeCandidate(action.cell, (<RestoreAction> action).candidate);
+  //  this.removeLastActionLogEntry();
   } // undoAction()
 
   /**
@@ -516,6 +533,7 @@ export class SudokuService {
    * 
    */
   public getCandidates(c: number) : number[] {
+// console.info('getCandidates c: ' + c);
     if (this.hasValue(c)) {
       return [];
     }

@@ -7,6 +7,7 @@ import { Common } from '../common/common';
 export const enum ActionType {
   SET_VALUE,
   GUESS_VALUE,
+  REMOVE_VALUE,
   // SET_INITIAL,
   REMOVE_CANDIDATE,
   RESTORE_CANDIDATE
@@ -63,7 +64,7 @@ export class ValueAction extends BaseValueAction {
 
   toString() {
     let s = super.toString() 
-        + Common.formatString('Set {0} in {1},{2}',
+        + Common.formatString('Set value {0} in {1},{2}',
         [this.value, Common.userRow(this.cell), Common.userCol(this.cell)]);
     if (this.hint) {
       s += ' (' + this.hint.toString() + ')';
@@ -91,9 +92,25 @@ export class GuessAction extends BaseValueAction {
   toString() : string {
     let s = super.toString()
         + Common.formatString(
-        'Guess {0} in {1},{2} with possibles {3} (User action)',
+        'Guess value {0} in {1},{2} with possibles {3} (User action)',
         [this.value, Common.userRow(this.cell), Common.userCol(this.cell),
            JSON.stringify(this._possibleValues)]);
+    return s;
+  }
+    
+} // class GuessAction
+
+export class RemoveValueAction extends BaseValueAction {
+
+  constructor(type: ActionType, cell: number, value: number) {
+    super(type, cell, value);
+  }
+
+  toString() : string {
+    let s = super.toString()
+        + Common.formatString(
+        'Remove value {0} in {1},{2} (User action)',
+        [this.value, Common.userRow(this.cell), Common.userCol(this.cell)]);
     return s;
   }
     

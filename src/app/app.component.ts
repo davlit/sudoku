@@ -199,7 +199,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // console.log('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
     
     let keyCode = keyEvent.keyCode;
-    let value = 0;
+    let newValue = 0;
 
     // get currently selected cell's row and column number
     // let ur = this.xselectedCell.r;
@@ -249,23 +249,52 @@ export class AppComponent implements OnInit, OnDestroy {
       case 32:		// space
       case 8:			// backspace
         keyEvent.preventDefault();
-        value = 0;
+        newValue = 0;
         break;
       default:
         if (keyCode >= 96 && keyCode <= 105) {  // keypad codes
           keyCode = keyCode - 48;     // change to number codes
         }
-        value = parseInt(String.fromCharCode(keyCode));
+        newValue = parseInt(String.fromCharCode(keyCode));
     }
 
-    if (value >= 0 && value <= 9) {
-      if (value > 0) {
-        // this.setCellValue(ur, uc, value);
-        this.setCellValue(Common.urcToCellIdx(ur, uc), value);
-      } else {
-        // this.removeCellValue(ur, uc);
-        this.removeCellValue(Common.urcToCellIdx(ur, uc));
-      }
+    if (newValue < 0 || newValue > 9) {
+      return;   // not zero and not 1..9, bail
+    }
+
+    // let selectedCellIdx = Common.urcToCellIdx(ur, uc);
+    let oldValue = this.sudokuService.getValue(this.selectedCell);
+
+    /*
+    case
+      oldValue == newValue            // nothing to do
+      newValue == 0                   // remove old value
+      oldValue == 0                   // set new value
+      oldValue != newValue            // remove old, set new
+    */
+
+    if (newValue == oldValue) {
+      return;   // nothing to do
+    }
+
+    if (oldValue != 0) {
+      // remove old first
+      this.removeCellValue(this.selectedCell);
+    }
+
+    if (newValue != 0) {
+      // set new
+      this.setCellValue(this.selectedCell, newValue);
+    }
+
+    // if (value >= 0 && value <= 9) {
+      // if (newValue > 0) {
+      //   // this.setCellValue(ur, uc, value);
+      //   this.setCellValue(Common.urcToCellIdx(ur, uc), newValue);
+      // } else {
+      //   // this.removeCellValue(ur, uc);
+      //   this.removeCellValue(Common.urcToCellIdx(ur, uc));
+      // }
 
       this.initializeHintStates();
       
@@ -280,7 +309,7 @@ export class AppComponent implements OnInit, OnDestroy {
         // this.setSelectedCell(ur, uc); 
         this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
       }
-    } // if value 0..9
+    // } // if value 0..9
   } // handleKeyPress()
 
   /**
@@ -547,21 +576,32 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   /**
    * 
    */
-  isValueComplete_(vr: number, vc: number) : boolean {
-    return this.valuesComplete[this.valueCoordsToValue(vr, vc)];
+  isValueComplete(v: number) : boolean {
+    return this.valuesComplete[v];
   }
+
+  // /**
+  //  * 
+  //  */
+  // handleChoiceClick_(vr: number, vc: number) : void {
+  //   let choice = this.valueCoordsToValue(vr, vc);
+  //   if (this.valuesComplete[choice]) {
+  //     return;
+  //   }
+  //   this.initializeHintStates();
+  //   this.setCellValue(this.selectedCell, choice);
+  // } // handleChoiceClick_()
 
   /**
    * 
    */
-  handleChoiceClick_(vr: number, vc: number) : void {
-    let choice = this.valueCoordsToValue(vr, vc);
-    if (this.valuesComplete[choice]) {
+  handleChoiceClick(v: number) : void {
+    if (this.valuesComplete[v]) {
       return;
     }
     this.initializeHintStates();
-    this.setCellValue(this.selectedCell, choice);
-  } // handleChoiceClick_()
+    this.setCellValue(this.selectedCell, v);
+  } // handleChoiceClick()
 
   /**
    * Function based on view's cell indexes in html code.
@@ -592,6 +632,10 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
     // capture before it's removed from log
     let lastAction = this.sudokuService.getLastAction();
+
+    if (lastAction === undefined) {
+      return;
+    }
 
     this.sudokuService.undoLastAction();
 

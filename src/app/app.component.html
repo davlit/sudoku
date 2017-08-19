@@ -270,26 +270,20 @@ s: sudoku, b: box, v: value, k: candidate
       <!-- ===== Value Picker ===== -->
       <p *ngIf="!isAnySelectedCell()"><span>Select a cell</span></p>
       <div *ngIf="isAnySelectedCell()">
-      <p>Click value for selected cell:</p>
-      <div class="val-table" *ngIf="isAnySelectedCell()">
-        <div class="val-row" *ngFor="let vr of [0,1,2]">
-          <div class="val-cell" *ngFor="let vc of [0,1,2]"
-              (mousedown)="handleChoiceClick_(vr, vc)">
-            <span class="val-val" [ngClass]="{'dim': isValueComplete_(vr, vc)}">
-              {{choiceToChar_(vr, vc)}}
-            </span>
+        <p>Click value for selected cell:</p>
+        <div class="vcontainer">
+          <div class="vcell" *ngFor="let v of [1,2,3,4,5,6,7,8,9]"
+              (mousedown)="handleChoiceClick(v)">
+            <span [ngClass]="{'dim': isValueComplete(v)}">{{v}}</span>
+          </div>
+          <div class="vcell vclear" (mousedown)="handleChoiceClearClick()">
+            Clear
           </div>
         </div>
-        <div class="clear-row">
-          <div class="clear-cell"
-              (mousedown)="handleChoiceClearClick()">
-            <span class="clear-val">Clear</span>
-          </div>
-        </div>
-      </div>
       </div>
       <br/>  
 
+      <!-- ===== Action Log ===== -->
       <p><span>Action Log:</span>
         <button [hidden]="actionLog === ''" class="general"
                 (click)="undoLastAction()">Undo Last Action</button><br/>

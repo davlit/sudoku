@@ -191,66 +191,30 @@ textarea {
   background-color: $tan1;
 }
 
-.val-table {
-  display: table;
-  width: auto;
-  text-align: center;
-  // font-size: 18px;
-  font-size: 2.0vw;
-  background-color: $tan1;
-  border: 2px solid $black;
-  /*border-spacing: 5px;*/
-  /*cellspacing:poor IE support for  this*/
-  /* border-collapse: separate;*/
-}
-
-.val-row {
-  display: table-row;
-  /*width: auto;*/
-}
-
-.val-cell {
-  float: left;  /*fix for  buggy browsers*/
-  display: table-column;
-  // height: 30px;
-  // width:  40px;
-  height: 3.0vw;
-  width:  4.0vw;
-  border: 1px solid $black;
-  margin: -1px -1px -1px -1px;
-}
-
 .dim {
   color: $gray1;
 }
 
-.val-val {
-  // line-height: 30px;
-  line-height: 3.0vw;
-  cursor: default;
+.vcontainer {
+  display: grid;
+  width: 9.7vw;
+  grid-template-columns: 3.0vw 3.0vw 3.0vw;
+  // grid-template-columns: repeat (3, 3.0vw);
+  grid-template-rows: repeat (4, 1fr);
+  grid-gap: 0.15vw; // creates cell borders with .bcell background color
+  background-color: $black;
+  border: 2px solid $black;
 }
 
-.clear-row{
-  display: table-row;
-  /*width: auto;*/
-}
-
-.clear-cell {
-  /*float: left;  /*fix for  buggy browsers*/
-  display: table-cell;
-  width: auto;
-  // height: 30px;
-  height: 3.0vw;
+.vcell {
   text-align: center;
-  border-top: 1px solid $black;
-  margin: -1px -1px -1px -1px;
+  font-size: (1.3 * $k-font-size);
+  background-color: $tan1;
+  cursor: pointer;
 }
 
-.clear-val {
-  // line-height: 30px;
-  line-height: 3.0vw;
-  text-align: center;
-  cursor: default;
+.vclear {
+  width: 9.3vw;
 }
 
 .clue-label-cell {
