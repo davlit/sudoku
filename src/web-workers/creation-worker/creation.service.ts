@@ -5,7 +5,7 @@ import { Common } from '../../app/common/common';
 import { Difficulty } from '../../app/model/difficulty';
 import { Puzzle } from '../../app/model/puzzle';
 
-import { GuessAction } from '../../app/action/action';
+import { GuessValueAction } from '../../app/action/action';
 import { ActionType } from '../../app/action/action';
 import { ActionLogService } from '../../app/action/action-log.service';
 import { ValueHint } from '../../app/hint/hint';
@@ -295,7 +295,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     } // while -- no hint, try guess
 
     // now we have to resort to guessing
-    let lastGuess: GuessAction = undefined;
+    let lastGuess: GuessValueAction = undefined;
     while (this.guess(lastGuess)) {	// while guess made
       if (this.solve()) {		// recursive call -- try new hint
         // recursive call returned true -> solved!
@@ -341,7 +341,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
 
     // now we have to resort to guessing
     let localSolutionsCount = 0;
-    let lastGuess: GuessAction = undefined;
+    let lastGuess: GuessValueAction = undefined;
     while (this.guess(lastGuess)) {	// while guess made
       localSolutionsCount += this.countSolutions(); // recursive call
       if (localSolutionsCount >= 2) {
@@ -362,7 +362,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    * first available candidate. If rollbacks dictate a subsequent guess, the 
    * next available candidate is used. 
    */
-  private guess(lastGuess: GuessAction) : boolean {
+  private guess(lastGuess: GuessValueAction) : boolean {
     let guessCell: number = undefined;
     let possibleValues: number[] = [];
     let guessValue: number = undefined;
@@ -422,7 +422,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
   /**
    * Working backwards undo every action until a guess action 
    */
-  private rollbackToLastGuess() : GuessAction {
+  private rollbackToLastGuess() : GuessValueAction {
 
     // undo entries that are not guesses
     let lastAction = this.actionLog.getLastEntry();
@@ -436,7 +436,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
         this.actionLog.getLastEntry().type === ActionType.GUESS_VALUE) {
       this.sudokuService.undoAction(this.actionLog.getLastEntry());
 
-      return <GuessAction> this.actionLog.getLastEntry();   // last GUESS_VALUE action
+      return <GuessValueAction> this.actionLog.getLastEntry();   // last GUESS_VALUE action
     }
     return undefined;
   } // rollbackToLastGuess()

@@ -18,7 +18,7 @@ import { HintType }         from './hint/hint.type';
 import { HintCounts }       from './hint/hintCounts';
 import { ActionType }       from './action/action';
 import { Action }           from './action/action';
-import { ValueAction }      from './action/action';
+import { SetValueAction }      from './action/action';
 import { NakedType }        from './model/naked.type';
 import { CombinationIterator } from './common/combination.iterator';
 
@@ -265,51 +265,31 @@ export class AppComponent implements OnInit, OnDestroy {
     // let selectedCellIdx = Common.urcToCellIdx(ur, uc);
     let oldValue = this.sudokuService.getValue(this.selectedCell);
 
-    /*
-    case
-      oldValue == newValue            // nothing to do
-      newValue == 0                   // remove old value
-      oldValue == 0                   // set new value
-      oldValue != newValue            // remove old, set new
-    */
-
     if (newValue == oldValue) {
       return;   // nothing to do
     }
 
+    // if replacing value, remove old first
     if (oldValue != 0) {
-      // remove old first
       this.removeCellValue(this.selectedCell);
     }
 
     if (newValue != 0) {
-      // set new
       this.setCellValue(this.selectedCell, newValue);
     }
 
-    // if (value >= 0 && value <= 9) {
-      // if (newValue > 0) {
-      //   // this.setCellValue(ur, uc, value);
-      //   this.setCellValue(Common.urcToCellIdx(ur, uc), newValue);
-      // } else {
-      //   // this.removeCellValue(ur, uc);
-      //   this.removeCellValue(Common.urcToCellIdx(ur, uc));
-      // }
-
-      this.initializeHintStates();
-      
-      // step selected cell right (wrap to next row) during entry
-      if (this.playState === PlayStates.ENTRY) {
-        uc++;
-        if (uc > 9) {
-          ur++;
-          if (ur > 9) { ur = 1; }
-          uc = 1;
-        }
-        // this.setSelectedCell(ur, uc); 
-        this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
+    this.initializeHintStates();
+    
+    // step selected cell right (wrap to next row) during entry
+    if (this.playState === PlayStates.ENTRY) {
+      uc++;
+      if (uc > 9) {
+        ur++;
+        if (ur > 9) { ur = 1; }
+        uc = 1;
       }
-    // } // if value 0..9
+      this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
+    }
   } // handleKeyPress()
 
   /**
@@ -580,18 +560,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     return this.valuesComplete[v];
   }
 
-  // /**
-  //  * 
-  //  */
-  // handleChoiceClick_(vr: number, vc: number) : void {
-  //   let choice = this.valueCoordsToValue(vr, vc);
-  //   if (this.valuesComplete[choice]) {
-  //     return;
-  //   }
-  //   this.initializeHintStates();
-  //   this.setCellValue(this.selectedCell, choice);
-  // } // handleChoiceClick_()
-
   /**
    * 
    */
@@ -604,23 +572,10 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   } // handleChoiceClick()
 
   /**
-   * Function based on view's cell indexes in html code.
-   */
-  choiceToChar_(vr: number, vc: number) : string {
-    return '' + this.valueCoordsToValue(vr, vc);
-  } // choiceToChar_()
-
-  /**
    * 
    */
   handleChoiceClearClick() : void {
     this.initializeHintStates();
-
-    // get currently selected cell's row and column number
-    // let r = this.xselectedCell.r;
-    // let c = this.xselectedCell.c;
-    
-    // this.removeCellValue(r, c);
     this.removeCellValue(this.selectedCell);
   } // handleChoiceClearClick_()
 
@@ -641,7 +596,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
     // update values complete
     if (lastAction.type === ActionType.SET_VALUE) {
-      let v = (<ValueAction> lastAction).value;
+      let v = (<SetValueAction> lastAction).value;
       this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     }
 

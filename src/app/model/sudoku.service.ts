@@ -2,11 +2,11 @@ import { Puzzle } from './puzzle';
 import { NakedType } from './naked.type';
 
 import { Action,
-         GuessAction,
+         GuessValueAction,
          ActionType,
-         RemoveAction,
-         RestoreAction,
-         ValueAction } from '../action/action';
+         RemoveCandidateAction,
+         RestoreCandidateAction,
+         SetValueAction } from '../action/action';
 
 import { ActionLogService } from '../action/action-log.service';
 
@@ -202,13 +202,13 @@ export class SudokuService {
     this.sudokuModel.boxs[cell.boxIndex].vOccurrences[newValue]++;
 
     // log action
-    let action: ValueAction;
+    let action: SetValueAction;
     switch (actionType) {
       case ActionType.SET_VALUE:
-        action = new ValueAction(ActionType.SET_VALUE, c, newValue, hint);
+        action = new SetValueAction(ActionType.SET_VALUE, c, newValue, hint);
         break;
       case ActionType.GUESS_VALUE:
-        action = new GuessAction(ActionType.GUESS_VALUE, c, newValue,
+        action = new GuessValueAction(ActionType.GUESS_VALUE, c, newValue,
             guessPossibles);
         break;
     } // switch
@@ -322,14 +322,14 @@ export class SudokuService {
   public removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
     this.actionLog.addEntry(
-        new RemoveAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
+        new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
   } // removeCandidate()
 
   public restoreCandidate(c: number, k: number) : void {
     if (this.isPossibleCandidate(c, k)) {
       this.sudokuModel.cells[c].candidates[k] = true;
       this.actionLog.addEntry(
-          new RestoreAction(ActionType.RESTORE_CANDIDATE, c, k));
+          new RestoreCandidateAction(ActionType.RESTORE_CANDIDATE, c, k));
     }
   }
 
@@ -374,7 +374,7 @@ export class SudokuService {
         this.removeValue(action.cell);
         break;
       case ActionType.REMOVE_CANDIDATE:
-        this.addCandidate(action.cell, (<RemoveAction> action).candidate);
+        this.addCandidate(action.cell, (<RemoveCandidateAction> action).candidate);
     }
   } // undoAction()
 

@@ -13,6 +13,17 @@ export const enum ActionType {
   RESTORE_CANDIDATE
 }
 
+/*
+Action (A)
+  BaseValueAction (A)
+    SetValueAction
+    GuessValueAction
+    RemoveValueAction
+  BaseCandidateAction (A)
+    RemoveCandidateAction
+    RestoreCandidateAction
+*/
+
 export abstract class Action {
   private _type: ActionType;
   private _cell: number;
@@ -56,7 +67,7 @@ abstract class BaseValueAction extends Action {
 
 } // class BaseValueAction
 
-export class ValueAction extends BaseValueAction {
+export class SetValueAction extends BaseValueAction {
 
   constructor(type: ActionType, cell: number, value: number, hint?: ValueHint) {
     super(type, cell, value, hint);
@@ -74,9 +85,9 @@ export class ValueAction extends BaseValueAction {
     return s;
   }
 
-} // class ValueAction
+} // class SetValueAction
 
-export class GuessAction extends BaseValueAction {
+export class GuessValueAction extends BaseValueAction {
   private _possibleValues: number[];
 
   constructor(type: ActionType, cell: number, value: number,
@@ -98,7 +109,7 @@ export class GuessAction extends BaseValueAction {
     return s;
   }
     
-} // class GuessAction
+} // class GuessValueAction
 
 export class RemoveValueAction extends BaseValueAction {
 
@@ -114,7 +125,7 @@ export class RemoveValueAction extends BaseValueAction {
     return s;
   }
     
-} // class GuessAction
+} // class RemoveValueAction
 
 abstract class BaseCandidateAction extends Action {
   private _candidate: number;
@@ -130,7 +141,7 @@ abstract class BaseCandidateAction extends Action {
 
 } // class BaseCandidateAction
 
-export class RemoveAction extends BaseCandidateAction {
+export class RemoveCandidateAction extends BaseCandidateAction {
 
   constructor(type: ActionType, cell: number, candidate: number, hint?: CandidatesHint) {
     super(type, cell, candidate, hint);
@@ -148,9 +159,9 @@ export class RemoveAction extends BaseCandidateAction {
     return s;
   }
     
-} // class RemoveAction
+} // class RemoveCandidateAction
 
-export class RestoreAction extends BaseCandidateAction {
+export class RestoreCandidateAction extends BaseCandidateAction {
 
   constructor(type: ActionType, cell: number, candidate: number) {
     super(type, cell, candidate);
@@ -162,4 +173,4 @@ export class RestoreAction extends BaseCandidateAction {
             [this.candidate, Common.userRow(this.cell), Common.userCol(this.cell)]);
   }
     
-} // class RestoreAction
+} // class RestoreCandidateAction
