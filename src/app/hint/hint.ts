@@ -123,14 +123,14 @@ export class ValueHint extends Hint {
 export class CandidatesHint extends Hint {
   private _cells: number[];
   private _candidates: number[];
-  private _removals: {c: number, k: number}[];
+  private _removes: {c: number, k: number}[];
 
   constructor(type: HintType, cells: number[], 
-      candidates: number[], removals: {c: number, k: number}[]) {
+      candidates: number[], removes: {c: number, k: number}[]) {
     super(type);
     this._cells = cells;
     this._candidates = candidates.sort();
-    this._removals = removals;
+    this._removes = removes;
   }
 
   get cells() : number[] {
@@ -153,8 +153,8 @@ export class CandidatesHint extends Hint {
     return this._candidates;
   }
   
-  get removals() : {c: number, k: number}[] {
-    return this._removals;
+  get removes() : {c: number, k: number}[] {
+    return this._removes;
   }
 
   getDifficultyRating(): Difficulty { 

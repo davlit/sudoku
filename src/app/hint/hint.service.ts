@@ -114,7 +114,7 @@ export class HintService {
    * Apply hint toward solution.
    */
   public applyHint() : void {
-    // let args = hint.removals;
+    // let args = hint.removes;
     if (this.activeHint == undefined) {
       return;   // no hunt to apply
     }
@@ -132,8 +132,8 @@ export class HintService {
         break;
       default:
         let kHint: CandidatesHint = <CandidatesHint> this.activeHint;
-        let removals = kHint.removals;
-        for (let removal of removals) {
+        let removes = kHint.removes;
+        for (let removal of removes) {
           this.sudokuService.removeCandidate(removal.c, removal.k, kHint);
         }
     } // switch
@@ -165,8 +165,8 @@ export class HintService {
         break;
       default:
         let kHint: CandidatesHint = <CandidatesHint> hint;
-        let removals = kHint.removals;
-        for (let removal of removals) {
+        let removes = kHint.removes;
+        for (let removal of removes) {
           this.sudokuService.removeCandidate(removal.c, removal.k, kHint);
         }
     } // switch
@@ -282,19 +282,19 @@ export class HintService {
 
         // look for actions; if none, move on
         if (Common.areCellsInSameRow(cells)) {
-          if (this.checkNakedsRemovals(ROW_CELLS[Common.rowIdx(cells[0])],
+          if (this.checkNakedsRemoves(ROW_CELLS[Common.rowIdx(cells[0])],
               cells, candidates, HintType.NAKED_PAIRS_ROW)) {
             return true;    
           }
         }
         if (Common.areCellsInSameCol(cells)) {
-          if (this.checkNakedsRemovals(COL_CELLS[Common.colIdx(cells[0])],
+          if (this.checkNakedsRemoves(COL_CELLS[Common.colIdx(cells[0])],
               cells, candidates, HintType.NAKED_PAIRS_COL)) {
             return true;
           }
         }
         if (Common.areCellsInSameBox(cells)) {
-          if (this.checkNakedsRemovals(BOX_CELLS[Common.boxIdx(cells[0])],
+          if (this.checkNakedsRemoves(BOX_CELLS[Common.boxIdx(cells[0])],
               cells, candidates, HintType.NAKED_PAIRS_BOX)) {
             return true;
           }
@@ -359,19 +359,19 @@ export class HintService {
 
           // look for actions; if none, move on
           if (Common.areCellsInSameRow(cells)) {
-            if (this.checkNakedsRemovals(ROW_CELLS[Common.rowIdx(cells[0])],
+            if (this.checkNakedsRemoves(ROW_CELLS[Common.rowIdx(cells[0])],
                 cells, candidates, HintType.NAKED_TRIPLES_ROW)) {
               return true;    
             }
           }
           if (Common.areCellsInSameCol(cells)) {
-            if (this.checkNakedsRemovals(COL_CELLS[Common.colIdx(cells[0])],
+            if (this.checkNakedsRemoves(COL_CELLS[Common.colIdx(cells[0])],
                 cells, candidates, HintType.NAKED_TRIPLES_COL)) {
               return true;
             }
           }
           if (Common.areCellsInSameBox(cells)) {
-            if (this.checkNakedsRemovals(BOX_CELLS[Common.boxIdx(cells[0])],
+            if (this.checkNakedsRemoves(BOX_CELLS[Common.boxIdx(cells[0])],
                 cells, candidates, HintType.NAKED_TRIPLES_BOX)) {
               return true;
             }
@@ -469,7 +469,7 @@ export class HintService {
       }
       if (cands.length == 3) {
         // 3 cells w/3 cands
-        // check for removals
+        // check for removes
       }
     }
 
@@ -559,19 +559,19 @@ export class HintService {
 
             // look for actions; if none, move on
             if (Common.areCellsInSameRow(cells)) {
-              if (this.checkNakedsRemovals(ROW_CELLS[Common.rowIdx(cells[0])],
+              if (this.checkNakedsRemoves(ROW_CELLS[Common.rowIdx(cells[0])],
                   cells, candidates, HintType.NAKED_QUADS_ROW)) {
                 return true;    
               }
             }
             if (Common.areCellsInSameCol(cells)) {
-              if (this.checkNakedsRemovals(COL_CELLS[Common.colIdx(cells[0])],
+              if (this.checkNakedsRemoves(COL_CELLS[Common.colIdx(cells[0])],
                   cells, candidates, HintType.NAKED_QUADS_COL)) {
                 return true;
               }
             }
             if (Common.areCellsInSameBox(cells)) {
-              if (this.checkNakedsRemovals(BOX_CELLS[Common.boxIdx(cells[0])],
+              if (this.checkNakedsRemoves(BOX_CELLS[Common.boxIdx(cells[0])],
                   cells, candidates, HintType.NAKED_QUADS_BOX)) {
                 return true;
               }
@@ -586,14 +586,14 @@ export class HintService {
 
   /**
    * Having cells with common candidates and common group, determine if
-   * candidate removals are possible. If so, lodge a hint and return true.
+   * candidate removes are possible. If so, lodge a hint and return true.
    * Return false to signal that no removal action is possible.
    */
-  private checkNakedsRemovals(groupCells: number[], cells: number[], 
+  private checkNakedsRemoves(groupCells: number[], cells: number[], 
       candidates: number[], hintType: HintType) : boolean {
 
-    // look for removals
-    let removals: {c: number, k: number}[] = [];
+    // look for removes
+    let removes: {c: number, k: number}[] = [];
 
     for (let c of groupCells) {
       if (this.sudokuService.hasValue(c) || cells.indexOf(c) > -1) {
@@ -601,18 +601,18 @@ export class HintService {
       }
       for (let k of candidates) {
         if (this.sudokuService.isCandidate(c, k)) {
-            removals.push({c: c, k: k});
+            removes.push({c: c, k: k});
         }
       } // for k
     } // for c
 
     // return true and hint if there are actions
-    if (removals.length > 0) {
-      this.activeHint = new CandidatesHint(hintType, cells, candidates, removals);
+    if (removes.length > 0) {
+      this.activeHint = new CandidatesHint(hintType, cells, candidates, removes);
       return true;
     }
     return false;
-  } // checkNakedsRemovals()
+  } // checkNakedsRemoves()
 
   /**
    * Check for hidden pairs in rows, columns, and boxes. If found, create a hint
@@ -786,14 +786,14 @@ export class HintService {
         continue;  // next combination of pair cells
       }
 
-      // look for removals: other candidates in pair cells
-      let removals: {c: number, k: number}[] = this.findHiddenRemovals(
+      // look for removes: other candidates in pair cells
+      let removes: {c: number, k: number}[] = this.findHiddenRemoves(
           pairCellCombination, _2matchedCands);
 
       // need at least 1 candidate to remove or it's not hidden pair
-      if (removals.length > 0) {
+      if (removes.length > 0) {
         this.activeHint = new CandidatesHint(hintType, pairCellCombination, 
-            _2matchedCands, removals);
+            _2matchedCands, removes);
         return true;
       }
           
@@ -885,14 +885,14 @@ export class HintService {
         continue;  // next combination of triple cells
       }
 
-      // look for removals: other candidates in triple cellsToValuesArray
-      let removals: {c: number, k: number}[] = this.findHiddenRemovals(
+      // look for removes: other candidates in triple cellsToValuesArray
+      let removes: {c: number, k: number}[] = this.findHiddenRemoves(
           tripCellCombination, _3matchedCands);
 
       // need at least 1 candidate to remove or it's not hidden triple
-      if (removals.length > 0) {
+      if (removes.length > 0) {
         this.activeHint = new CandidatesHint(hintType, tripCellCombination, 
-            _3matchedCands, removals);
+            _3matchedCands, removes);
         return true;
       }
           
@@ -1009,19 +1009,19 @@ export class HintService {
               continue I4;
             }
 
-            // look for removals: other candidates in quad cellsToValuesArray
-            let removals: {c: number, k: number}[] = this.findHiddenRemovals(
+            // look for removes: other candidates in quad cellsToValuesArray
+            let removes: {c: number, k: number}[] = this.findHiddenRemoves(
                 [quadCells[i1], quadCells[i2], quadCells[i3], quadCells[i4]],
                 // quadCandidates);
                 _4matchedCands);
 
-    console.log('removals      : ' + removals.length + ' (need at least 1)');  
+    console.log('removes      : ' + removes.length + ' (need at least 1)');  
 
             // no candidates to remove, so no hidden quad
-            if (removals.length > 0) {
+            if (removes.length > 0) {
               this.activeHint = new CandidatesHint(hintType, 
                   [quadCells[i1], quadCells[i2], quadCells[i3], quadCells[i4]], 
-                  _4matchedCands, removals);
+                  _4matchedCands, removes);
     console.log('hint: ' + JSON.stringify(this.activeHint));
               return true;
             }
@@ -1034,22 +1034,22 @@ export class HintService {
   } // checkHiddenQuadsGroup()
 
   /**
-   * Helper method to find candidate removals from hidden pairs, triples, quads.
+   * Helper method to find candidate removes from hidden pairs, triples, quads.
    */
-  private findHiddenRemovals(hiddenCells: number[], hiddenCands: number[]) 
+  private findHiddenRemoves(hiddenCells: number[], hiddenCands: number[]) 
       : {c: number, k: number}[] {
-    let removals: {c: number, k: number}[] = [];
+    let removes: {c: number, k: number}[] = [];
     for (let hiddenCell of hiddenCells) {
       // let hiddenCellCands: number[] = this.cells[hiddenCell].getCandidates().slice();
       let hiddenCellCands: number[] = this.sudokuService.getCandidates(hiddenCell).slice();
       for (let hiddenCellCand of hiddenCellCands) {
         if (hiddenCands.indexOf(hiddenCellCand) === -1) {
-          removals.push({c: hiddenCell, k: hiddenCellCand});
+          removes.push({c: hiddenCell, k: hiddenCellCand});
         }
       }
     }
-    return removals;
-  } // findHiddenRemovals()
+    return removes;
+  } // findHiddenRemoves()
 
   /**
    * Check for pointing rows and columns. If found, create a hint and return 
@@ -1093,7 +1093,7 @@ export class HintService {
         }
 
         // look for actions
-        let removals: {c: number, k: number}[] = [];
+        let removes: {c: number, k: number}[] = [];
         if (sameRow) {
             
           // scan other cells in row outside box
@@ -1102,14 +1102,14 @@ export class HintService {
               continue; // cell in same box
             }
             if (this.sudokuService.isCandidate(c, k)) {
-              removals.push({c: c, k: k});
+              removes.push({c: c, k: k});
             }
           } // for
 
-          // if there are removals, we have hint
-          if (removals.length > 0) {
+          // if there are removes, we have hint
+          if (removes.length > 0) {
             this.activeHint = new CandidatesHint(HintType.POINTING_ROW, 
-                [boxCandOccurrences[0]], [k], removals);
+                [boxCandOccurrences[0]], [k], removes);
             return true;
           }
         } else {	// same column
@@ -1120,14 +1120,14 @@ export class HintService {
               continue; // cell in same box
             }
             if (this.sudokuService.isCandidate(c, k)) {
-              removals.push({c: c, k: k});
+              removes.push({c: c, k: k});
             }
           } // for
 
-          // if there are removals, we have hint
-          if (removals.length > 0) {
+          // if there are removes, we have hint
+          if (removes.length > 0) {
             this.activeHint = new CandidatesHint(HintType.POINTING_COL, 
-                [boxCandOccurrences[0]], [k], removals);
+                [boxCandOccurrences[0]], [k], removes);
             return true;
           }
         } // else same col
@@ -1184,8 +1184,8 @@ export class HintService {
           continue CANDS;   // not in same box, next cand
         }
         
-        // must be same box, different row; look for removals
-        let removals: {c: number, k: number}[] = [];
+        // must be same box, different row; look for removes
+        let removes: {c: number, k: number}[] = [];
 
         // look for k's in other rows in box 
         // this row is row, this box is box
@@ -1196,14 +1196,14 @@ export class HintService {
             continue;   // box cell in same row, next c
           }
 
-          // if isCandidate, push to removals
+          // if isCandidate, push to removes
           if (this.sudokuService.isCandidate(c, k)) {
-            removals.push({c: c, k: k});
+            removes.push({c: c, k: k});
           }
         } // for
-        if (removals.length > 0) {
+        if (removes.length > 0) {
           this.activeHint = new CandidatesHint(HintType.ROW_BOX_REDUCTION, 
-              [rowCandOccurrences[0]], [k], removals);
+              [rowCandOccurrences[0]], [k], removes);
           return true;
         }
       } // for CANDS
@@ -1251,8 +1251,8 @@ export class HintService {
           continue CANDS;   // not in same box, next cand
         }
         
-        // must be same box, different col; look for removals
-        let removals: {c: number, k: number}[] = [];
+        // must be same box, different col; look for removes
+        let removes: {c: number, k: number}[] = [];
 
         // look for k's in other cols in box
         // this col is col, this box is box
@@ -1263,14 +1263,14 @@ export class HintService {
             continue;   // box cell in same col, next c
           }
 
-          // if isCandidate, push to removals
+          // if isCandidate, push to removes
           if (this.sudokuService.isCandidate(c, k)) {
-            removals.push({c: c, k: k});
+            removes.push({c: c, k: k});
           }
         } // for
-        if (removals.length > 0) {
+        if (removes.length > 0) {
           this.activeHint = new CandidatesHint(HintType.COL_BOX_REDUCTION, 
-              [colCandOccurrences[0]], [k], removals);
+              [colCandOccurrences[0]], [k], removes);
           return true;
         }
       } // for CANDS

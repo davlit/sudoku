@@ -973,7 +973,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       // // hidden triple col 5, 347 in 1,5 4,5 6,5
       // // https://www.sudokuoftheday.com/techniques/hidden-pairs-triples/
       // '5286...4913649..257942.563....1..2....78263....25.9.6.24.3..9768.97.2413.7.9.4582'
-      // // Hint: {"_type":21,"_cells":[4,31,49],"_candidates":[3,4,7],"_removals":[{"c":4,"k":1}]}
+      // // Hint: {"_type":21,"_cells":[4,31,49],"_candidates":[3,4,7],"_removes":[{"c":4,"k":1}]}
       // // Hint: Hidden triples 3/4/7 in column 5
 
       // // hidden triple col 5, 139 in 4,5 6,5 8,5
@@ -981,7 +981,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       // // '37.4.81.....9.37.494.1...8342......5...5.4...8......46.1..49...5.96..4....42..931'
       // '37.4.81.....9.37.494.1...8342......51..5.43.98......46.1..49...5.96..4....42..931'
       // // Hint: {"_type":21,"_cells":[31,49,67],"_candidates":[1,3,9],
-      // // "_removals":[{"c":31,"k":6},{"c":31,"k":7},{"c":31,"k":8},{"c":49,"k":2},
+      // // "_removes":[{"c":31,"k":6},{"c":31,"k":7},{"c":31,"k":8},{"c":49,"k":2},
       // //              {"c":49,"k":7},{"c":67,"k":7},{"c":67,"k":8}]}
       // // Hint: Hidden triples 1/3/9 in column 5
 
@@ -990,7 +990,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       // '9.34..67.712658943.64739..2.3..475.9....9.3....93...8.4...63.9..9.27.4363.69847.1'
       '9.34..67.712658943.64739..2.31.475.9....9.3....93...8.4..163.9..9.27.4363269847.1'
       // Hint: {"_type":20,"_cells":[36,41,43],"_candidates":[1,2,6],
-      // "_removals":[{"c":36,"k":5},{"c":36,"k":8},{"c":41,"k":5}]}
+      // "_removes":[{"c":36,"k":5},{"c":36,"k":8},{"c":41,"k":5}]}
       // Hint: Hidden triples 1/2/6 in row 5
     );
   }

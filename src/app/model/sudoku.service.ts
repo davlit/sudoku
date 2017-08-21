@@ -335,7 +335,7 @@ export class SudokuService {
 
   /**
    * Undoes the last logged action. If the last action resulted from a complex
-   * hint that caused multiple candidate removals e.g. nakedPairs, etc.
+   * hint that caused multiple candidate removes e.g. nakedPairs, etc.
    * - should not have deal with und0 REMOVE_VALUE
    * - only undo SET_VALUE and REMOVE_CANDIDATE
    * 
