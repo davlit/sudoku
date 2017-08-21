@@ -1,8 +1,6 @@
 // import { Injectable } from '@angular/core';
 
 import { SudokuService } from '../model/sudoku.service';
-// import { Group } from '../model/sudoku.model';
-// import { Group } from '../model/sudoku.service';
 import { Group } from '../model/group';
 import { Common } from '../common/common';
 import { CombinationIterator } from '../common/combination.iterator';
@@ -42,20 +40,32 @@ export class HintService {
     ) {
       this.hintLog = new HintLogService();
       this.sudokuService = sudokuService;
-    }
+  }
 
+  /**
+   * 
+   */
   public initializeHintLog() : void {
     this.hintLog.initialize();
   }
 
+  /**
+   * 
+   */
   public addHintLogEntry(hint: Hint) : void {
     this.hintLog.addEntry(hint);
   }
 
+  /**
+   * 
+   */
   public getHintCounts() : HintCounts {
     return this.hintLog.getHintCounts();
   }
 
+  /**
+   * 
+   */
   public getActiveHint() {
     return this.activeHint;
   }
@@ -129,6 +139,10 @@ export class HintService {
     } // switch
     this.activeHint = undefined;
   } // applyHint()
+
+  // -------------------------------------------------------------------------
+  // private methods
+  // -------------------------------------------------------------------------
 
   /**
    * Apply hint toward solution.

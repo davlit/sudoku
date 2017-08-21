@@ -85,6 +85,10 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     return sudoku.serialize();
   } // createSudoku()
 
+  // -------------------------------------------------------------------------
+  // private methods
+  // -------------------------------------------------------------------------
+
   /**
    * 
    */
@@ -286,6 +290,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
   private solve() : boolean {
     while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
       this.hintService.applyHint();
+console.info('Action log: ' + this.actionLog.toStringFirstFirst());
       if (this.sudokuService.isSolved()) {
         return true;		// done
       }
