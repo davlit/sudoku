@@ -312,7 +312,7 @@ export class SudokuService {
 
   /**
    * Remove given candidate from given cell. This method is only
-   * used for explicit independent candidate removal. 
+   * used for explicit independent candidate remove. 
    * 
    * THIS METHOD SHOULD NOT BE USED FOR IMPLICIT CANDIDATE REMOVALS RESULTING 
    * FROM SETTING CELL VALUES.

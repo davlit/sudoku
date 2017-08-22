@@ -5,6 +5,7 @@ import { Action,
          GuessValueAction,
          ActionType,
          RemoveCandidateAction,
+         RemoveCandidatesAction,
          RestoreCandidateAction,
          SetValueAction } from '../action/action';
 
@@ -24,6 +25,8 @@ import { Common,
          ROW_CELLS,
          COL_CELLS,
          BOX_CELLS } from  '../common/common';
+
+import { CellCandidate } from '../common/cell.candidate';
 
 import { SudokuModel } from './sudoku.model';
 import { Cell } from './cell';
@@ -324,6 +327,15 @@ export class SudokuService {
     this.actionLog.addEntry(
         new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
   } // removeCandidate()
+
+  // public removeCandidates(cellCandidates: CellCandidate[], hint: Rem) : void {
+  //   for (let cellCandidate of cellCandidates) {
+  //     this.sudokuModel.cells[cellCandidate.cell].candidates[cellCandidate.candidate] = false;
+  //   }
+  //   this.actionLog.addEntry(
+  //     new RemoveCandidatesAction(ActionType.REMOVE_CANDIDATES, cellCandidates, )
+  //   )
+  // } // removeCandidates()
 
   public restoreCandidate(c: number, k: number) : void {
     if (this.isPossibleCandidate(c, k)) {

@@ -3,6 +3,7 @@
 import { SudokuService } from '../model/sudoku.service';
 import { Group } from '../model/group';
 import { Common } from '../common/common';
+import { CellCandidate } from '../common/cell.candidate';
 import { CombinationIterator } from '../common/combination.iterator';
 import { NakedType }  from '../model/naked.type';
 import { Difficulty }  from '../model/difficulty';
@@ -114,9 +115,8 @@ export class HintService {
    * Apply hint toward solution.
    */
   public applyHint() : void {
-    // let args = hint.removes;
     if (this.activeHint == undefined) {
-      return;   // no hunt to apply
+      return;   // no hint to apply
     }
     this.hintLog.addEntry(this.activeHint);
 
@@ -133,8 +133,8 @@ export class HintService {
       default:
         let kHint: CandidatesHint = <CandidatesHint> this.activeHint;
         let removes = kHint.removes;
-        for (let removal of removes) {
-          this.sudokuService.removeCandidate(removal.c, removal.k, kHint);
+        for (let remove of removes) {
+          this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
         }
     } // switch
     this.activeHint = undefined;
@@ -166,8 +166,8 @@ export class HintService {
       default:
         let kHint: CandidatesHint = <CandidatesHint> hint;
         let removes = kHint.removes;
-        for (let removal of removes) {
-          this.sudokuService.removeCandidate(removal.c, removal.k, kHint);
+        for (let remove of removes) {
+          this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
         }
     } // switch
     hint = undefined;
@@ -587,13 +587,13 @@ export class HintService {
   /**
    * Having cells with common candidates and common group, determine if
    * candidate removes are possible. If so, lodge a hint and return true.
-   * Return false to signal that no removal action is possible.
+   * Return false to signal that no remove action is possible.
    */
   private checkNakedsRemoves(groupCells: number[], cells: number[], 
       candidates: number[], hintType: HintType) : boolean {
 
     // look for removes
-    let removes: {c: number, k: number}[] = [];
+    let removes: CellCandidate[] = [];
 
     for (let c of groupCells) {
       if (this.sudokuService.hasValue(c) || cells.indexOf(c) > -1) {
@@ -601,7 +601,7 @@ export class HintService {
       }
       for (let k of candidates) {
         if (this.sudokuService.isCandidate(c, k)) {
-            removes.push({c: c, k: k});
+            removes.push(new CellCandidate(c, k));
         }
       } // for k
     } // for c
@@ -708,7 +708,7 @@ export class HintService {
    * 
    * (1) Candidates that appear exactly 2 times in group, and
    * (2) 2 times appearing candidates are confined to 2 cells, and,
-   * as usual, there are candidate removal actions available.
+   * as usual, there are candidate remove actions available.
    */
   private checkHiddenPairsGroup(group: Group, hintType: HintType) : boolean {
 
@@ -787,7 +787,7 @@ export class HintService {
       }
 
       // look for removes: other candidates in pair cells
-      let removes: {c: number, k: number}[] = this.findHiddenRemoves(
+      let removes: CellCandidate[] = this.findHiddenRemoves(
           pairCellCombination, _2matchedCands);
 
       // need at least 1 candidate to remove or it's not hidden pair
@@ -807,7 +807,7 @@ export class HintService {
    * 
    * (1) Candidates that appear exactly 2 or 3 times in group, and
    * (2) 2 or 3 times appearing candidates are confined to 3 cells, and,
-   * as usual, there are candidate removal actions available.
+   * as usual, there are candidate remove actions available.
    */
   private checkHiddenTriplesGroup(group: Group, hintType: HintType) : boolean {
 
@@ -886,7 +886,7 @@ export class HintService {
       }
 
       // look for removes: other candidates in triple cellsToValuesArray
-      let removes: {c: number, k: number}[] = this.findHiddenRemoves(
+      let removes: CellCandidate[] = this.findHiddenRemoves(
           tripCellCombination, _3matchedCands);
 
       // need at least 1 candidate to remove or it's not hidden triple
@@ -906,7 +906,7 @@ export class HintService {
    * 
    * (1) Candidates that appear exactly 2, 3, or 4 times in group, and
    * (2) 2, 3, or 4 times appearing candidates are confined to 34 cells, and,
-   * as usual, there are candidate removal actions available.
+   * as usual, there are candidate remove actions available.
    */
   private checkHiddenQuadsGroup(group: Group, hintType: HintType) : boolean {
 
@@ -982,15 +982,7 @@ export class HintService {
     console.log('_4quadCells   : ' + JSON.stringify(_4quadCells));            
     console.log('_4cands       : ' + JSON.stringify(_4cands) + ' (need at least 4)');            
 
-            // make sure quad candidates don't appear outside quad cells -- NO!
-            // for (let k of cands) {
-            //   if (kCounts1[k] != kCounts[k]) {
-            //     continue I4;   // candidate k appears outside of quad cells
-            //   }
-            // }
-
             // if not 4 candidates, try next combination of quad cells
-            // if (cands.length != 4) {
             if (_4cands.length < 4) {
               continue I4;
             }
@@ -1010,9 +1002,9 @@ export class HintService {
             }
 
             // look for removes: other candidates in quad cellsToValuesArray
-            let removes: {c: number, k: number}[] = this.findHiddenRemoves(
+            // let removes: {c: number, k: number}[] = this.findHiddenRemoves(
+            let removes: CellCandidate[] = this.findHiddenRemoves(
                 [quadCells[i1], quadCells[i2], quadCells[i3], quadCells[i4]],
-                // quadCandidates);
                 _4matchedCands);
 
     console.log('removes      : ' + removes.length + ' (need at least 1)');  
@@ -1037,14 +1029,13 @@ export class HintService {
    * Helper method to find candidate removes from hidden pairs, triples, quads.
    */
   private findHiddenRemoves(hiddenCells: number[], hiddenCands: number[]) 
-      : {c: number, k: number}[] {
-    let removes: {c: number, k: number}[] = [];
+      : CellCandidate[] {
+    let removes: CellCandidate[] = [];
     for (let hiddenCell of hiddenCells) {
-      // let hiddenCellCands: number[] = this.cells[hiddenCell].getCandidates().slice();
       let hiddenCellCands: number[] = this.sudokuService.getCandidates(hiddenCell).slice();
       for (let hiddenCellCand of hiddenCellCands) {
         if (hiddenCands.indexOf(hiddenCellCand) === -1) {
-          removes.push({c: hiddenCell, k: hiddenCellCand});
+          removes.push(new CellCandidate(hiddenCell, hiddenCellCand));
         }
       }
     }
@@ -1093,7 +1084,7 @@ export class HintService {
         }
 
         // look for actions
-        let removes: {c: number, k: number}[] = [];
+        let removes: CellCandidate[] = [];
         if (sameRow) {
             
           // scan other cells in row outside box
@@ -1102,7 +1093,7 @@ export class HintService {
               continue; // cell in same box
             }
             if (this.sudokuService.isCandidate(c, k)) {
-              removes.push({c: c, k: k});
+              removes.push(new CellCandidate(c, k));
             }
           } // for
 
@@ -1120,7 +1111,7 @@ export class HintService {
               continue; // cell in same box
             }
             if (this.sudokuService.isCandidate(c, k)) {
-              removes.push({c: c, k: k});
+              removes.push(new CellCandidate(c, k));
             }
           } // for
 
@@ -1185,7 +1176,7 @@ export class HintService {
         }
         
         // must be same box, different row; look for removes
-        let removes: {c: number, k: number}[] = [];
+        let removes: CellCandidate[] = [];
 
         // look for k's in other rows in box 
         // this row is row, this box is box
@@ -1198,7 +1189,7 @@ export class HintService {
 
           // if isCandidate, push to removes
           if (this.sudokuService.isCandidate(c, k)) {
-            removes.push({c: c, k: k});
+            removes.push(new CellCandidate(c, k));
           }
         } // for
         if (removes.length > 0) {
@@ -1252,7 +1243,7 @@ export class HintService {
         }
         
         // must be same box, different col; look for removes
-        let removes: {c: number, k: number}[] = [];
+        let removes: CellCandidate[] = [];
 
         // look for k's in other cols in box
         // this col is col, this box is box
@@ -1265,7 +1256,7 @@ export class HintService {
 
           // if isCandidate, push to removes
           if (this.sudokuService.isCandidate(c, k)) {
-            removes.push({c: c, k: k});
+            removes.push(new CellCandidate(c, k));
           }
         } // for
         if (removes.length > 0) {

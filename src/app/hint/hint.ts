@@ -2,6 +2,7 @@ import { HintType } from './hint.type';
 import { ActionType } from '../action/action';
 import { Difficulty } from '../model/difficulty';
 import { Common } from '../common/common';
+import { CellCandidate } from '../common/cell.candidate';
 
 /**
  * Hint life cycle
@@ -123,10 +124,10 @@ export class ValueHint extends Hint {
 export class CandidatesHint extends Hint {
   private _cells: number[];
   private _candidates: number[];
-  private _removes: {c: number, k: number}[];
+  private _removes: CellCandidate[];
 
   constructor(type: HintType, cells: number[], 
-      candidates: number[], removes: {c: number, k: number}[]) {
+      candidates: number[], removes: CellCandidate[]) {
     super(type);
     this._cells = cells;
     this._candidates = candidates.sort();
@@ -153,7 +154,7 @@ export class CandidatesHint extends Hint {
     return this._candidates;
   }
   
-  get removes() : {c: number, k: number}[] {
+  get removes() : CellCandidate[] {
     return this._removes;
   }
 
