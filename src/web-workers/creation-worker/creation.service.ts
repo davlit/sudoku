@@ -102,7 +102,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    */
   private initializeLogs() {
     this.sudokuService.initializeActionLog();
-    // this.hintService.initializeHintLog();
     this.hintLog.initialize();
   }
 

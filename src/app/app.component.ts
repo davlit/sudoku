@@ -12,7 +12,6 @@ import { CacheService }     from './model/cache.service';
 import { Puzzle }           from './model/puzzle';
 import { Hint }             from './hint/hint';
 import { HintService }      from './hint/hint.service';
-import { HintLogService }   from './hint/hint-log.service';
 import { ValueHint }        from './hint/hint';
 import { CandidatesHint }   from './hint/hint';
 import { HintType }         from './hint/hint.type';
@@ -61,7 +60,6 @@ export class AppComponent implements OnInit, OnDestroy {
   copyright = COPYRIGHT;
   sudokuService: SudokuService;
   hintService: HintService;
-  hintLog: HintLogService;
 
   // ----- state properties -----
   playState: PlayStates;
@@ -86,7 +84,6 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {
     this.sudokuService = new SudokuService(new ActionLogService());
     this.hintService = new HintService(this.sudokuService);
-    this.hintLog = new HintLogService();
 
     this.messageSubscription = this.messageService.getMessage()
         .subscribe(message => { 
@@ -803,91 +800,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
   }
     
-  // /**
-  //  * Native AppComponent version
-  //  */
-  // // apply hint toward solution
-  // applyHint() : void {
-  //   this.hintMessage = '';
-  //   this.hintState = HintStates.READY
-  //   // WARNING - cannot set autoStartState to READY here
-  //   //    or the auto start loop will stop
-  //   //    therefore cannot call: this.initializeHintStates();
-  //   this.hintService.applyHint();
-  //   this.hintsApplied++;
-  //   if (this.hint.getActionType() === ActionType.SET_VALUE) {
-  //     let value = this.hint.getValue();
-  //     this.valuesComplete[value] = this.sudokuService.isValueComplete(value);
-  //     if (this.sudokuService.isSolved()) {
-  //       this.handlePuzzleComplete();
-  //     }
-  //   }
-  //   this.refreshActionLog();
-  //   this.hint = undefined;
-  // } // applyHint()
-    
-  // /**
-  //  * Apply hint toward solution.  FROM HintService!!!
-  //  */
-  // public applyHint() : void {
-  //   if (this.activeHint == undefined) {
-  //     return;   // no hint to apply
-  //   }
-  //   this.hintLog.addEntry(this.activeHint);
-
-  //   // switch (hint.action) {
-  //   switch (this.activeHint.type) {
-  //     case HintType.NAKED_SINGLE:
-  //     case HintType.HIDDEN_SINGLE_ROW:
-  //     case HintType.HIDDEN_SINGLE_COL:
-  //     case HintType.HIDDEN_SINGLE_BOX:
-  //       let vHint: ValueHint = <ValueHint> this.activeHint;
-  //       this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-  //           vHint);
-  //       break;
-  //     default:
-  //       let kHint: CandidatesHint = <CandidatesHint> this.activeHint;
-  //       let removes = kHint.removes;
-  //       for (let remove of removes) {
-  //         this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
-  //       }
-  //   } // switch
-  //   this.activeHint = undefined;
-  // } // applyHint()
-
-  // /**
-  //  * Apply hint toward solution.  FROM CreationService !!!
-  //  */
-  // private applyHint(hint: Hint) : void {
-  //   if (hint == undefined) {
-  //     return;   // no hint to apply
-  //   }
-  //   // this.hintLog.addEntry(hint);
-  //   // this.hintService.addHintLogEntry(hint);
-  //   this.hintLog.addEntry(hint);
-
-  //   // switch (hint.action) {
-  //   switch (hint.type) {
-  //     case HintType.NAKED_SINGLE:
-  //     case HintType.HIDDEN_SINGLE_ROW:
-  //     case HintType.HIDDEN_SINGLE_COL:
-  //     case HintType.HIDDEN_SINGLE_BOX:
-  //       let vHint: ValueHint = <ValueHint> hint;
-  //       this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-  //           vHint);
-  //       break;
-  //     default:
-  //       let kHint: CandidatesHint = <CandidatesHint> hint;
-  //       let removes = kHint.removes;
-  //       for (let remove of removes) {
-  //         this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
-  //       }
-  //   } // switch
-  //   hint = undefined;
-  // } // applyHint()
-
   /**
-   * NEW
+   * Apply a hint toward a solution.
    */
   applyHint(hint: Hint) {
     if (hint == undefined) {
@@ -895,10 +809,10 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
     this.hintMessage = '';
     this.hintState = HintStates.READY
+
     // WARNING - cannot set autoStartState to READY here
     //    or the auto start loop will stop
     //    therefore cannot call: this.initializeHintStates();
-    this.hintLog.addEntry(hint);            // TODO not sure this is needed
 
     // do the work
     switch (hint.type) {
