@@ -13,6 +13,7 @@ import { CandidatesHint } from '../../app/hint/hint';
 import { Hint } from '../../app/hint/hint';
 import { HintType } from '../../app/hint/hint.type';
 import { HintService } from '../../app/hint/hint.service';
+import { HintLogService } from '../../app/hint/hint-log.service';
 
 import { SudokuService } from '../../app/model/sudoku.service';
 
@@ -30,6 +31,7 @@ export class CreationService {
   private randomCellIndexes: number[];
   private randomValues: number[];
 
+  private hintLog: HintLogService;
   private actionLog: ActionLogService;
   private sudokuService: SudokuService;
   private hintService: HintService;
@@ -39,6 +41,7 @@ export class CreationService {
       // private sudokuService: SudokuService,
       // private hintService: HintService
     ) {
+    this.hintLog = new HintLogService();
     this.actionLog = new ActionLogService();
     this.sudokuService = new SudokuService(this.actionLog);
     this.hintService = new HintService(this.sudokuService);
@@ -99,7 +102,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    */
   private initializeLogs() {
     this.sudokuService.initializeActionLog();
-    this.hintService.initializeHintLog();
+    // this.hintService.initializeHintLog();
+    this.hintLog.initialize();
   }
 
   /**
@@ -271,7 +275,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     this.solve();
 
     puzzle.completedPuzzle = this.sudokuService.cellsToValuesArray();
-    puzzle.stats = this.hintService.getHintCounts();
+    // puzzle.stats = this.hintService.getHintCounts();
+    puzzle.stats = this.hintLog.getHintCounts();
     puzzle.actualDifficulty = puzzle.stats.getActualDifficulty();
 
     let elapsed: number = Date.now() - start;
@@ -418,7 +423,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
       return;   // no hint to apply
     }
     // this.hintLog.addEntry(hint);
-    this.hintService.addHintLogEntry(hint);
+    // this.hintService.addHintLogEntry(hint);
+    this.hintLog.addEntry(hint);
 
     // switch (hint.action) {
     switch (hint.type) {
@@ -463,7 +469,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     }
     guessValue = possibleValues[0];   // try 1st available candidate
     possibleValues = possibleValues.slice(1);   // remove guess value
-    this.hintService.addHintLogEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
+    // this.hintService.addHintLogEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
+    this.hintLog.addEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
     this.sudokuService.setValue(guessCell, guessValue, ActionType.GUESS_VALUE, possibleValues);
     return true;
   } // guess()
