@@ -12,7 +12,7 @@ import { Hint } from '../hint/hint';
 import { ValueHint } from '../hint/hint';
 import { CandidatesHint } from '../hint/hint';
 import { HintType } from '../hint/hint.type';
-import { HintLogService } from '../hint/hint-log.service';
+// import { HintLogService } from '../hint/hint-log.service';
 import { HintCounts } from '../hint/hintCounts';
 import { CANDIDATES } from '../common/common';
 import { ROWS } from       '../common/common';
@@ -31,7 +31,7 @@ import { BOX_CELLS } from  '../common/common';
 export class HintService {
 
   private activeHint: Hint;
-  private hintLog: HintLogService;
+  // private hintLog: HintLogService;
   private sudokuService: SudokuService;
 
   constructor(
@@ -39,37 +39,37 @@ export class HintService {
     // private hintLog: HintLogService
     sudokuService: SudokuService
     ) {
-      this.hintLog = new HintLogService();
+      // this.hintLog = new HintLogService();
       this.sudokuService = sudokuService;
   }
 
-  /**
-   * 
-   */
-  public initializeHintLog() : void {
-    this.hintLog.initialize();
-  }
+  // /**
+  //  * 
+  //  */
+  // public initializeHintLog() : void {
+  //   this.hintLog.initialize();
+  // }
 
-  /**
-   * 
-   */
-  public addHintLogEntry(hint: Hint) : void {
-    this.hintLog.addEntry(hint);
-  }
+  // /**
+  //  * 
+  //  */
+  // public addHintLogEntry(hint: Hint) : void {
+  //   this.hintLog.addEntry(hint);
+  // }
 
-  /**
-   * 
-   */
-  public getHintCounts() : HintCounts {
-    return this.hintLog.getHintCounts();
-  }
+  // /**
+  //  * 
+  //  */
+  // public getHintCounts() : HintCounts {
+  //   return this.hintLog.getHintCounts();
+  // }
 
-  /**
-   * 
-   */
-  public getActiveHint() {
-    return this.activeHint;
-  }
+  // /**
+  //  * 
+  //  */
+  // public getActiveHint() {
+  //   return this.activeHint;
+  // }
 
   /**
    * Check for any hints at this state of the sudoku solution progress. If
@@ -111,67 +111,67 @@ export class HintService {
     return undefined;  // no hints using any techniques without guessing
   } // getHint()
 
-  /**
-   * Apply hint toward solution.
-   */
-  public applyHint() : void {
-    if (this.activeHint == undefined) {
-      return;   // no hint to apply
-    }
-    this.hintLog.addEntry(this.activeHint);
+  // /**
+  //  * Apply hint toward solution.
+  //  */
+  // public applyHint() : void {
+  //   if (this.activeHint == undefined) {
+  //     return;   // no hint to apply
+  //   }
+  //   this.hintLog.addEntry(this.activeHint);
 
-    // switch (hint.action) {
-    switch (this.activeHint.type) {
-      case HintType.NAKED_SINGLE:
-      case HintType.HIDDEN_SINGLE_ROW:
-      case HintType.HIDDEN_SINGLE_COL:
-      case HintType.HIDDEN_SINGLE_BOX:
-        let vHint: ValueHint = <ValueHint> this.activeHint;
-        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-            vHint);
-        break;
-      default:
-        let kHint: CandidatesHint = <CandidatesHint> this.activeHint;
-        let removes = kHint.removes;
-        for (let remove of removes) {
-          this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
-        }
-    } // switch
-    this.activeHint = undefined;
-  } // applyHint()
+  //   // switch (hint.action) {
+  //   switch (this.activeHint.type) {
+  //     case HintType.NAKED_SINGLE:
+  //     case HintType.HIDDEN_SINGLE_ROW:
+  //     case HintType.HIDDEN_SINGLE_COL:
+  //     case HintType.HIDDEN_SINGLE_BOX:
+  //       let vHint: ValueHint = <ValueHint> this.activeHint;
+  //       this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
+  //           vHint);
+  //       break;
+  //     default:
+  //       let kHint: CandidatesHint = <CandidatesHint> this.activeHint;
+  //       let removes = kHint.removes;
+  //       for (let remove of removes) {
+  //         this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+  //       }
+  //   } // switch
+  //   this.activeHint = undefined;
+  // } // applyHint()
 
   // -------------------------------------------------------------------------
   // private methods
   // -------------------------------------------------------------------------
 
-  /**
-   * Apply hint toward solution.
-   */
-  private applyGivenHint(hint: Hint) : void {
-    if (hint == undefined) {
-      return;   // no hunt to apply
-    }
-    this.hintLog.addEntry(hint);
+  // /**
+  //  * Apply hint toward solution.
+  //  */
+  // private applyGivenHint(hint: Hint) : void {
+  //   if (hint == undefined) {
+  //     return;   // no hunt to apply
+  //   }
+  //   this.hintLog.addEntry(hint);
 
-    // switch (hint.action) {
-    switch (hint.type) {
-      case HintType.NAKED_SINGLE:
-      case HintType.HIDDEN_SINGLE_ROW:
-      case HintType.HIDDEN_SINGLE_COL:
-      case HintType.HIDDEN_SINGLE_BOX:
-        let vHint: ValueHint = <ValueHint> hint;
-        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-            vHint);
-        break;
-      default:
-        let kHint: CandidatesHint = <CandidatesHint> hint;
-        let removes = kHint.removes;
-        for (let remove of removes) {
-          this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
-        }
-    } // switch
-    hint = undefined;
-  } // applyHint()
+  //   // switch (hint.action) {
+  //   switch (hint.type) {
+  //     case HintType.NAKED_SINGLE:
+  //     case HintType.HIDDEN_SINGLE_ROW:
+  //     case HintType.HIDDEN_SINGLE_COL:
+  //     case HintType.HIDDEN_SINGLE_BOX:
+  //       let vHint: ValueHint = <ValueHint> hint;
+  //       this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
+  //           vHint);
+  //       break;
+  //     default:
+  //       let kHint: CandidatesHint = <CandidatesHint> hint;
+  //       let removes = kHint.removes;
+  //       for (let remove of removes) {
+  //         this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+  //       }
+  //   } // switch
+  //   hint = undefined;
+  // } // applyHint()
 
   /**
    * Randomly look for cells with a single candidate. If found, create a hint
