@@ -16,7 +16,7 @@ export class Puzzle {
     this._completedPuzzle = undefined;
     this._desiredDifficulty = undefined;
     this._actualDifficulty = undefined;
-    this._actualDifficulty = undefined;
+    this._generatePasses = undefined;
     this._solutionsCount = undefined;
     this._stats = undefined;
   }

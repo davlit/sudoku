@@ -71,8 +71,8 @@ export class CacheService {
 // console.info('\ncacheService.init() creationWorker.onmessage');
       this.webworkerWorking = false;
       localStorage.setItem(this.localStorageKey, event.data);
-// console.info('\nCache keys after webworker replenishment: ' 
-//   + JSON.stringify(this.getCacheKeys()));
+console.info('\nCache keys after webworker replenishment: ' 
+  + JSON.stringify(this.getCacheKeys()));
 
     this.sendMessage('Cache addition');
     this.sendMessage('Cache changed');

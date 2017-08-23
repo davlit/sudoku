@@ -812,7 +812,8 @@ try {
   /**
    * Represent the givenValues of the sudoku as a grid string.
    */
-  private toGridString() : string {
+  // private toGridString() : string {
+  public toGridString() : string {
     return this.arrayToGridString(this.cellValuesToArray());
   } // toGridString()
 

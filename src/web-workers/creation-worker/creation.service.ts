@@ -9,6 +9,8 @@ import { GuessValueAction } from '../../app/action/action';
 import { ActionType } from '../../app/action/action';
 import { ActionLogService } from '../../app/action/action-log.service';
 import { ValueHint } from '../../app/hint/hint';
+import { CandidatesHint } from '../../app/hint/hint';
+import { Hint } from '../../app/hint/hint';
 import { HintType } from '../../app/hint/hint.type';
 import { HintService } from '../../app/hint/hint.service';
 
@@ -46,7 +48,7 @@ export class CreationService {
    * 
    */
   public createSudoku(difficulty: Difficulty) : string {
-// console.info('In creationService.createSudoku() difficulty: ' + difficulty);
+console.info('In creationService.createSudoku() difficulty: ' + difficulty);
 
     let sudoku = new Puzzle();
     sudoku.desiredDifficulty = difficulty;
@@ -54,6 +56,8 @@ export class CreationService {
     // step 1 - generate random finished sudoku
     // sudoku.completedPuzzle = this.makeRandomSolution();
     sudoku.completedPuzzle = this.makeRandomSolution();
+
+// console.info('Step 1:\n' + this.sudokuService.toGridString()); 
 
     let pass = 0;
 
@@ -74,6 +78,7 @@ export class CreationService {
       this.completePuzzle(sudoku);
 
 // console.log('Pass ' + pass + ' diff ' +  sudoku.actualDifficulty);
+// if (pass > 50) { break; }
 
     } // while not getting desired difficulty
 
@@ -181,6 +186,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
         continue NEXT_CELL;
       }
 
+// console.info('Step 2a:\n' + this.sudokuService.toGridString()); 
+
       switch (puzzle.desiredDifficulty) {
 
         // no guessing cases
@@ -188,15 +195,20 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
         case Difficulty.MEDIUM:
         case Difficulty.HARD:
           let hard: boolean = false;
-          while (this.hintService.getHint(puzzle.desiredDifficulty)) {
+          let hint: Hint = this.hintService.getHint(puzzle.desiredDifficulty);
+          // while (this.hintService.getHint(puzzle.desiredDifficulty)) {
+          while (hint) {
 
             // count difficulty hard hints
-            if (this.hintService.getActiveHint().getDifficultyRating() === Difficulty.HARD) {
+            // if (this.hintService.getActiveHint().getDifficultyRating() === Difficulty.HARD) {
+            if (hint.getDifficultyRating() === Difficulty.HARD) {
               hard = true;
             }
 
-            this.hintService.applyHint();
-          }
+            // this.hintService.applyHint();
+            this.applyHint(hint);
+            hint = this.hintService.getHint(puzzle.desiredDifficulty);
+          } // while
           let solved = this.sudokuService.isSolved();
           this.rollbackAll();
           if (solved) {
@@ -288,8 +300,11 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    * finally there is no possible solution.
    */
   private solve() : boolean {
-    while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
-      this.hintService.applyHint();
+    let hint: Hint = this.hintService.getHint(Difficulty.HARDEST);
+    // while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
+    while (hint != undefined) {
+      // this.hintService.applyHint();
+      this.applyHint(hint);
 // console.info('Action log: ' + this.actionLog.toStringFirstFirst());
       if (this.sudokuService.isSolved()) {
         return true;		// done
@@ -297,6 +312,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
       if (this.sudokuService.isImpossible()) {
         return false;		// no value, no candidate cell exists
       }
+      hint = this.hintService.getHint(Difficulty.HARDEST);
     } // while -- no hint, try guess
 
     // now we have to resort to guessing
@@ -332,8 +348,11 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    * difficulty rating desired.
    */
   private countSolutions() : number {
-    while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
-      this.hintService.applyHint();
+    let hint: Hint = this.hintService.getHint(Difficulty.HARDEST);
+    // while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
+    while (hint != undefined) {
+      // this.hintService.applyHint();
+      this.applyHint(hint);
       if (this.sudokuService.isSolved()) {
         this.rollbackToLastGuess();
         return 1;
@@ -342,6 +361,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
         this.rollbackToLastGuess();
         return 0;
       }
+      hint = this.hintService.getHint(Difficulty.HARDEST);
     } // while getHint() -- no hint, try guess
 
     // now we have to resort to guessing
@@ -360,6 +380,65 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     this.rollbackToLastGuess();
     return localSolutionsCount;
   } // countSolutions()
+
+  // /**
+  //  * Apply hint toward solution.
+  //  */
+  // private applyHint() : void {
+  //   if (this.activeHint == undefined) {
+  //     return;   // no hint to apply
+  //   }
+  //   this.hintLog.addEntry(this.activeHint);
+
+  //   // switch (hint.action) {
+  //   switch (this.activeHint.type) {
+  //     case HintType.NAKED_SINGLE:
+  //     case HintType.HIDDEN_SINGLE_ROW:
+  //     case HintType.HIDDEN_SINGLE_COL:
+  //     case HintType.HIDDEN_SINGLE_BOX:
+  //       let vHint: ValueHint = <ValueHint> this.activeHint;
+  //       this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
+  //           vHint);
+  //       break;
+  //     default:
+  //       let kHint: CandidatesHint = <CandidatesHint> this.activeHint;
+  //       let removes = kHint.removes;
+  //       for (let remove of removes) {
+  //         this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+  //       }
+  //   } // switch
+  //   this.activeHint = undefined;
+  // } // applyHint()
+
+  /**
+   * Apply hint toward solution.
+   */
+  private applyHint(hint: Hint) : void {
+    if (hint == undefined) {
+      return;   // no hint to apply
+    }
+    // this.hintLog.addEntry(hint);
+    this.hintService.addHintLogEntry(hint);
+
+    // switch (hint.action) {
+    switch (hint.type) {
+      case HintType.NAKED_SINGLE:
+      case HintType.HIDDEN_SINGLE_ROW:
+      case HintType.HIDDEN_SINGLE_COL:
+      case HintType.HIDDEN_SINGLE_BOX:
+        let vHint: ValueHint = <ValueHint> hint;
+        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
+            vHint);
+        break;
+      default:
+        let kHint: CandidatesHint = <CandidatesHint> hint;
+        let removes = kHint.removes;
+        for (let remove of removes) {
+          this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+        }
+    } // switch
+    hint = undefined;
+  } // applyHint()
 
   /**
    * Makes a guess for a cell value. If a lastGuess is not provided, a cell 
