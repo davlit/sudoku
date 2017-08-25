@@ -5,8 +5,10 @@ import { Common } from '../../app/common/common';
 import { Difficulty } from '../../app/model/difficulty';
 import { Puzzle } from '../../app/model/puzzle';
 
-import { GuessValueAction } from '../../app/action/action';
 import { ActionType } from '../../app/action/action';
+import { SetValueAction } from '../../app/action/action';
+import { GuessValueAction } from '../../app/action/action';
+import { RemoveCandidateAction } from '../../app/action/action';
 import { ActionLogService } from '../../app/action/action-log.service';
 import { ValueHint } from '../../app/hint/hint';
 import { CandidatesHint } from '../../app/hint/hint';
@@ -32,7 +34,7 @@ export class CreationService {
   private randomValues: number[];
 
   private hintLog: HintLogService;
-  private actionLog: ActionLogService;
+  private actionLog: ActionLogService;      // CreationService's dedicated action log
   private sudokuService: SudokuService;
   private hintService: HintService;
 
@@ -43,7 +45,9 @@ export class CreationService {
     ) {
     this.hintLog = new HintLogService();
     this.actionLog = new ActionLogService();
-    this.sudokuService = new SudokuService(this.actionLog);
+    // this.sudokuService = new SudokuService(this.actionLog);     // WORKS!
+    // this.sudokuService = new SudokuService(new ActionLogService());   // SudokuService has an independent action log DOESN'T WORK!
+    this.sudokuService = new SudokuService();
     this.hintService = new HintService(this.sudokuService);
   }
 
@@ -52,6 +56,8 @@ export class CreationService {
    */
   public createSudoku(difficulty: Difficulty) : string {
 console.info('In creationService.createSudoku() difficulty: ' + difficulty);
+
+    this.actionLog.initialize();
 
     let sudoku = new Puzzle();
     sudoku.desiredDifficulty = difficulty;
@@ -103,6 +109,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
   private initializeLogs() {
     this.sudokuService.initializeActionLog();
     this.hintLog.initialize();
+    this.actionLog.initialize();
   }
 
   /**
@@ -434,12 +441,22 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
         let vHint: ValueHint = <ValueHint> hint;
         this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
             vHint);
+
+        // // log action
+        this.actionLog.addEntry(
+            new SetValueAction(ActionType.SET_VALUE, vHint.cell, vHint.value, vHint));
+
         break;
       default:
         let kHint: CandidatesHint = <CandidatesHint> hint;
         let removes = kHint.removes;
         for (let remove of removes) {
           this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+
+          // // log action
+          this.actionLog.addEntry(
+              new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, remove.cell, remove.candidate, kHint));
+
         }
     } // switch
     hint = undefined;
@@ -461,7 +478,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     } else {
       guessCell = lastGuess.cell;
       possibleValues = lastGuess.possibleValues;
-      this.sudokuService.removeLastActionLogEntry(); // remove previous action
+      // this.sudokuService.removeLastActionLogEntry(); // remove previous action
       if (possibleValues.length === 0) {
         return false;
       }
@@ -471,8 +488,39 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     // this.hintService.addHintLogEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
     this.hintLog.addEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
     this.sudokuService.setValue(guessCell, guessValue, ActionType.GUESS_VALUE, possibleValues);
+
+    // // log action
+    this.actionLog.addEntry(
+        new GuessValueAction(ActionType.GUESS_VALUE, guessCell, guessValue, possibleValues));
+
     return true;
   } // guess()
+
+  // /**
+  //  * FROM SudokuService
+  //  * 
+  //  * @param cell 
+  //  * @param value 
+  //  * @param actionType 
+  //  * @param possibleValues 
+  //  * @param hint 
+  //  */
+  // private setValue(cell: number, value: number, actionType: ActionType, possibleValues: number[], hint: ValueHint) {
+  //   this.sudokuService.setValue(cell, value, actionType, possibleValues, hint);
+    
+  //   // log action
+  //   let action: SetValueAction;
+  //   switch (actionType) {
+  //     case ActionType.SET_VALUE:
+  //       action = new SetValueAction(ActionType.SET_VALUE, c, newValue, hint);
+  //       break;
+  //     case ActionType.GUESS_VALUE:
+  //       action = new GuessValueAction(ActionType.GUESS_VALUE, c, newValue,
+  //           guessPossibles);
+  //       break;
+  //   } // switch
+  //   this.actionLog.addEntry(action);
+  // }
 
   /**
    * Find and return the cell index that has the fewest candidates. The cound

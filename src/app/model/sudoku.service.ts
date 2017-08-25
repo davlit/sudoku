@@ -55,11 +55,11 @@ export class SudokuService {
    */
   constructor(
       // this.actionLog: ActionLogService,
-    actionLog: ActionLogService
+    // actionLog: ActionLogService
   ) {
     this.sudokuModel = new SudokuModel();
-    // this.actionLog = new ActionLogService();
-    this.actionLog = actionLog;
+    this.actionLog = new ActionLogService();
+    // this.actionLog = actionLog;
     this.initializeModel();
   } // constructor()
 

@@ -82,7 +82,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
     private messageService: MessageService
   ) {
-    this.sudokuService = new SudokuService(new ActionLogService());
+    // this.sudokuService = new SudokuService(new ActionLogService());
+    this.sudokuService = new SudokuService();
     this.hintService = new HintService(this.sudokuService);
 
     this.messageSubscription = this.messageService.getMessage()
