@@ -287,8 +287,8 @@ s: sudoku, b: box, v: value, k: candidate
       <p><span>Action Log:</span>
         <button [hidden]="actionLog === ''" class="general"
                 (click)="undoLastAction()">Undo Last Action</button><br/>
-        <!-- <textarea [ngModel]="actionLog" rows="8" cols="55"></textarea> -->
-        <textarea [ngModel]="actionLog"></textarea>
+        <!-- <textarea [ngModel]="actionsLog" rows="8" cols="55"></textarea> -->
+        <textarea [ngModel]="actionsLog"></textarea>
       </p>
 
       <p>
@@ -349,7 +349,7 @@ s: sudoku, b: box, v: value, k: candidate
       </p>
 
       <p>Action log:<br/>
-        <textarea [ngModel]="actionLog" rows="30" cols="55"></textarea>
+        <textarea [ngModel]="actionsLog" rows="30" cols="55"></textarea>
       </p>
     </div>  <!-- *ngSwitchCase="playStates.SOLVED" -->
 

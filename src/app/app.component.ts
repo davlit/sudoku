@@ -19,6 +19,8 @@ import { HintCounts }       from './hint/hintCounts';
 import { ActionType }       from './action/action';
 import { Action }           from './action/action';
 import { SetValueAction }      from './action/action';
+import { RemoveCandidateAction }      from './action/action';
+import { RestoreCandidateAction }      from './action/action';
 import { NakedType }        from './model/naked.type';
 import { CombinationIterator } from './common/combination.iterator';
 
@@ -60,6 +62,7 @@ export class AppComponent implements OnInit, OnDestroy {
   copyright = COPYRIGHT;
   sudokuService: SudokuService;
   hintService: HintService;
+  actionLog: ActionLogService;
 
   // ----- state properties -----
   playState: PlayStates;
@@ -85,6 +88,7 @@ export class AppComponent implements OnInit, OnDestroy {
     // this.sudokuService = new SudokuService(new ActionLogService());
     this.sudokuService = new SudokuService();
     this.hintService = new HintService(this.sudokuService);
+    this.actionLog = new ActionLogService();
 
     this.messageSubscription = this.messageService.getMessage()
         .subscribe(message => { 
@@ -136,7 +140,7 @@ export class AppComponent implements OnInit, OnDestroy {
   candidatesModified: boolean;
   hintMessage: string;
   // autoSolveMessage: string;
-  actionLog: string;
+  actionsLog: string;
   cluesShowing: boolean;
   solutionClues: string;
   timerSubscription: Subscription;
@@ -184,9 +188,32 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-// -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
   // methods called from UI
   // -----------------------------------------------------------------------
+
+  /**
+   * Responds to Generate button. Gets sudoku puzzle of desired difficulty
+   * from cache. Loads sudoku and switches to Play state.
+   */
+  generate(difficulty: Difficulty) : void {
+    this.currentPuzzle = Puzzle.deserialize(this.cacheService.getSudoku(difficulty));
+
+    // bind metadata for ui, load sudoku for user execution
+    this.actualDifficulty = 
+        Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
+    this.solutionClues = this.createSolutionClues();
+
+    this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
+    this.actionLog.initialize();
+    this.actionsLog = '';
+    
+console.log('Sudoku:\n' + this.currentPuzzle.toString());
+
+    // go to sudoku execution by user
+    this.startUserTimer();
+    this.playState = PlayStates.EXECUTE;
+  } // generate() 
 
   /**
    * User keyboard actions.
@@ -413,12 +440,21 @@ export class AppComponent implements OnInit, OnDestroy {
       let cellIdx = this.viewToCellIdx(vb, vc);
       if (this.sudokuService.isCandidate(cellIdx, k)) {
         this.sudokuService.removeCandidate(cellIdx, k, undefined);
+
+        // log action
+        this.actionLog.addEntry(
+            new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, cellIdx, k));
+
       } else {
         this.sudokuService.restoreCandidate(cellIdx, k);
+
+        // log action
+        this.actionLog.addEntry(
+            new RestoreCandidateAction(ActionType.RESTORE_CANDIDATE, cellIdx, k));
       }
     }
     this.candidatesModified = true;
-    this.refreshActionLog();
+    this.refreshActionsLog();
   } // handleCandidateClick_()
 
   /**
@@ -445,27 +481,6 @@ export class AppComponent implements OnInit, OnDestroy {
     return this.sudokuService.isCandidate(this.viewToCellIdx(vb, vc), k) 
         ? k.toString() : '';
   } // candToChar_()
-
-  /**
-   * Responds to Generate button. Gets sudoku puzzle of desired difficulty
-   * from cache. Loads sudoku and switches to Play state.
-   */
-  generate(difficulty: Difficulty) : void {
-    this.currentPuzzle = Puzzle.deserialize(this.cacheService.getSudoku(difficulty));
-
-    // bind metadata for ui, load sudoku for user execution
-    this.actualDifficulty = 
-        Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
-    this.solutionClues = this.createSolutionClues();
-
-    this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
-    
-console.log('Sudoku:\n' + this.currentPuzzle.toString());
-
-    // go to sudoku execution by user
-    this.startUserTimer();
-    this.playState = PlayStates.EXECUTE;
-  } // generate() 
 
   /**
    * Button 'Show Candidates', 'Hide Candidates' EXECUTION state
@@ -588,13 +603,16 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.initializeHintStates();
 
     // capture before it's removed from log
-    let lastAction = this.sudokuService.getLastAction();
+    // let lastAction = this.sudokuService.getLastAction();
+    let lastAction = this.actionLog.getLastEntry();
 
     if (lastAction === undefined) {
       return;
     }
 
-    this.sudokuService.undoLastAction();
+    // this.sudokuService.undoLastAction();
+    this.sudokuService.undoAction(lastAction);
+    this.actionLog.removeLastEntry();
 
     // update values complete
     if (lastAction.type === ActionType.SET_VALUE) {
@@ -604,9 +622,18 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
     // set selected cell to that of last action
     this.setSelectedCell(lastAction.cell);
-    this.refreshActionLog();
+    this.refreshActionsLog();
   } // undoLastAction()
   
+  // /**
+  //  * Called by user button press (playComponent.ts) undoLastAction())   FROM SudokuService
+  //  */
+  // public undoLastAction() : void {    // called by user button
+  //   let lastAction = this.actionLog.getLastEntry();
+  //   this.undoAction(lastAction);
+  //   this.actionLog.removeLastEntry();
+  // } // undoLastAction()
+
   /**
    * button 'Restart Current Puzzle' EXECUTION, SOLVED states
    */
@@ -824,12 +851,22 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
         let vHint: ValueHint = <ValueHint> hint;
         this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
             vHint);
+
+        // // log action
+        this.actionLog.addEntry(
+            new SetValueAction(ActionType.SET_VALUE, vHint.cell, vHint.value, vHint));
+
         break;
       default:
         let kHint: CandidatesHint = <CandidatesHint> hint;
         let removes = kHint.removes;
         for (let remove of removes) {
           this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+
+        // log action
+        this.actionLog.addEntry(
+            new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, remove.cell, remove.candidate));
+
         }
     } // switch
     this.hintsApplied++;
@@ -840,7 +877,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
         this.handlePuzzleComplete();
       }
     }
-    this.refreshActionLog();
+    this.refreshActionsLog();
     this.hint = undefined;
   } // applyHint()
 
@@ -855,11 +892,16 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     }
 
     this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
+
+    // // log action
+    this.actionLog.addEntry(
+        new SetValueAction(ActionType.SET_VALUE, ci, v));
+
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     if (this.sudokuService.isSolved()) {
       this.handlePuzzleComplete();
     }
-      this.refreshActionLog();
+      this.refreshActionsLog();
   }
 
   /**
@@ -870,7 +912,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     if (oldValue >= 1) {
       this.sudokuService.removeValue(ci);
       this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
-      this.refreshActionLog();
+      this.refreshActionsLog();
     }
   }
   
@@ -886,7 +928,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    */
   handlePuzzleComplete() : void {
     this.unselectCell();
-    this.refreshActionLog();
+    this.refreshActionsLog();
     this.stopUserTimer();
     this.playState = PlayStates.SOLVED;
   }
@@ -894,9 +936,17 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   /**
    * 
    */
-  refreshActionLog() {
-    this.actionLog = this.sudokuService.getActionLogAsString();
+  refreshActionsLog() {
+    // this.actionsLog = this.sudokuService.getActionLogAsString();
+    this.actionsLog = this.getActionLogAsString();
   }
+
+  /**
+   * 
+   */
+  public getActionLogAsString() : string {
+    return this.actionLog.toStringLastFirst();
+  } // getActionLogAsString()
 
   /**
    * 
@@ -923,6 +973,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    */
   initializeUserInterface() {
     this.sudokuService.initializeModel();
+    this.actionLog.initialize();
+    this.actionsLog = '';
     this.actualDifficulty = undefined;
     this.unselectCell();   // no cell selected
 
@@ -939,12 +991,12 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     // this.generating = false;
     this.hint = undefined;
     this.initializeHintStates();
-    this.actionLog = '';
+    this.actionsLog = '';
     this.desiredDifficulty = this.DEFAULT_DIFFICULTY;
 
     this.cluesShowing = false;
 
-    this.actionLog = '';
+    this.actionsLog = '';
     this.hintsViewed = 0;
     this.hintsApplied = 0;
   } // initializeUserInterface()

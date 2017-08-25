@@ -9,7 +9,7 @@ import { Action,
          RestoreCandidateAction,
          SetValueAction } from '../action/action';
 
-import { ActionLogService } from '../action/action-log.service';
+// import { ActionLogService } from '../action/action-log.service';
 
 import { ValueHint,
          CandidatesHint } from '../hint/hint';
@@ -48,7 +48,7 @@ export class SudokuService {
 
   private currentSudoku: Puzzle = undefined;
   private sudokuModel: SudokuModel = undefined;
-  private actionLog: ActionLogService = undefined;
+  // private actionLog: ActionLogService = undefined;
 
   /**
    * Inject the data model and logs.
@@ -58,7 +58,7 @@ export class SudokuService {
     // actionLog: ActionLogService
   ) {
     this.sudokuModel = new SudokuModel();
-    this.actionLog = new ActionLogService();
+    // this.actionLog = new ActionLogService();
     // this.actionLog = actionLog;
     this.initializeModel();
   } // constructor()
@@ -75,15 +75,15 @@ export class SudokuService {
       this.initializeGroup(this.sudokuModel.cols[g]);
       this.initializeGroup(this.sudokuModel.boxs[g]);
     }
-    this.initializeActionLog();
+    // this.initializeActionLog();
   } // initializeModel()
 
-  /**
-   * 
-   */
-  public initializeActionLog() : void {
-    this.actionLog.initialize();
-  } // initializeActionLog()
+  // /**
+  //  * 
+  //  */
+  // public initializeActionLog() : void {
+  //   this.actionLog.initialize();
+  // } // initializeActionLog()
 
   /**
    * 
@@ -113,7 +113,7 @@ export class SudokuService {
       this.setValue(c, givenValue, ActionType.SET_VALUE);
     } // for
 
-    this.initializeActionLog();
+    // this.initializeActionLog();
     return puzzle;
   } // loadProvidedSudoku()
 
@@ -204,18 +204,18 @@ export class SudokuService {
     this.sudokuModel.cols[cell.colIndex].vOccurrences[newValue]++;
     this.sudokuModel.boxs[cell.boxIndex].vOccurrences[newValue]++;
 
-    // log action
-    let action: SetValueAction;
-    switch (actionType) {
-      case ActionType.SET_VALUE:
-        action = new SetValueAction(ActionType.SET_VALUE, c, newValue, hint);
-        break;
-      case ActionType.GUESS_VALUE:
-        action = new GuessValueAction(ActionType.GUESS_VALUE, c, newValue,
-            guessPossibles);
-        break;
-    } // switch
-    this.actionLog.addEntry(action);
+    // // log action
+    // let action: SetValueAction;
+    // switch (actionType) {
+    //   case ActionType.SET_VALUE:
+    //     action = new SetValueAction(ActionType.SET_VALUE, c, newValue, hint);
+    //     break;
+    //   case ActionType.GUESS_VALUE:
+    //     action = new GuessValueAction(ActionType.GUESS_VALUE, c, newValue,
+    //         guessPossibles);
+    //     break;
+    // } // switch
+    // this.actionLog.addEntry(action);
 
     // remove candidate (this new value) from related cells
     for (let rc of Common.getRelatedCells(c)) {
@@ -324,8 +324,8 @@ export class SudokuService {
    */
   public removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
-    this.actionLog.addEntry(
-        new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
+    // this.actionLog.addEntry(
+    //     new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
   } // removeCandidate()
 
   // public removeCandidates(cellCandidates: CellCandidate[], hint: Rem) : void {
@@ -340,8 +340,8 @@ export class SudokuService {
   public restoreCandidate(c: number, k: number) : void {
     if (this.isPossibleCandidate(c, k)) {
       this.sudokuModel.cells[c].candidates[k] = true;
-      this.actionLog.addEntry(
-          new RestoreCandidateAction(ActionType.RESTORE_CANDIDATE, c, k));
+      // this.actionLog.addEntry(
+      //     new RestoreCandidateAction(ActionType.RESTORE_CANDIDATE, c, k));
     }
   }
 
@@ -594,12 +594,12 @@ try {
     return count;
   } // getNumberOfCandidates()
 
-  /**
-   * Used by SudokoCreationService.
-   */
-  public removeLastActionLogEntry() : void {
-    this.actionLog.removeLastEntry();
-  } // removeLastActionLogEntry()
+  // /**
+  //  * Used by SudokoCreationService.
+  //  */
+  // public removeLastActionLogEntry() : void {
+  //   this.actionLog.removeLastEntry();
+  // } // removeLastActionLogEntry()
 
   /**
    * Represent the values of the sudoku as an array of 81 values.
@@ -612,28 +612,28 @@ try {
     return v;
   } // cellsToValuesArray()
 
-  /**
-   * 
-   */
-  public getLastAction() : Action {
-    return this.actionLog.getLastEntry();
-  } // getLastAction()
+  // /**
+  //  * 
+  //  */
+  // public getLastAction() : Action {
+  //   return this.actionLog.getLastEntry();
+  // } // getLastAction()
 
-  /**
-   * Called by user button press (playComponent.ts) undoLastAction())
-   */
-  public undoLastAction() : void {    // called by user button
-    let lastAction = this.actionLog.getLastEntry();
-    this.undoAction(lastAction);
-    this.actionLog.removeLastEntry();
-  } // undoLastAction()
+  // /**
+  //  * Called by user button press (playComponent.ts) undoLastAction())
+  //  */
+  // public undoLastAction() : void {    // called by user button
+  //   let lastAction = this.actionLog.getLastEntry();
+  //   this.undoAction(lastAction);
+  //   this.actionLog.removeLastEntry();
+  // } // undoLastAction()
 
-  /**
-   * 
-   */
-  public getActionLogAsString() : string {
-    return this.actionLog.toStringLastFirst();
-  } // getActionLogAsString()
+  // /**
+  //  * 
+  //  */
+  // public getActionLogAsString() : string {
+  //   return this.actionLog.toStringLastFirst();
+  // } // getActionLogAsString()
 
   /**
    * Refresh all cells candidates by first clearing all then seting 
