@@ -38,15 +38,9 @@ export class CreationService {
   private sudokuService: SudokuService;
   private hintService: HintService;
 
-  constructor(
-      // private actionLog: ActionLogService, 
-      // private sudokuService: SudokuService,
-      // private hintService: HintService
-    ) {
+  constructor() {
     this.hintLog = new HintLogService();
     this.actionLog = new ActionLogService();
-    // this.sudokuService = new SudokuService(this.actionLog);     // WORKS!
-    // this.sudokuService = new SudokuService(new ActionLogService());   // SudokuService has an independent action log DOESN'T WORK!
     this.sudokuService = new SudokuService();
     this.hintService = new HintService(this.sudokuService);
   }
@@ -63,7 +57,6 @@ console.info('In creationService.createSudoku() difficulty: ' + difficulty);
     sudoku.desiredDifficulty = difficulty;
 
     // step 1 - generate random finished sudoku
-    // sudoku.completedPuzzle = this.makeRandomSolution();
     sudoku.completedPuzzle = this.makeRandomSolution();
 
 // console.info('Step 1:\n' + this.sudokuService.toGridString()); 
@@ -107,7 +100,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    * 
    */
   private initializeLogs() {
-    this.sudokuService.initializeActionLog();
     this.hintLog.initialize();
     this.actionLog.initialize();
   }
@@ -239,8 +231,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
 
       this.sudokuService.setValue(c, savedValue, ActionType.SET_VALUE);
       this.sudokuService.setValue(symC, savedSymValue, ActionType.SET_VALUE);
-      this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
-      this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
+      // this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
+      // this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
     } // for next random symmetric pairs of cells to pare
 
     // TODO

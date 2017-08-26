@@ -33,15 +33,15 @@ import { MessageService } from './common/message.service';
 
 enum PlayStates {
   NEW,
-  ENTRY,    // not used currently
-  CREATING, // not used currently
+  ENTRY,         // not used currently
+  CREATING,      // not used currently
   EXECUTE, 
   SOLVED
 }
 enum HintStates {
-  READY,	// no hint has been requested
-  ACTIVE,	// a hint exists and has not been applied
-  NO_HINT	// a hint has been requested but no hint is available
+  READY,	       // no hint has been requested
+  ACTIVE,	       // a hint exists and has not been applied
+  NO_HINT	       // a hint has been requested but no hint is available
 };
 enum AutoSolveStates {
   READY,        // autoSolve is not running
@@ -77,15 +77,10 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
-
-    /** */
-    // sudokuService: SudokuService,
-    // hintService: HintService,
     private cacheService: CacheService,
 
     private messageService: MessageService
   ) {
-    // this.sudokuService = new SudokuService(new ActionLogService());
     this.sudokuService = new SudokuService();
     this.hintService = new HintService(this.sudokuService);
     this.actionLog = new ActionLogService();
@@ -865,7 +860,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
 
         // log action
         this.actionLog.addEntry(
-            new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, remove.cell, remove.candidate));
+            new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, remove.cell, remove.candidate, kHint));
 
         }
     } // switch
@@ -885,6 +880,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * 
    */
   setCellValue(ci: number, v: number) : void {
+// console.info('ci: ' + ci + ' ' + Common.userRow(ci) + ',' + Common.userCol(ci));
+// console.info('completedPuzzle: ' + this.currentPuzzle.completedPuzzle);
 
     // check for new values not that of solution
     if (v != this.currentPuzzle.completedPuzzle[ci]) {

@@ -9,8 +9,6 @@ import { Action,
          RestoreCandidateAction,
          SetValueAction } from '../action/action';
 
-// import { ActionLogService } from '../action/action-log.service';
-
 import { ValueHint,
          CandidatesHint } from '../hint/hint';
 
@@ -48,18 +46,12 @@ export class SudokuService {
 
   private currentSudoku: Puzzle = undefined;
   private sudokuModel: SudokuModel = undefined;
-  // private actionLog: ActionLogService = undefined;
 
   /**
-   * Inject the data model and logs.
+   * Create and initialize the data model.
    */
-  constructor(
-      // this.actionLog: ActionLogService,
-    // actionLog: ActionLogService
-  ) {
+  constructor() {
     this.sudokuModel = new SudokuModel();
-    // this.actionLog = new ActionLogService();
-    // this.actionLog = actionLog;
     this.initializeModel();
   } // constructor()
 
@@ -75,18 +67,10 @@ export class SudokuService {
       this.initializeGroup(this.sudokuModel.cols[g]);
       this.initializeGroup(this.sudokuModel.boxs[g]);
     }
-    // this.initializeActionLog();
   } // initializeModel()
 
-  // /**
-  //  * 
-  //  */
-  // public initializeActionLog() : void {
-  //   this.actionLog.initialize();
-  // } // initializeActionLog()
-
   /**
-   * 
+   * TODO not sure this is needed.
    */
   public getCurrentSudoku() : Puzzle {
     return this.currentSudoku;
@@ -143,6 +127,8 @@ export class SudokuService {
   } // getValue()
 
   /**
+   * TODO update this documentation
+   * 
    * Sets value of a cell to the given value. In the specified cell, all candidates
    * are removed. The candidate, equal to the value being set, is removed from 
    * every cell that shares the row, column, and box of the given cell.
@@ -195,29 +181,16 @@ export class SudokuService {
       this.removeValue(c);
     }
 
-    // set new value, remove candidates
+    // set new value, remove candidates from cell
     cell.value = newValue;   
     this.removeAllCellCandidates(c);
 
-    // increment occurrences in groups
+    // increment occurrences in cell's groups (row, column, box)
     this.sudokuModel.rows[cell.rowIndex].vOccurrences[newValue]++;
     this.sudokuModel.cols[cell.colIndex].vOccurrences[newValue]++;
     this.sudokuModel.boxs[cell.boxIndex].vOccurrences[newValue]++;
 
-    // // log action
-    // let action: SetValueAction;
-    // switch (actionType) {
-    //   case ActionType.SET_VALUE:
-    //     action = new SetValueAction(ActionType.SET_VALUE, c, newValue, hint);
-    //     break;
-    //   case ActionType.GUESS_VALUE:
-    //     action = new GuessValueAction(ActionType.GUESS_VALUE, c, newValue,
-    //         guessPossibles);
-    //     break;
-    // } // switch
-    // this.actionLog.addEntry(action);
-
-    // remove candidate (this new value) from related cells
+    // remove candidate (i.e. new value) from related cells (rc)
     for (let rc of Common.getRelatedCells(c)) {
       if (this.sudokuModel.cells[rc].value != 0) {
         continue;
@@ -227,6 +200,8 @@ export class SudokuService {
   } // setValue()
 
   /**
+   * TODO update this documentation
+   * 
    * Removes the givenValue of the specified cell to make it empty. This 
    * function also reestablishes appropriate candidates in the cell and
    * reestablishes the candidate, equal to the givenValue being removed, in
@@ -304,6 +279,8 @@ export class SudokuService {
   } // removeValue()
 
   /**
+   * TODO update this documentation
+   * 
    * Remove given candidate from given cell. This method is only
    * used for explicit independent candidate removal. 
    * 
@@ -324,10 +301,9 @@ export class SudokuService {
    */
   public removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
-    // this.actionLog.addEntry(
-    //     new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, c, k, hint));
   } // removeCandidate()
 
+  // TODO future use?
   // public removeCandidates(cellCandidates: CellCandidate[], hint: Rem) : void {
   //   for (let cellCandidate of cellCandidates) {
   //     this.sudokuModel.cells[cellCandidate.cell].candidates[cellCandidate.candidate] = false;
@@ -340,12 +316,12 @@ export class SudokuService {
   public restoreCandidate(c: number, k: number) : void {
     if (this.isPossibleCandidate(c, k)) {
       this.sudokuModel.cells[c].candidates[k] = true;
-      // this.actionLog.addEntry(
-      //     new RestoreCandidateAction(ActionType.RESTORE_CANDIDATE, c, k));
     }
   }
 
   /**
+   * TODO update this documentation
+   * 
    * Undoes the last logged action. If the last action resulted from a complex
    * hint that caused multiple candidate removes e.g. nakedPairs, etc.
    * - should not have deal with und0 REMOVE_VALUE
@@ -449,28 +425,28 @@ export class SudokuService {
   } // hasValue()
 
   /**
-   * 
+   * Get the row object from the row index.
    */
   public getRow(r: number) : Group {
     return this.sudokuModel.rows[r];
   } // getRow()
 
   /**
-   * 
+   * Get the column object from the column index.
    */
   public getCol(c: number) : Group {
     return this.sudokuModel.cols[c];
   } // getCol()
 
   /**
-   * 
+   * Get the box object from the box index.
    */
   public getBox(b: number) : Group {
     return this.sudokuModel.boxs[b];
   } // getBox()
 
   /**
-   * Returns true if cell has a value;
+   * Returns true if any cell in a group has a specific value;
    */
   public containsValue(group: Group, v: number) : boolean {
     return group.vOccurrences[v] === 1;
@@ -581,7 +557,7 @@ try {
   } // isValueComplete()
 
   /**
-   * 
+   * Return the number of candidates in a cell.
    */
   public getNumberOfCandidates(c: number) : number {
     let count = 0;
@@ -594,13 +570,6 @@ try {
     return count;
   } // getNumberOfCandidates()
 
-  // /**
-  //  * Used by SudokoCreationService.
-  //  */
-  // public removeLastActionLogEntry() : void {
-  //   this.actionLog.removeLastEntry();
-  // } // removeLastActionLogEntry()
-
   /**
    * Represent the values of the sudoku as an array of 81 values.
    */
@@ -611,29 +580,6 @@ try {
     }
     return v;
   } // cellsToValuesArray()
-
-  // /**
-  //  * 
-  //  */
-  // public getLastAction() : Action {
-  //   return this.actionLog.getLastEntry();
-  // } // getLastAction()
-
-  // /**
-  //  * Called by user button press (playComponent.ts) undoLastAction())
-  //  */
-  // public undoLastAction() : void {    // called by user button
-  //   let lastAction = this.actionLog.getLastEntry();
-  //   this.undoAction(lastAction);
-  //   this.actionLog.removeLastEntry();
-  // } // undoLastAction()
-
-  // /**
-  //  * 
-  //  */
-  // public getActionLogAsString() : string {
-  //   return this.actionLog.toStringLastFirst();
-  // } // getActionLogAsString()
 
   /**
    * Refresh all cells candidates by first clearing all then seting 

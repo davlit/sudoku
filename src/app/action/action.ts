@@ -31,13 +31,11 @@ Action (A)
 
 export abstract class Action {
   private _type: ActionType;
-  // private _cell: number;
   private _hint: Hint;
 
   // constructor(type: ActionType, cell: number, hint?: Hint) {
   constructor(type: ActionType, hint?: Hint) {
     this._type = type;
-    // this._cell = cell;
     this._hint = hint;
   }
 
@@ -45,10 +43,6 @@ export abstract class Action {
     return this._type;
   }
   
-  // get cell() : number {
-  //   return this._cell;
-  // }
-
   abstract get cell(): number;
 
   get hint() : Hint {
@@ -66,7 +60,6 @@ abstract class BaseValueAction extends Action {
   private _value: number;
 
   constructor(type: ActionType, cell: number, value: number, hint?: ValueHint) {
-    // super(type, cell, hint);
     super(type, hint);
     this._cell = cell;
     this._value = value;

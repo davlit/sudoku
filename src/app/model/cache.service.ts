@@ -8,7 +8,9 @@ import * as CreationWorker from
 
 import { MessageService } from '../common/message.service';
 
-/*  localStorage API - keys and stored data are all strings
+/*  
+localStorage API - keys and stored data are all strings
+----------------
 localStorage.setItem(key: string, item: string) : void
 localStorage.getItem(key: string) : string
 localStorage.length : number
@@ -50,69 +52,16 @@ export class CacheService {
       this.init();
   }
 
-  sendMessage(message: string): void {
-    // send message to subscribers via observable subject
-    this.messageService.sendMessage(message);
-  }
-
-  clearMessage(): void {
-    // clear message
-    this.messageService.clearMessage();
-  }
   // -------------------------------------------------------------------------
   //  Public methods
   // -------------------------------------------------------------------------
 
-  /**
-   * Receive web worker output
-   */
-  init() {
-    this.creationWorker.onmessage = ((event: MessageEvent) => {
-// console.info('\ncacheService.init() creationWorker.onmessage');
-      this.webworkerWorking = false;
-      localStorage.setItem(this.localStorageKey, event.data);
-console.info('\nCache keys after webworker replenishment: ' 
-  + JSON.stringify(this.getCacheKeys()));
-
-    this.sendMessage('Cache addition');
-    this.sendMessage('Cache changed');
-
-      // This is a loop. Since replenishCache() engages a web worker to
-      // create a sudoku, and this method, creationWorker.onmessage(), is
-      // is called unpon the web worker's completion, calling 
-      // replenish.cache() here creates a loop. However, replenishCache()
-      // stops when the cache is full. So whenever replenishCache() is the
-      // loop will continue until the cache is full.
-      this.replenishCache();
-    });
-  } // init()
-  
-  /**
+    /**
    * Empty the cache.
    */
   public emptyCache() : void {
     localStorage.clear()
   } // clearCache()
-
-  /**
-   * Get cache size.
-   */
-  public getCacheSize() : number {
-    return localStorage.length;
-  } // getCacheSize()
-
-  /**
-   * Get cache size by difficulty.
-   */
-  public getCacheSizeByDifficulty(difficulty: Difficulty) : number {
-    let count = 0;
-    for (let key of KEYS[difficulty]) {
-      if (localStorage.getItem(key)) {
-        count++;
-      }
-    }
-    return count;
-  } // getCacheSizeByDifficulty()
 
   /**
    * Get an array of current localStorage keys.
@@ -225,13 +174,67 @@ console.info('\nCache keys after webworker replenishment: '
   /**
    * Remove the cached item with given key;
    */
-  public removeCacheItem(key: string) {
+  private removeCacheItem(key: string) {
     localStorage.removeItem(key);
   } // removeCacheItem
+
+  // /**
+  //  * Get cache size.   NOT USED but may be useful
+  //  */
+  // public getCacheSize() : number {
+  //   return localStorage.length;
+  // } // getCacheSize()
+
+  // /**
+  //  * Get cache size by difficulty.   NOT USED but may be useful
+  //  */
+  // public getCacheSizeByDifficulty(difficulty: Difficulty) : number {
+  //   let count = 0;
+  //   for (let key of KEYS[difficulty]) {
+  //     if (localStorage.getItem(key)) {
+  //       count++;
+  //     }
+  //   }
+  //   return count;
+  // } // getCacheSizeByDifficulty()
 
   // -------------------------------------------------------------------------
   //  Private methods
   // -------------------------------------------------------------------------
+
+  /**
+   * Receive web worker output
+   */
+  private init() {
+    this.creationWorker.onmessage = ((event: MessageEvent) => {
+// console.info('\ncacheService.init() creationWorker.onmessage');
+      this.webworkerWorking = false;
+      localStorage.setItem(this.localStorageKey, event.data);
+console.info('\nCache keys after webworker replenishment: ' 
+  + JSON.stringify(this.getCacheKeys()));
+
+    this.sendMessage('Cache addition');
+    this.sendMessage('Cache changed');
+
+      // This is a loop. Since replenishCache() engages a web worker to
+      // create a sudoku, and this method, creationWorker.onmessage(), is
+      // is called unpon the web worker's completion, calling 
+      // replenish.cache() here creates a loop. However, replenishCache()
+      // stops when the cache is full. So whenever replenishCache() is the
+      // loop will continue until the cache is full.
+      this.replenishCache();
+    });
+  } // init()
+  
+  private sendMessage(message: string): void {
+    // send message to subscribers via observable subject
+    this.messageService.sendMessage(message);
+  }
+
+  private clearMessage(): void {
+    // clear message
+    this.messageService.clearMessage();
+  }
 
   /**
    * Create and cache a sudoku.
