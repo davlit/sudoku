@@ -299,7 +299,7 @@ export class SudokuService {
    * - restore the candidate
    * - remove log entry, don't create new one
    */
-  public removeCandidate(c: number, k: number, hint: CandidatesHint) : void {
+  public removeCandidate(c: number, k: number, hint?: CandidatesHint) : void {
     this.sudokuModel.cells[c].candidates[k] = false;
   } // removeCandidate()
 

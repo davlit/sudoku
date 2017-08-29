@@ -5,7 +5,7 @@
   <!-- <span class="appVersion">&nbsp;&nbsp;&nbsp;{{version}}</span> -->
 
   <!-- testing -->
-  <button (click)="emptyCache()">Empty cache</button>
+  <!-- <button (click)="emptyCache()">Empty cache</button> -->
 
 <!-- ANIMATED PROGRESS BAR - DEMO -->
 <!--
@@ -270,7 +270,7 @@ s: sudoku, b: box, v: value, k: candidate
       <!-- ===== Value Picker ===== -->
       <p *ngIf="!isAnySelectedCell()"><span>Select a cell</span></p>
       <div *ngIf="isAnySelectedCell()">
-        <p>Click value for selected cell:</p>
+        <p>Value picker for selected cell:</p>
         <div class="vcontainer">
           <div class="vcell" *ngFor="let v of [1,2,3,4,5,6,7,8,9]"
               (mousedown)="handleChoiceClick(v)">
@@ -296,7 +296,7 @@ s: sudoku, b: box, v: value, k: candidate
             tooltip="Start over on same sudoku" 
             placement="bottom">Restart sudoku</button>&nbsp;
         <button class="general" (click)="startNewPuzzle()">New sudoku</button>
-        <button class="general" (click)="printGrid()">Print</button>
+        <!-- <button class="general" (click)="printGrid()">Print</button> -->
       </p>
 
       <!-- <p>
@@ -306,7 +306,7 @@ s: sudoku, b: box, v: value, k: candidate
       </p> -->
 
       <!-- <p> -->
-      <table class="clues">
+      <!-- <table class="clues">
       <tr>   
         <td>     
         <button *ngIf="!cluesShowing" class="exec start" 
@@ -319,12 +319,27 @@ s: sudoku, b: box, v: value, k: candidate
             Hide clues</button>
         </td>
         <td class="clues">
-         <!-- <span [hidden]="!cluesShowing" class="clues">{{solutionClues}}</span>  -->
          <textarea [hidden]="!cluesShowing" class="clues">{{solutionClues}}</textarea> 
         </td>
       </tr>
-      </table>
+      </table> -->
       <!-- </p> -->
+
+      <!-- ===== Instructions ===== -->
+      <p><span>Instructions:</span>
+        <!-- <button [hidden]="actionLog === ''" class="general"
+                (click)="undoLastAction()">Undo Last Action</button><br/> -->
+        <!-- <textarea [ngModel]="actionsLog" rows="8" cols="55"></textarea> -->
+        <textarea>
+- Resize your browser window as desired to see everything.
+- Click on a cell to select it.
+- Use number keys to set a value in the selected cell.
+- Or use a mouse click on the 1 to 9 & Clear "Value Picker".
+- A zero key or Clear will remove the selected cell's value.
+- When candidates are showing, double click to remove one.
+- Try out other buttons.
+        </textarea>
+      </p>
 
     </div>  <!-- *ngSwitchCase="PlayStates.EXECUTE" -->
 

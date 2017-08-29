@@ -19,6 +19,7 @@ import { HintCounts }       from './hint/hintCounts';
 import { ActionType }       from './action/action';
 import { Action }           from './action/action';
 import { SetValueAction }      from './action/action';
+import { RemoveValueAction }      from './action/action';
 import { RemoveCandidateAction }      from './action/action';
 import { RestoreCandidateAction }      from './action/action';
 import { NakedType }        from './model/naked.type';
@@ -187,6 +188,28 @@ export class AppComponent implements OnInit, OnDestroy {
   // methods called from UI
   // -----------------------------------------------------------------------
 
+  /*
+  User actions:
+    Set cell value from keyboard (no previous value)
+    Set cell value from picker (no previous value)
+      ActionType.SET_VALUE
+    Unset cell value from keyboard (0)
+    Unset cell value from picker (Clear)
+      ActionType.REMOVE_VALUE
+    Set cell replacement value from keyboard (remove previous value)
+    Set cell replacement value from picker (remove previous value)
+      ActionType.REMOVE_VALUE
+      ActionType.SET_VALUE
+    Remove a candidate
+      ActionType.REMOVE_CANDIDATE
+    Restore a candidate
+      ActionType.RESTORE_CANDIDATE
+    Apply a hint that sets a value
+      ActionType.SET_VALUE
+    Apply a hint that removes one or more candidates
+      ActionType.REMOVE_CANDIDATES
+  */
+
   /**
    * Responds to Generate button. Gets sudoku puzzle of desired difficulty
    * from cache. Loads sudoku and switches to Play state.
@@ -214,6 +237,9 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * User keyboard actions.
    */
   handleKeyPress(keyEvent: any) : void {
+      
+    // console.log('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
+    
     if (this.playState != PlayStates.ENTRY 
         && this.playState != PlayStates.EXECUTE) {
       return;
@@ -221,20 +247,22 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       
     // console.log('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
     
+    this.initializeHintStates();    // remove any hint
+
+    // key press is meaningless without a selected cell
+    if (!this.isCellSelected()) {
+      return;
+    }
+
     let keyCode = keyEvent.keyCode;
     let newValue = 0;
 
     // get currently selected cell's row and column number
-    // let ur = this.xselectedCell.r;
-    // let uc = this.xselectedCell.c;
-    let ur = Common.userRow(this.selectedCell);
-    let uc = Common.userCol(this.selectedCell);
-    
-    // no key action if no cell selected
-    if (ur == 0 && uc == 0) {
-      return;
-    }
+    let ur = Common.userRow(this.selectedCell); // user row 1..9
+    let uc = Common.userCol(this.selectedCell); // user col 1..9
 
+    // console.info();
+    
     switch(keyCode) {
       case 37:		// left arrow - wrap to previous row
         uc--;
@@ -265,7 +293,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       case 40:		// down arrow - wrap in column
         ur++;
         if (ur > 9) { ur = 1; }
-        // this.setSelectedCell(ur, uc); 
         this.setSelectedCell(Common.urcToCellIdx(ur, uc)); 
         return;
       case 46:		// delete
@@ -281,11 +308,12 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
         newValue = parseInt(String.fromCharCode(keyCode));
     }
 
+    // console.info('keycode, newValue, selectedCell: ' + keyCode + ', ' + newValue + ', ' + this.selectedCell);
+
     if (newValue < 0 || newValue > 9) {
       return;   // not zero and not 1..9, bail
     }
 
-    // let selectedCellIdx = Common.urcToCellIdx(ur, uc);
     let oldValue = this.sudokuService.getValue(this.selectedCell);
 
     if (newValue == oldValue) {
@@ -301,8 +329,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.setCellValue(this.selectedCell, newValue);
     }
 
-    this.initializeHintStates();
-    
     // step selected cell right (wrap to next row) during entry
     if (this.playState === PlayStates.ENTRY) {
       uc++;
@@ -344,7 +370,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    */
   isSelectedCell(vb: number, vc: number) : boolean {
     return this.selectedCell === this.viewToCellIdx(vb, vc);
-  }
+  } // isSelectedCell()
   
   /**
    * 
@@ -355,7 +381,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   } // isCellInvalid_()
   
   /**
-   * 
    * Function based on view's cell indexes in html code.
    */
   handleCellClick(event, vb: number, vc: number) : void {
@@ -364,6 +389,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       return;
     }
     
+    this.initializeHintStates();    // remove any hint 
     let ci = this.viewToCellIdx(vb, vc);
     if (this.isCellLocked(ci)) {
       return;         // can't accept click on locked cell
@@ -380,11 +406,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       case 2:   // middle click
         return;
       case 3:   // right click
-        // let nakeds = this.sudokuService.getNakedCandidates_(zr, zc, NakedType.SINGLE);
         let nakeds = this.sudokuService.findNakedCandidates(ci, NakedType.SINGLE);
         if (nakeds.length === 1) {
-          // this.setCellValue(zr, zc, nakeds[0]);
-          // this.setSelectedCell(zr, zc);
           this.setCellValue(ci, nakeds[0]);
           this.setSelectedCell(ci);
         }
@@ -409,7 +432,6 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   valueToChar_(vb: number, vc: number) : string {
     let value = this.sudokuService.getValue(this.viewToCellIdx(vb, vc));
     return value == 0 ? '' : value.toString(); 
-    // return value.toString(); 
   } // valueToChar_()
   
   /**
@@ -429,7 +451,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
         && this.playState != PlayStates.EXECUTE) {
       return;
     }
-    this.initializeHintStates();
+    this.initializeHintStates();    // remove any hint
 
     if (this.candidatesShowing) {
       let cellIdx = this.viewToCellIdx(vb, vc);
@@ -494,7 +516,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.candidatesVisible[k] = false;
     }
     this.candidatesVisible[kand] = true;
-  }
+  } // candidateVisible()
 
   /**
    * 
@@ -539,7 +561,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   autoSolveButton() : boolean {
     return this.autoSolveState != AutoSolveStates.NO_HINT
         && this.hintState != HintStates.NO_HINT; 
-  }
+  } // autoSolveButton()
   
   /**
    * 
@@ -570,24 +592,24 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    */
   isValueComplete(v: number) : boolean {
     return this.valuesComplete[v];
-  }
+  } // isValueComplete()
 
   /**
    * 
    */
   handleChoiceClick(v: number) : void {
+    this.initializeHintStates();    // remove any hint
     if (this.valuesComplete[v]) {
       return;
     }
-    this.initializeHintStates();
     this.setCellValue(this.selectedCell, v);
   } // handleChoiceClick()
 
   /**
-   * 
+   * This method reponds to the user clicking on "Clear."
    */
   handleChoiceClearClick() : void {
-    this.initializeHintStates();
+    this.initializeHintStates();    // remove any hint
     this.removeCellValue(this.selectedCell);
   } // handleChoiceClearClick_()
 
@@ -595,40 +617,41 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * button 'Undo Last Action' EXECUTION state
    */
   undoLastAction() : void {
-    this.initializeHintStates();
+    this.initializeHintStates();    // remove any hint
 
-    // capture before it's removed from log
-    // let lastAction = this.sudokuService.getLastAction();
     let lastAction = this.actionLog.getLastEntry();
-
     if (lastAction === undefined) {
       return;
     }
 
-    // this.sudokuService.undoLastAction();
-    this.sudokuService.undoAction(lastAction);
-    this.actionLog.removeLastEntry();
-
-    // update values complete
-    if (lastAction.type === ActionType.SET_VALUE) {
-      let v = (<SetValueAction> lastAction).value;
-      this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
-    }
+    let action = undefined;
+    switch (lastAction.type) {
+      case ActionType.SET_VALUE:
+        action = <SetValueAction>lastAction;
+        this.sudokuService.removeValue(action.cell);
+        break;
+      //case ActionType.GUESS_VALUE:
+      //  break;
+      case ActionType.REMOVE_VALUE:
+        action = <RemoveValueAction>lastAction;
+        this.sudokuService.setValue(action.cell, action.value, action.action);
+        break;
+      case ActionType.REMOVE_CANDIDATE:
+        action = <RemoveCandidateAction>lastAction;
+        this.sudokuService.restoreCandidate(action.cell, action.candidate);
+        break;
+      case ActionType.RESTORE_CANDIDATE:
+        action = <RestoreCandidateAction>lastAction;
+        this.sudokuService.removeCandidate(action.cell, action.candidate);
+        break;
+    } // switch
 
     // set selected cell to that of last action
     this.setSelectedCell(lastAction.cell);
+    this.actionLog.removeLastEntry();
     this.refreshActionsLog();
   } // undoLastAction()
   
-  // /**
-  //  * Called by user button press (playComponent.ts) undoLastAction())   FROM SudokuService
-  //  */
-  // public undoLastAction() : void {    // called by user button
-  //   let lastAction = this.actionLog.getLastEntry();
-  //   this.undoAction(lastAction);
-  //   this.actionLog.removeLastEntry();
-  // } // undoLastAction()
-
   /**
    * button 'Restart Current Puzzle' EXECUTION, SOLVED states
    */
@@ -641,7 +664,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.currentPuzzle = this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
     this.actualDifficulty = temp;       // restore
     this.playState = PlayStates.EXECUTE;
-  }
+  } // restartCurrentPuzzle()
   
   // button 'Start New Puzzle' EXECUTION, SOLVED state
   startNewPuzzle() : void {
@@ -649,11 +672,14 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.initializeUserInterface();
     this.sudokuService.initializeModel();
     this.playState = PlayStates.NEW;
-  }
+  } // startNewPuzzle()
 
+  /**
+   * 
+   */
   printGrid() {
     // this.router.navigate(['/print']);
-  }
+  } // printGrid()
   
   // ----------------------------------------------------------------------
   // conversion methods
@@ -674,7 +700,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    */
   valueCoordsToValue(r: number, c: number) : number {
     return (r * 3) + c + 1;
-  }
+  } // valueCoordsToValue()
 
   // ----------------------------------------------------------------------
   // other methods
@@ -784,30 +810,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    */
   setSelectedCell(ci: number) : void {
     this.selectedCell = ci;
-  }
+  } // setSelectedCell()
     
-  // /**
-  //  * 
-  //  */
-  // removeCandidate(cell: number, k: number) : void {
-  //   this.initializeHintStates();
-  //   if (this.candidatesShowing) {
-  //     this.sudokuService.removeCandidate(cell, k, undefined);
-  //   }
-  //   this.refreshActionLog();
-  // }
-  
-  // /**
-  //  * 
-  //  */
-  // restoreCandidate(cell: number, k: number) : void {
-  //   this.initializeHintStates();
-  //   if (this.candidatesShowing) {
-  //     this.sudokuService.restoreCandidate(cell, k);
-  //   }
-  //   this.refreshActionLog();
-  // }
-  
   /**
    * 
    */
@@ -821,7 +825,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     } else {
       this.hintState = HintStates.NO_HINT;
     }
-  }
+  } // findHint()
     
   /**
    * Apply a hint toward a solution.
@@ -880,17 +884,16 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
    * 
    */
   setCellValue(ci: number, v: number) : void {
-// console.info('ci: ' + ci + ' ' + Common.userRow(ci) + ',' + Common.userCol(ci));
-// console.info('completedPuzzle: ' + this.currentPuzzle.completedPuzzle);
 
     // check for new values not that of solution
     if (v != this.currentPuzzle.completedPuzzle[ci]) {
       console.warn('Not the solution value');
     }
 
+    if (this.sudokuService.getValue(ci) != v) {
+      this.removeCellValue(ci);
+    }
     this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
-
-    // // log action
     this.actionLog.addEntry(
         new SetValueAction(ActionType.SET_VALUE, ci, v));
 
@@ -899,26 +902,36 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       this.handlePuzzleComplete();
     }
       this.refreshActionsLog();
-  }
+  } // setCellValue()
 
   /**
    * 
    */
   removeCellValue(ci: number) : void {
     let oldValue = this.sudokuService.getValue(ci);
-    if (oldValue >= 1) {
-      this.sudokuService.removeValue(ci);
-      this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
-      this.refreshActionsLog();
+    if (oldValue == 0) {
+      return;   // nothing to remove
     }
-  }
+    this.sudokuService.removeValue(ci);
+    this.actionLog.addEntry(
+        new RemoveValueAction(ActionType.REMOVE_VALUE, ci, oldValue));
+    this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
+    this.refreshActionsLog();
+  } // removeCellValue()
   
   /**
    * 
    */
   unselectCell() : void {
     this.selectedCell = -1;
-  }
+  } // unselectCell()
+    
+  /**
+   * 
+   */
+  isCellSelected() : boolean {
+    return this.selectedCell >= 0 && this.selectedCell <= 80;
+  } // unselectCell()
     
   /**
    * 
@@ -928,7 +941,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.refreshActionsLog();
     this.stopUserTimer();
     this.playState = PlayStates.SOLVED;
-  }
+  } // handlePuzzleComplete()
     
   /**
    * 
@@ -936,12 +949,12 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
   refreshActionsLog() {
     // this.actionsLog = this.sudokuService.getActionLogAsString();
     this.actionsLog = this.getActionLogAsString();
-  }
+  } // refreshActionsLog()
 
   /**
    * 
    */
-  public getActionLogAsString() : string {
+  getActionLogAsString() : string {
     return this.actionLog.toStringLastFirst();
   } // getActionLogAsString()
 
@@ -956,14 +969,14 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
           elapsedSeconds++;
           this.elapsedTime = Common.toElapsedTimeString(elapsedSeconds);
         });
-  }
+  } // startUserTimer()
 
   /**
    * 
    */
   stopUserTimer() : void {
     this.timerSubscription.unsubscribe();
-  }
+  } // stopUserTimer()
 
   /**
    * 
@@ -987,7 +1000,7 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     this.playState = PlayStates.NEW;
     // this.generating = false;
     this.hint = undefined;
-    this.initializeHintStates();
+    this.initializeHintStates();    // remove any hint
     this.actionsLog = '';
     this.desiredDifficulty = this.DEFAULT_DIFFICULTY;
 
