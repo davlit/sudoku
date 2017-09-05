@@ -122,7 +122,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     // this.randomCellIndexes = Common.RANDOM_CELLS_1;
     // this.randomValues = Common.RANDOM_VALUES_1;
    for (let v of VALUES) {
-      this.sudokuService.setValue(this.randomCellIndexes[v], v, ActionType.GUESS_VALUE);
+      // this.sudokuService.setValue(this.randomCellIndexes[v], v, ActionType.GUESS_VALUE);
+      this.sudokuService.setValue(this.randomCellIndexes[v], v);
     }
     this.solve();
 
@@ -229,8 +230,10 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
           } // if multiple solutions, fall through to restore pared cells
       } // switch
 
-      this.sudokuService.setValue(c, savedValue, ActionType.SET_VALUE);
-      this.sudokuService.setValue(symC, savedSymValue, ActionType.SET_VALUE);
+      // this.sudokuService.setValue(c, savedValue, ActionType.SET_VALUE);
+      // this.sudokuService.setValue(symC, savedSymValue, ActionType.SET_VALUE);
+      this.sudokuService.setValue(c, savedValue);
+      this.sudokuService.setValue(symC, savedSymValue);
       // this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
       // this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
     } // for next random symmetric pairs of cells to pare
@@ -431,8 +434,9 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
       case HintType.HIDDEN_SINGLE_COL:
       case HintType.HIDDEN_SINGLE_BOX:
         let vHint: ValueHint = <ValueHint> hint;
-        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-            vHint);
+        // this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
+        //     vHint);
+        this.sudokuService.setValue(vHint.cell, vHint.value);
 
         // // log action
         this.actionLog.addEntry(
@@ -479,7 +483,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     possibleValues = possibleValues.slice(1);   // remove guess value
     // this.hintService.addHintLogEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
     this.hintLog.addEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
-    this.sudokuService.setValue(guessCell, guessValue, ActionType.GUESS_VALUE, possibleValues);
+    // this.sudokuService.setValue(guessCell, guessValue, ActionType.GUESS_VALUE, possibleValues);
+    this.sudokuService.setValue(guessCell, guessValue);
 
     // // log action
     this.actionLog.addEntry(

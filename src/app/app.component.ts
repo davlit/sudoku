@@ -634,7 +634,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       //  break;
       case ActionType.REMOVE_VALUE:
         action = <RemoveValueAction>lastAction;
-        this.sudokuService.setValue(action.cell, action.value, action.action);
+        // this.sudokuService.setValue(action.cell, action.value, action.action);
+        this.sudokuService.setValue(action.cell, action.value);
         break;
       case ActionType.REMOVE_CANDIDATE:
         action = <RemoveCandidateAction>lastAction;
@@ -848,8 +849,9 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
       case HintType.HIDDEN_SINGLE_COL:
       case HintType.HIDDEN_SINGLE_BOX:
         let vHint: ValueHint = <ValueHint> hint;
-        this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-            vHint);
+        // this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
+        //     vHint);
+        this.sudokuService.setValue(vHint.cell, vHint.value);
 
         // // log action
         this.actionLog.addEntry(
@@ -893,7 +895,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     if (this.sudokuService.getValue(ci) != v) {
       this.removeCellValue(ci);
     }
-    this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
+    // this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
+    this.sudokuService.setValue(ci, v);
     this.actionLog.addEntry(
         new SetValueAction(ActionType.SET_VALUE, ci, v));
 

@@ -36,6 +36,22 @@ export class SudokuModel {
     }
   } // constructor
 
+  // public initializeModel() : void {
+  public initialize() : void {
+    for (let ci of CELLS) {
+      // this.initializeCell(this.sudokuModel.cells[c]);
+      this._cells[ci].initialize();
+    }
+    for (let g of GROUPS) {
+      // this.initializeGroup(this.sudokuModel.rows[g]);
+      // this.initializeGroup(this.sudokuModel.cols[g]);
+      // this.initializeGroup(this.sudokuModel.boxs[g]);
+      this._rows[g].initialize();
+      this._cols[g].initialize();
+      this._boxs[g].initialize();
+    }
+  } // initializeModel()
+
   get cells() {
     return this._cells;
   }

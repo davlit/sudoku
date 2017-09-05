@@ -25,18 +25,57 @@ import { VALUES } from '../common/common';
  * - vOccurrences (can be derived from cells)
  */
 export class Group {
-  vOccurrences: number[];
-  cells: number[]
+  private _vOccurrences: number[];
+  private _cells: number[];
 
   constructor(groupCells: number[]) {
-    this.vOccurrences = new Array(10);
+    this._vOccurrences = new Array(10);
+    this._cells = groupCells;
+    this.initialize();
+  }
+
+  public initialize() {
     for (let v of VALUES) {
-      this.vOccurrences[v] = 0;
+      this._vOccurrences[v] = 0;
     }
-    this.cells = groupCells;
+  }
+
+  get vOccurrences() {
+    return this._vOccurrences;
+  }
+
+  get cells() {
+    return this._cells;
+  }
+
+  private hasValue(v: number) : boolean {
+    return this._vOccurrences[v] > 0;
   }
 
 } // class Group
+
+
+// export class Group {
+//   vOccurrences: number[];
+//   cells: number[]
+
+//   constructor(groupCells: number[]) {
+//     this.vOccurrences = new Array(10);
+//     for (let v of VALUES) {
+//       this.vOccurrences[v] = 0;
+//     }
+//     this.cells = groupCells;
+//   }
+
+  // /**
+  //  * 
+  //  */
+  // public containsValue(v: number) : boolean {
+  //   // return this.vOccurrences[v] == 1;
+  //   return this._vOccurrences[v] > 0;
+  // }
+
+//} // class Group
 
 // export class Group {
 //   private _vOccurrences: number[];  // number of occurrences of each value

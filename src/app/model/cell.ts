@@ -23,12 +23,18 @@ export class Cell {
    * @param boxIndex 
    */
   constructor(rowIndex: number, colIndex:number, boxIndex:number) {
-    this._value = 0;   // no value
+    // this._value = 0;   // no value
     this._candidates = new Array(10);
-    this.setAllCandidates();  // every value is candidate
+    // this.setAllCandidates();  // every value is candidate
     this._rowIndex = rowIndex;
     this._colIndex = colIndex;
     this._boxIndex = boxIndex;
+    this.initialize();
+  }
+
+  initialize() {
+    this._value = 0;          // empty, no value
+    this.setAllCandidates();  // every value is candidate
   }
 
   get value() : number {
@@ -55,9 +61,9 @@ export class Cell {
     return this._boxIndex;
   }
 
-  // set value(value: number) {
-  //   this._value = value;
-  // }
+  public hasValue() : boolean {
+    return this._value > 0;
+  }
 
   /**
    * Make every value a candidate.
@@ -77,7 +83,22 @@ export class Cell {
     }
   } // unsetAllCandidates()
 
-  
+  /**
+   * 
+   */
+  // public isValidCandidate(k: number) : boolean {
+
+  // }
+
+  //   let row = this.sudokuModel.rows[cell.rowIndex];
+  //   let col = this.sudokuModel.cols[cell.colIndex];
+  //   let box = this.sudokuModel.boxs[cell.boxIndex];
+
+  //     if (   row.vOccurrences[oldValue] > 0
+  //         || col.vOccurrences[oldValue] > 0
+  //         || box.vOccurrences[oldValue] > 0) {
+  //       continue;
+  //     }
 
 } // class Cell
 

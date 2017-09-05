@@ -15,27 +15,29 @@ $green3: #009900;  // xgreen
 $blue1:  #4d4dff;
 $blue2:  #0000ff;  // blue
 
-// $k-size is the width and heighth of a candidate cell. This value determines
-// the $s-size, $b-size, and $p-size -- the dimensions of a sudoku cell, a box
-// cell and the overall puzzle
-$k-size: 1.7vw;                 // candidate cell dimension
-$s-size: $k-size * 3;           // sudoku cell dimension (81 cells)
-$b-size: $s-size * 3 + 0.3;     // box dimension (9 boxes)
-$p-size: $b-size * 3 + 0.85;    // puzzle dimension
-
-// $k-font-size is that of candidates. 
+// font size of a cell candidate
+// all font sizes are scaled from this
 $k-font-size: 1.2vw;
-$s-font-size: $k-font-size * 3;
 
-$margin-size: (100 - ($p-size * 2)) / 2;
+$grid-size: 49vw;
+$exterior-border: 0.2vw;
+$box-border: 0.2vw;
+$cell-border: 0.15vw;
+$cell-size: 5.25vw;
+$candidate-size: $cell-size / 3;
+$margin-size: (100 - ($grid-size * 2)) / 2;
+
 
 #appContainer {
   display: grid;
-  grid-template-columns: repeat(2, [col] $p-size);
+  grid-template-columns: repeat(2, [col] $grid-size);
   grid-template-rows: repeat(3, [row] auto);
   margin: $margin-size;
 }
-
+ 
+//  --------------------------------------------------------------------------
+//  HEADER
+//  --------------------------------------------------------------------------
 #header {
   grid-column: col 1 / span 1;
   grid-row: row 1;
@@ -43,36 +45,28 @@ $margin-size: (100 - ($p-size * 2)) / 2;
 
 span.appTitle {
   float: left;
-  font-size: $k-font-size * 3;
+  font-size: (3 * $k-font-size);
   font-weight: bold;
   color: $green2;
 }
 
-#controls {
-  grid-column: col 2 / span 1;
-  grid-row: row 1 / span 2;
-
-  padding-left: 2.0vw;
-  font-size: 1.2vw;
-}
-
+//  --------------------------------------------------------------------------
+//  SUDOKU GRID
+//  --------------------------------------------------------------------------
+/*  Borders: The entire grid of 81 cells has
+    - an exterior border
+    - interior box borders separating the 9 boxes
+    - interior cell borders separating the 9 cells within a box
+    All borders are created by background colors that only appear as lines.
+    Exterior and box borders "show through" as a margin and grid layout gaps.
+    Cell borders similarly are gaps between cells in each box. 
+*/
 #gridsection {
   grid-column: col 1 / span 1;
   grid-row: row 2 / span 1;
-}
-
-#footer {
-  grid-column: col 1 / span 2;
-  grid-row: row 3;
-  font-size: 0.8 * $k-font-size;
-}
-span.tab {
-  padding: 0 (18 * $k-size);
-}
- 
-.pcell {
-  width: $p-size;
-  padding: 0.2vw;
+  width: $grid-size;
+  height: $grid-size;
+  padding: $box-border;   // creates outer border
   background-color: $black;
 }
 
@@ -80,26 +74,26 @@ span.tab {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
-  grid-gap: 0.2vw;  // creates box borders with .pcell background color
-}
-
-.bcell {
-  background-color: $gray1;
+  grid-gap: $box-border;
 }
 
 .scontainer {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
-  grid-gap: 0.15vw; // creates cell borders with .bcell background color
+  grid-gap: $cell-border;
+
+  background-color: $gray1;  
 }
 
 .scell {
-  font-size: $s-font-size;
+  width:  $cell-size;
+  height: $cell-size;
+  font-size: (3 * $k-font-size);
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   text-align: center;
-  line-height: $s-size;
+  align-self: center;
   background-color: $tan1;
 }
 
@@ -107,15 +101,18 @@ span.tab {
   background-color: $green1;
 }
 
-span.value {
+// span.value {
+div.value {
   color: $green3;
 }
 
-span.locked {
+// span.locked {
+div.locked {
   color: $black;
 }
 
-span.invalid {
+// span.invalid {
+div.invalid {
   color: $red3;
 }
 
@@ -130,13 +127,15 @@ span.invalid {
 }
 
 .kcell {
-  width: $k-size;
-  height: $k-size;
+  width:  $candidate-size;
+  height: $candidate-size;
   font-size: $k-font-size;
   font-weight: normal;
   color: $gray2;
-  text-align: center;
-  line-height: $k-size;
+  // text-align: center;
+  // line-height: $candidate-size;
+  justify-content: center;
+  align-self: center;
 }
 
 .candidate {
@@ -148,6 +147,77 @@ span.invalid {
   color: $blue2;
 }
 
+//  --------------------------------------------------------------------------
+//  CONTROLS
+//  --------------------------------------------------------------------------
+#controls {
+  grid-column: col 2 / span 1;
+  // grid-row: row 1 / span 2;
+  grid-row: row 1 / span 3;
+
+  padding-left: 2.0vw;
+  font-size: $k-font-size;
+}
+
+controlsContainer {
+  display: grid;
+  grid-template-columns: 1;
+  grid-template-rows: 12 auto;
+}
+
+.controlsRow {
+  grid-column: col 1;
+  padding: 0.1vw 1vw 0.1vw 1vw
+}
+
+.cRow01 {
+  grid-row: row 1;
+}
+
+.cRow02 {
+  grid-row: row 2;
+}
+
+.cRow03 {
+  grid-row: row 3;
+}
+
+.cRow04 {
+  grid-row: row 4;
+}
+
+.cRow05 {
+  grid-row: row 5;
+}
+
+.cRow06 {
+  grid-row: row 6;
+}
+
+.cRow07 {
+  grid-row: row 7;
+}
+
+.cRow08 {
+  grid-row: row 8;
+}
+
+.cRow09 {
+  grid-row: row 9;
+}
+
+.cRow10 {
+  grid-row: row 10;
+}
+
+.cRow11 {
+  grid-row: row 11;
+}
+
+.cRow12 {
+  grid-row: row 12;
+}
+
 button {
   border: none;
   border-radius: 0.5vw;
@@ -156,12 +226,11 @@ button {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 1.2vw;
+  font-size: $k-font-size;
   margin: auto;
   cursor: pointer;
 }
 
-// button.diff { width: 80px;}
 button.diff { width: 8.0vw;}
 button.easy    { background-color: $white; color: $black; }
 button.medium  { background-color: $green3; } 
@@ -170,12 +239,12 @@ button.hardest { background-color: $red3; }
 
 .strike {text-decoration: line-through}
 
-// button.exec { width: 140px; }
 button.exec { width: 15.0vw; }
 button.start   { background-color: $green2; } 
 button.stop    { background-color: $red2 }
 
 button.general { background-color: $blue1; }
+button.placeHolder { visibility: hidden; }
 
 cands { margin-left: 1px; }
 
@@ -186,8 +255,8 @@ cands { margin-left: 1px; }
 textarea {
   font-family: monospace;
   width: 40vw;
-  height: 10vw;
-  font-size: 0.8vw;
+  height: 9vw;
+  font-size: (0.67 * $k-font-size);
   background-color: $tan1;
 }
 
@@ -243,9 +312,25 @@ textarea.clues {
 	resize: none;
   width: 25vw;
   height: 4.0vw;
-  font-size: 0.8vw;
+  font-size: (0.67 * $k-font-size);
 }
 
+//  --------------------------------------------------------------------------
+//  FOOTER
+//  --------------------------------------------------------------------------
+#footer {
+  // grid-column: col 1 / span 2;
+  grid-column: col 1 / span 1;
+  grid-row: row 3;
+  font-size: (0.8 * $k-font-size);
+}
+span.tab {
+  padding: 0 (4 * $candidate-size);
+}
+ 
+//  --------------------------------------------------------------------------
+//  EXTRAS
+//  --------------------------------------------------------------------------
 // progress bar
 $progress-width: 590px;
 $progress-height: 10px;

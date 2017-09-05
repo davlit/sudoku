@@ -70,7 +70,7 @@ export class SudokuService {
   } // initializeModel()
 
   /**
-   * TODO not sure this is needed.
+   * TODO not sure this is needed. Used by Print sudoku.
    */
   public getCurrentSudoku() : Puzzle {
     return this.currentSudoku;
@@ -94,7 +94,8 @@ export class SudokuService {
       }
 
       // set cell, update row/col/box
-      this.setValue(c, givenValue, ActionType.SET_VALUE);
+      // this.setValue(c, givenValue, ActionType.SET_VALUE);
+      this.setValue(c, givenValue);
     } // for
 
     // this.initializeActionLog();
@@ -103,12 +104,13 @@ export class SudokuService {
 
   /**
    * Sets a given value in every cell and set all groups to complete.
+   * Used by CreationService to set a full grid of values.
    */
   public setAllValues(values: number[]) : void {
-    for (let c of CELLS) {    // c is 0..80
-      let cell = this.sudokuModel.cells[c];   // cell at [c] in cells array
-      cell.value = values[c];   // value at [c] in values array
-      this.removeAllCellCandidates(c);
+    for (let ci of CELLS) {    // c is 0..80
+      let cell = this.sudokuModel.cells[ci];   // cell at [c] in cells array
+      cell.value = values[ci];   // value at [c] in values array
+      this.removeAllCellCandidates(ci);
     }
     for (let g of GROUPS) {
       for (let v of VALUES) {
@@ -122,80 +124,51 @@ export class SudokuService {
   /**
    * Return givenValue of cell. Zero means no givenValue;
    */
-  public getValue(c: number) : number {
-    return this.sudokuModel.cells[c].value;
+  public getValue(ci: number) : number {
+    return this.sudokuModel.cells[ci].value;
   } // getValue()
 
   /**
-   * TODO update this documentation
+   * Sets value of a cell to the given value. In the specified cell, all 
+   * candidates are removed. The candidate, equal to the value being set, is 
+   * removed from every cell that shares the row, column, and box of the given
+   * cell.
    * 
-   * Sets value of a cell to the given value. In the specified cell, all candidates
-   * are removed. The candidate, equal to the value being set, is removed from 
-   * every cell that shares the row, column, and box of the given cell.
-   * 
-   * If the cell is locked or already has the new value, no action will be 
+   * If the cell already has the new value, no action will be 
    * taken. If the cell has some other value, that old value will be removed
-   * first. The new value will be removed as a candidate where it appears in 
-   * the cell's row, column, and box.
+   * first. 
    * 
-   * 
-   * 
-   * 
-   * 
-   * Set given givenValue in given cell.
-   * - will not affect a locked cell
-   * - if cell already has the new givenValue, nothing to do
-   * - if cell already has another givenValue, remove it first
-   * - set the new givenValue (also removes all candidates from cell)
-   * - update givenValues count in cell's row, column, and box
-   * - update givenValues used
-   * - *TODO* conflict in row, col, box ............. mark invalid
-   * - create and log action entry
-   * - remove this givenValue as candidate in related cells
-   * 
-   * Called by
-   * - setValue_() user key press or right click (playComponent.ts) setCellValue())
-   * - applyHint()
-   * - undoAction() REMOVE_VALUE
-   * - generatePuzzle() step 2 (pare down)
-   * 
-   * Undo notes
-   * - remove givenValue
-   * - restore old previous givenValue? Down thru a removeValue action?
-   * - update givenValues count in cell's row, column, and box
-   * - update givenValues used
-   * - conflict ................
-   * - restore candidates in cell
-   * - restore candidates in related CELLS
-   * - remove log entry, don't create new one
-   */     
-  public setValue(c: number, newValue: number, actionType: ActionType, 
-      guessPossibles? : number[], hint?: ValueHint) : void {
-    let cell = this.sudokuModel.cells[c];
+   * @param ci the cell index
+   * @param newValue 
+   * @param actionType 
+   * @param guessPossibles in the case of a guess
+   * @param hint if a hint is being applied
+   */
+  // public setValue(ci: number, newValue: number, actionType: ActionType, 
+  //     guessPossibles? : number[], hint?: ValueHint) : void {
+  public setValue(ci: number, newValue: number) : void {
+   let cell = this.sudokuModel.cells[ci];
 
     // if cell has givenValue, remove it first
-    if (cell.value != 0) {
-      if (cell.value === newValue) {
+    if (cell.hasValue()) {
+      if (cell.value == newValue) {
         return;	// same as existing givenValue, nothing to do
       }
-      this.removeValue(c);
+      this.removeValue(ci);
     }
 
     // set new value, remove candidates from cell
     cell.value = newValue;   
-    this.removeAllCellCandidates(c);
+    this.removeAllCellCandidates(ci);
 
     // increment occurrences in cell's groups (row, column, box)
-    this.sudokuModel.rows[cell.rowIndex].vOccurrences[newValue]++;
-    this.sudokuModel.cols[cell.colIndex].vOccurrences[newValue]++;
-    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[newValue]++;
+    this.incrementGroupOccurrences(ci, newValue);
 
     // remove candidate (i.e. new value) from related cells (rc)
-    for (let rc of Common.getRelatedCells(c)) {
-      if (this.sudokuModel.cells[rc].value != 0) {
-        continue;
+    for (let rc of Common.getRelatedCells(ci)) {
+      if (!this.hasValue(rc)) {
+        this.removeCandidate(rc, newValue);
       }
-      this.sudokuModel.cells[rc].candidates[newValue] = false;
     }            
   } // setValue()
 
@@ -235,23 +208,29 @@ export class SudokuService {
    * 
    * - conflict ................
    */
-  public removeValue(c: number) : void {
-
-    let cell = this.sudokuModel.cells[c];
+  public removeValue(ci: number) : void {
+    let cell = this.sudokuModel.cells[ci];
     
-    // get existing givenValue, exit if no existing givenValue
-    let oldValue = cell.value;
-    if (oldValue === 0) {
+    if (!cell.hasValue()) {
       return;			// nothing to remove
     }
 
+    let oldValue = cell.value;
+
     cell.value = 0;
+    // let row = this.sudokuModel.rows[cell.rowIndex];
+    // let col = this.sudokuModel.cols[cell.colIndex];
+    // let box = this.sudokuModel.boxs[cell.boxIndex];
+    // row.vOccurrences[oldValue]--;
+    // col.vOccurrences[oldValue]--;
+    // box.vOccurrences[oldValue]--;
+
+    // increment occurrences in cell's groups (row, column, box)
+    this.decrementGroupOccurrences(ci, oldValue);
+
     let row = this.sudokuModel.rows[cell.rowIndex];
     let col = this.sudokuModel.cols[cell.colIndex];
     let box = this.sudokuModel.boxs[cell.boxIndex];
-    row.vOccurrences[oldValue]--;
-    col.vOccurrences[oldValue]--;
-    box.vOccurrences[oldValue]--;
 
     // add applicable candidates to cell
     for (let v of VALUES) {
@@ -260,11 +239,11 @@ export class SudokuService {
           || box.vOccurrences[oldValue] > 0) {
         continue;
       }
-      this.addCandidate(c, v);
+      this.addCandidate(ci, v);
     }
 
     // add candidate (this cell's old givenValue) to related cells
-    for (let rc of Common.getRelatedCells(c)) {
+    for (let rc of Common.getRelatedCells(ci)) {
       let relatedCell = this.sudokuModel.cells[rc];
       let rcRow = this.sudokuModel.rows[relatedCell.rowIndex];
       let rcCol = this.sudokuModel.cols[relatedCell.colIndex];
@@ -277,6 +256,34 @@ export class SudokuService {
       this.addCandidate(rc, oldValue);
     }
   } // removeValue()
+
+  /**
+   * Increment the occurrences of a vlues in a cell's group (row, column, and
+   * box).
+   * 
+   * @param ci cell index
+   * @param value cell value
+   */
+  private incrementGroupOccurrences(ci: number, value: number) : void {
+    let cell = this.sudokuModel.cells[ci];
+    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]++;
+    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]++;
+    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]++;
+  }
+
+  /**
+   * Decrement the occurrences of a vlues in a cell's group (row, column, and
+   * box).
+   * 
+   * @param ci cell index
+   * @param value cell value
+   */
+  private decrementGroupOccurrences(ci: number, value: number) : void {
+    let cell = this.sudokuModel.cells[ci];
+    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]--;
+    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]--;
+    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]--;
+  }
 
   /**
    * TODO update this documentation

@@ -34,11 +34,10 @@ export class Puzzle {
   } // serialize()
 
   static deserialize(puzzleData) : Puzzle {
-// console.log(puzzleData.getStats());
     let data = JSON.parse(puzzleData);
     let puzzle = new Puzzle();
     puzzle._initialValues = data._initialValues;
-    puzzle._completedPuzzle = data._completedPuzzle;
+    puzzle._completedPuzzle = JSON.parse('[' + data._completedPuzzle + ']');
     puzzle._desiredDifficulty = data._desiredDifficulty;
     puzzle._actualDifficulty = data._actualDifficulty;
     puzzle._generatePasses = data._generatePasses;

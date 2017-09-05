@@ -17,7 +17,7 @@
 
 </div> <!-- #header -->
 
-<div id="gridsection">
+<!-- <div id="gridsection"> -->
 <!--
 Sudoku grid based on
 - 3 rows and 3 columns of boxes
@@ -27,11 +27,14 @@ Sudoku grid based on
 Sudoku model is based on 9 rows and 9 columns of cells
 s: sudoku, b: box, v: value, k: candidate
  -->
+<!-- <div id="gridsection">
  <div class="pcell" (keyup)="handleKeyPress($event)" 
+    oncontextmenu="return false;" tabindex="1"> -->
+<div id="gridsection" (keyup)="handleKeyPress($event)" 
     oncontextmenu="return false;" tabindex="1">
   <div class="bcontainer">
     <div *ngFor="let vb of [0,1,2,3,4,5,6,7,8]">
-      <div class="bcell">
+      <!-- <div class="bcell"> -->
         <div class="scontainer">
           <div *ngFor="let vc of [0,1,2,3,4,5,6,7,8]">
             <div class="scell" [ngSwitch]="hasValue(vb, vc)"
@@ -39,13 +42,13 @@ s: sudoku, b: box, v: value, k: candidate
                   'selected': isSelectedCell(vb, vc)}"
                 (mousedown)="handleCellClick($event, vb, vc)">
             
-              <!-- opt 1: value -->
-              <span *ngSwitchCase="true" class="value"
+              <!-- opt 1: value -->  <!-- span -->
+              <div *ngSwitchCase="true" class="value"
                 [ngClass]="{
                   'locked':   isCellLocked_(vb, vc),
                   'invalid':  isCellInvalid(vb, vc)}">
                 {{valueToChar_(vb, vc)}}
-              </span>
+              </div>
               <!-- end opt 1 -->
 
               <!-- opt 2: candidates -->
@@ -65,10 +68,10 @@ s: sudoku, b: box, v: value, k: candidate
             </div> <!-- scell -->
           </div> <!-- *ngFor c -->
         </div> <!-- scontainer -->
-      </div> <!-- bcell -->
+      <!-- </div> --> <!-- bcell -->
     </div> <!-- *ngFor b -->
   </div> <!-- bcontainer -->
-</div> <!-- pcell -->
+<!--</div> <!-- pcell -->
 
 </div> <!-- id="gridsection" -->
 
@@ -80,55 +83,6 @@ s: sudoku, b: box, v: value, k: candidate
     <div *ngSwitchCase="PlayStates.NEW">
 
       <p>Select a new Sudoku:</p>
-
-      <!-- <div>
-      <span *ngIf="easyAvailable; else easyNotAvailable">
-        <button (click)="generate(0)" class="diff easy" 
-          tooltip="Solvable finding naked or hidden singles">
-          Easy</button>
-      </span>
-      <ng-template #easyNotAvailable>
-        <button class="diff easy strike"
-          tooltip="Loading ...">
-          Easy</button>
-      </ng-template>
-      &nbsp;
-
-      <span *ngIf="mediumAvailable; else mediumNotAvailable">
-        <button (click)="generate(1)" class="diff medium" 
-          tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions">
-          medium</button>
-      </span>
-      <ng-template #mediumNotAvailable>
-        <button class="diff medium strike"
-          tooltip="Loading ...">
-          medium</button>
-      </ng-template>
-      &nbsp;
-
-      <span *ngIf="hardAvailable; else hardNotAvailable">
-        <button (click)="generate(2)" class="diff hard" 
-          tooltip="Solvable finding naked triples/quads or hidden pairs/triples">
-          hard</button>
-      </span>
-      <ng-template #hardNotAvailable>
-        <button class="diff hard strike"
-          tooltip="Loading ...">
-          hard</button>
-      </ng-template>
-      &nbsp;
-
-      <span *ngIf="hardestAvailable; else hardestNotAvailable">
-        <button (click)="generate(3)" class="diff hardest" 
-          tooltip="Solvable using more advanced techniques or guessing">
-          hardest</button>
-      </span>
-      <ng-template #hardestNotAvailable>
-        <button class="diff hardest strike"
-          tooltip="Loading ...">
-          hardest</button>
-      </ng-template>
-      </div> -->
 
       <button *ngIf="easyAvailable" (click)="generate(0)" class="diff easy" 
         tooltip="Solvable finding naked or hidden singles">
@@ -200,13 +154,11 @@ s: sudoku, b: box, v: value, k: candidate
     <!-- ========== play-execute ========== -->
     <div *ngSwitchCase="PlayStates.EXECUTE" (keyup)="handleKeyPress($event)">
 
-      <p>
-        Difficulty: {{actualDifficulty}}
-        &nbsp;&nbsp;&nbsp;
-        Elapsed time: {{elapsedTime}}
-      </p>
+      <div class="controlsRow cRow01">
+        Difficulty: {{actualDifficulty}} &nbsp;&nbsp;&nbsp; Elapsed time: {{elapsedTime}}
+      </div>
 
-      <p>
+      <div class="controlsRow cRow02">
         <button *ngIf="!candidatesShowing" class="exec start" 
             (click)="toggleCandidates()"
             tooltip="Display the candidates in open cells">
@@ -222,55 +174,62 @@ s: sudoku, b: box, v: value, k: candidate
                 {{k}}</button>
           </span>
         </span>
-      </p>
+      </div>
 
-      <p>
-        <button *ngIf="candidatesModified" class="general" 
+      <div class="controlsRow cRow03">
+        <button *ngIf="candidatesModified" 
+            class="general" 
             (click)="refreshCandidates()"
             tooltip="Candidates have been manually removed -- this will restore them">
-            Refresh candidates</button>
-      </p>
+            Refresh candidates
+        </button>
+        <button *ngIf="!candidatesModified" 
+            class="placeHolder">
+            Place Holder
+        </button>
+      </div>
 
-      <!-- ===== Hints ===== -->
-      <div [ngSwitch]="hintState">
-        <p *ngSwitchCase="hintStates.READY">
-          <button class="exec start" 
+      <div class="controlsRow cRow04">
+        <div [ngSwitch]="hintState">
+          <button *ngSwitchCase="hintStates.READY" 
+              class="exec start" 
               (click)="handleHintClick()"
               tooltip="Suggest a valid move">
               Get hint</button>
-        </p>
-        <p *ngSwitchCase="hintStates.ACTIVE">
-          <button class="exec stop" 
+          <button *ngSwitchCase="hintStates.ACTIVE"
+              class="exec stop" 
               (click)="handleHintClick()"
               tooltip="Automatically execute the suggested move">
               Apply hint</button>
           {{hintMessage}}              
-        </p>
-        <p *ngSwitchCase="hintStates.NO_HINT">
+        <span *ngSwitchCase="hintStates.NO_HINT">
           No hint available              
-        </p>
+        </span>
+        </div>
       </div>
 
-      <!-- ===== Auto Solve ===== -->
-      <p [ngSwitch]="autoSolveState">
-        <button *ngSwitchCase="autoSolveStates.READY" 
-            class="exec start" (click)="handleAutoSolveClick()"
-            tooltip="Automatically solve the sudoku using hints">
-            Auto solve start</button>
-        <button *ngSwitchCase="autoSolveStates.RUNNING
-            || autoSolveStates.PENDING_STOP" 
-            class="exec stop" (click)="handleAutoSolveClick()"
-            tooltip="Stop the action">
-            Auto solve stop</button>
-        <span *ngSwitchCase="autoSolveStates.NO_HINT
-            || autoSolveStates.PENDING_STOP">
-            Auto solve not available</span>
-      </p>
+      <div class="controlsRow cRow05">
+        <div [ngSwitch]="autoSolveState">
+          <button *ngSwitchCase="autoSolveStates.READY" 
+              class="exec start" (click)="handleAutoSolveClick()"
+              tooltip="Automatically solve the sudoku using hints">
+              Auto solve start</button>
+          <button *ngSwitchCase="autoSolveStates.RUNNING
+              || autoSolveStates.PENDING_STOP" 
+              class="exec stop" (click)="handleAutoSolveClick()"
+              tooltip="Stop the action">
+              Auto solve stop</button>
+          <span *ngSwitchCase="autoSolveStates.NO_HINT
+              || autoSolveStates.PENDING_STOP">
+              Auto solve not available</span>
+        </div>
+      </div>
 
-      <!-- ===== Value Picker ===== -->
-      <p *ngIf="!isAnySelectedCell()"><span>Select a cell</span></p>
-      <div *ngIf="isAnySelectedCell()">
-        <p>Value picker for selected cell:</p>
+      <div class="controlsRow cRow06">
+      </div>
+
+      <div class="controlsRow cRow07">
+        Value picker for selected cell:
         <div class="vcontainer">
           <div class="vcell" *ngFor="let v of [1,2,3,4,5,6,7,8,9]"
               (mousedown)="handleChoiceClick(v)">
@@ -281,23 +240,39 @@ s: sudoku, b: box, v: value, k: candidate
           </div>
         </div>
       </div>
-      <br/>  
 
-      <!-- ===== Action Log ===== -->
-      <p><span>Action Log:</span>
+      <div class="controlsRow cRow08">
+        Action Log:
         <button [hidden]="actionLog === ''" class="general"
-                (click)="undoLastAction()">Undo Last Action</button><br/>
-        <!-- <textarea [ngModel]="actionsLog" rows="8" cols="55"></textarea> -->
-        <textarea [ngModel]="actionsLog"></textarea>
-      </p>
+                (click)="undoLastAction()">Undo Last Action</button>
+      </div>
 
-      <p>
-        <button class="general" (click)="restartCurrentPuzzle()"
+      <div class="controlsRow cRow09">
+        <textarea [ngModel]="actionsLog"></textarea>
+      </div>
+
+      <div class="controlsRow cRow10">
+         <button class="general" (click)="restartCurrentPuzzle()"
             tooltip="Start over on same sudoku" 
             placement="bottom">Restart sudoku</button>&nbsp;
-        <button class="general" (click)="startNewPuzzle()">New sudoku</button>
-        <!-- <button class="general" (click)="printGrid()">Print</button> -->
-      </p>
+        <button class="general" (click)="startNewPuzzle()">New sudoku</button> 
+      </div>
+
+      <div class="controlsRow cRow011">
+      </div>
+
+      <div class="controlsRow cRow012">
+        Instructions:
+          <textarea>
+- Resize your browser window as desired to see everything.
+- Click on a cell to select it.
+- Use number keys to set a value in the selected cell.
+- Or use a mouse click on the 1 to 9 & Clear "Value Picker".
+- A zero key or Clear will remove the selected cell's value.
+- When candidates are showing, double click to remove one.
+- Try out other buttons.
+        </textarea> 
+      </div>
 
       <!-- <p>
         <span>Solution Clues:</span><br/>
@@ -324,22 +299,6 @@ s: sudoku, b: box, v: value, k: candidate
       </tr>
       </table> -->
       <!-- </p> -->
-
-      <!-- ===== Instructions ===== -->
-      <p><span>Instructions:</span>
-        <!-- <button [hidden]="actionLog === ''" class="general"
-                (click)="undoLastAction()">Undo Last Action</button><br/> -->
-        <!-- <textarea [ngModel]="actionsLog" rows="8" cols="55"></textarea> -->
-        <textarea>
-- Resize your browser window as desired to see everything.
-- Click on a cell to select it.
-- Use number keys to set a value in the selected cell.
-- Or use a mouse click on the 1 to 9 & Clear "Value Picker".
-- A zero key or Clear will remove the selected cell's value.
-- When candidates are showing, double click to remove one.
-- Try out other buttons.
-        </textarea>
-      </p>
 
     </div>  <!-- *ngSwitchCase="PlayStates.EXECUTE" -->
 
