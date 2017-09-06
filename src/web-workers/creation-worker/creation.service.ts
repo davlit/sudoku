@@ -5,6 +5,7 @@ import { Common } from '../../app/common/common';
 import { Difficulty } from '../../app/model/difficulty';
 import { Puzzle } from '../../app/model/puzzle';
 
+import { Action } from '../../app/action/action';
 import { ActionType } from '../../app/action/action';
 import { SetValueAction } from '../../app/action/action';
 import { GuessValueAction } from '../../app/action/action';
@@ -447,7 +448,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
         let kHint: CandidatesHint = <CandidatesHint> hint;
         let removes = kHint.removes;
         for (let remove of removes) {
-          this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+          // this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+          this.sudokuService.removeCandidate(remove.cell, remove.candidate);
 
           // // log action
           this.actionLog.addEntry(
@@ -562,14 +564,16 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     // undo entries that are not guesses
     let lastAction = this.actionLog.getLastEntry();
     while (lastAction && lastAction.type != ActionType.GUESS_VALUE) {
-      this.sudokuService.undoAction(lastAction);
+      // this.sudokuService.undoAction(lastAction);
+      this.undoLastAction(lastAction);
       this.actionLog.removeLastEntry();
       lastAction = this.actionLog.getLastEntry();
     }
 
     if (this.actionLog.getLastEntry() &&
         this.actionLog.getLastEntry().type === ActionType.GUESS_VALUE) {
-      this.sudokuService.undoAction(this.actionLog.getLastEntry());
+      // this.sudokuService.undoAction(this.actionLog.getLastEntry());
+      this.undoLastAction(this.actionLog.getLastEntry());
 
       return <GuessValueAction> this.actionLog.getLastEntry();   // last GUESS_VALUE action
     }
@@ -581,11 +585,70 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    */
   private rollbackAll() : void {
     while (this.actionLog.getLastEntry()) {
-      this.sudokuService.undoAction(this.actionLog.getLastEntry());
+      // this.sudokuService.undoAction(this.actionLog.getLastEntry());
+      this.undoLastAction(this.actionLog.getLastEntry());
       this.actionLog.removeLastEntry();
     }
   } // rollbackAll()
 
+  /**
+   * NEW
+   * @param action 
+   */
+  private undoLastAction(action: Action) : void {
+    let actionType = action.type;
+    switch (actionType) {
+      case ActionType.SET_VALUE:
+      case ActionType.GUESS_VALUE:
+        this.sudokuService.removeValue(action.cell);
+        break;
+      case ActionType.REMOVE_CANDIDATE:
+        this.sudokuService.addCandidate(action.cell, (<RemoveCandidateAction> action).candidate);
+    }
+  }
+
+  // /**
+  //  * FROM APP COMPNONENT
+  //  * 
+  //  * button 'Undo Last Action' EXECUTION state
+  //  */
+  // private XXXundoLastAction() : void {
+  //   this.initializeHintStates();    // remove any hint
+
+  //   let lastAction = this.actionLog.getLastEntry();
+  //   if (lastAction === undefined) {
+  //     return;
+  //   }
+
+  //   let action = undefined;
+  //   switch (lastAction.type) {
+  //     case ActionType.SET_VALUE:
+  //       action = <SetValueAction>lastAction;
+  //       this.sudokuService.removeValue(action.cell);
+  //       break;
+  //     //case ActionType.GUESS_VALUE:
+  //     //  break;
+  //     case ActionType.REMOVE_VALUE:
+  //       action = <RemoveValueAction>lastAction;
+  //       // this.sudokuService.setValue(action.cell, action.value, action.action);
+  //       this.sudokuService.setValue(action.cell, action.value);
+  //       break;
+  //     case ActionType.REMOVE_CANDIDATE:
+  //       action = <RemoveCandidateAction>lastAction;
+  //       this.sudokuService.restoreCandidate(action.cell, action.candidate);
+  //       break;
+  //     case ActionType.RESTORE_CANDIDATE:
+  //       action = <RestoreCandidateAction>lastAction;
+  //       this.sudokuService.removeCandidate(action.cell, action.candidate);
+  //       break;
+  //   } // switch
+
+  //   // set selected cell to that of last action
+  //   this.setSelectedCell(lastAction.cell);
+  //   this.actionLog.removeLastEntry();
+  //   this.refreshActionsLog();
+  // } // undoLastAction()
+  
   // /**
   //  * Swap values of two given cells.
   //  */

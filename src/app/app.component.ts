@@ -456,7 +456,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
     if (this.candidatesShowing) {
       let cellIdx = this.viewToCellIdx(vb, vc);
       if (this.sudokuService.isCandidate(cellIdx, k)) {
-        this.sudokuService.removeCandidate(cellIdx, k, undefined);
+        // this.sudokuService.removeCandidate(cellIdx, k, undefined);
+        this.sudokuService.removeCandidate(cellIdx, k);
 
         // log action
         this.actionLog.addEntry(
@@ -862,7 +863,8 @@ console.log('Sudoku:\n' + this.currentPuzzle.toString());
         let kHint: CandidatesHint = <CandidatesHint> hint;
         let removes = kHint.removes;
         for (let remove of removes) {
-          this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+          // this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
+          this.sudokuService.removeCandidate(remove.cell, remove.candidate);
 
         // log action
         this.actionLog.addEntry(

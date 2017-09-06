@@ -24,10 +24,14 @@ const DIFFICULTIES = [Difficulty.EASY,
                       Difficulty.MEDIUM, 
                       Difficulty.HARD, 
                       Difficulty.HARDEST];
-const KEYS: string[][] = [['easy-1',    'easy-2',    'easy-3'   ],
-                          ['medium-1',  'medium-2',  'medium-3' ],
-                          ['hard-1',    'hard-2',    'hard-3'   ],
-                          ['hardest-1', 'hardest-2', 'hardest-3']];
+// const KEYS: string[][] = [['easy-1',    'easy-2',    'easy-3'   ],
+//                           ['medium-1',  'medium-2',  'medium-3' ],
+//                           ['hard-1',    'hard-2',    'hard-3'   ],
+//                           ['hardest-1', 'hardest-2', 'hardest-3']];
+const KEYS: string[][] = [['01', '02', '03'],
+                          ['11', '12', '13'],
+                          ['21', '22', '23'],
+                          ['31', '32', '33']];
 
 /**
  * Manages the cache of prepared sudokus of varying difficulty.
