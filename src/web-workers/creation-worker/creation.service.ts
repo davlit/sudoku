@@ -1,4 +1,3 @@
-// import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Common } from '../../app/common/common';
@@ -28,7 +27,9 @@ import { ROW_CELLS } from  '../../app/common/common';
 import { COL_CELLS } from  '../../app/common/common';
 import { ROOT_VALUES } from  '../../app/common/common';
 
-// @Injectable()
+/**
+ * This class creates sudokus of varying difficulty.
+ */
 export class CreationService {
 
   private randomCellIndexes: number[];
@@ -39,7 +40,11 @@ export class CreationService {
   private sudokuService: SudokuService;
   private hintService: HintService;
 
+  /**
+   * 
+   */
   constructor() {
+console.warn('CreationService constructor')    ;
     this.hintLog = new HintLogService();
     this.actionLog = new ActionLogService();
     this.sudokuService = new SudokuService();
@@ -47,10 +52,16 @@ export class CreationService {
   }
 
   /**
+   * Create a sudoku of desired difficulty. There are 3 major steps and the
+   * process is iterative. Easy, Medium, and Hardest are fairly easy to make.
+   * Hard sudokus are the most difficult and it may take many interations.
    * 
+   * This is a CPU-intense task, hence is it run in background using a
+   * Web Worker. This allows the user interface to be responsive. The user
+   * will not likely know a background task is working behind the scenes.
    */
   public createSudoku(difficulty: Difficulty) : string {
-console.info('In creationService.createSudoku() difficulty: ' + difficulty);
+console.info('\nCreating ' + Puzzle.getDifficultyLabel(difficulty) + ' sudoku ...');
 
     this.actionLog.initialize();
 
@@ -86,8 +97,6 @@ console.info('In creationService.createSudoku() difficulty: ' + difficulty);
     } // while not getting desired difficulty
 
     sudoku.generatePasses = pass;
-// console.info('In creationService.createSudoku() sudoku: ' + sudoku);
-// console.info('In creationService.createSudoku() serialized: ' + sudoku.serialize());
 console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty) 
     + ' in ' + sudoku.generatePasses + ' passes');
     return sudoku.serialize();
@@ -123,7 +132,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     // this.randomCellIndexes = Common.RANDOM_CELLS_1;
     // this.randomValues = Common.RANDOM_VALUES_1;
    for (let v of VALUES) {
-      // this.sudokuService.setValue(this.randomCellIndexes[v], v, ActionType.GUESS_VALUE);
       this.sudokuService.setValue(this.randomCellIndexes[v], v);
     }
     this.solve();
@@ -204,7 +212,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
           while (hint) {
 
             // count difficulty hard hints
-            // if (this.hintService.getActiveHint().getDifficultyRating() === Difficulty.HARD) {
             if (hint.getDifficultyRating() === Difficulty.HARD) {
               hard = true;
             }
@@ -231,12 +238,8 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
           } // if multiple solutions, fall through to restore pared cells
       } // switch
 
-      // this.sudokuService.setValue(c, savedValue, ActionType.SET_VALUE);
-      // this.sudokuService.setValue(symC, savedSymValue, ActionType.SET_VALUE);
       this.sudokuService.setValue(c, savedValue);
       this.sudokuService.setValue(symC, savedSymValue);
-      // this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
-      // this.sudokuService.removeLastActionLogEntry(); // keep restores out of action log
     } // for next random symmetric pairs of cells to pare
 
     // TODO
@@ -270,6 +273,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
 
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues =  Common.shuffleArray(VALUES.slice());
+
     // testing
     // this.randomCellIndexes = Common.RANDOM_CELLS_3;
     // this.randomValues = Common.RANDOM_VALUES_3;
@@ -308,9 +312,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    */
   private solve() : boolean {
     let hint: Hint = this.hintService.getHint(Difficulty.HARDEST);
-    // while (this.hintService.getHint(Difficulty.HARDEST) != undefined) {
     while (hint != undefined) {
-      // this.hintService.applyHint();
       this.applyHint(hint);
 // console.info('Action log: ' + this.actionLog.toStringFirstFirst());
       if (this.sudokuService.isSolved()) {
@@ -388,35 +390,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     return localSolutionsCount;
   } // countSolutions()
 
-  // /**
-  //  * Apply hint toward solution.
-  //  */
-  // private applyHint() : void {
-  //   if (this.activeHint == undefined) {
-  //     return;   // no hint to apply
-  //   }
-  //   this.hintLog.addEntry(this.activeHint);
-
-  //   // switch (hint.action) {
-  //   switch (this.activeHint.type) {
-  //     case HintType.NAKED_SINGLE:
-  //     case HintType.HIDDEN_SINGLE_ROW:
-  //     case HintType.HIDDEN_SINGLE_COL:
-  //     case HintType.HIDDEN_SINGLE_BOX:
-  //       let vHint: ValueHint = <ValueHint> this.activeHint;
-  //       this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-  //           vHint);
-  //       break;
-  //     default:
-  //       let kHint: CandidatesHint = <CandidatesHint> this.activeHint;
-  //       let removes = kHint.removes;
-  //       for (let remove of removes) {
-  //         this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
-  //       }
-  //   } // switch
-  //   this.activeHint = undefined;
-  // } // applyHint()
-
   /**
    * Apply hint toward solution.
    */
@@ -424,8 +397,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     if (hint == undefined) {
       return;   // no hint to apply
     }
-    // this.hintLog.addEntry(hint);
-    // this.hintService.addHintLogEntry(hint);
     this.hintLog.addEntry(hint);
 
     // switch (hint.action) {
@@ -435,26 +406,17 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
       case HintType.HIDDEN_SINGLE_COL:
       case HintType.HIDDEN_SINGLE_BOX:
         let vHint: ValueHint = <ValueHint> hint;
-        // this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-        //     vHint);
         this.sudokuService.setValue(vHint.cell, vHint.value);
-
-        // // log action
         this.actionLog.addEntry(
             new SetValueAction(ActionType.SET_VALUE, vHint.cell, vHint.value, vHint));
-
         break;
       default:
         let kHint: CandidatesHint = <CandidatesHint> hint;
         let removes = kHint.removes;
         for (let remove of removes) {
-          // this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
           this.sudokuService.removeCandidate(remove.cell, remove.candidate);
-
-          // // log action
           this.actionLog.addEntry(
               new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, remove.cell, remove.candidate, kHint));
-
         }
     } // switch
     hint = undefined;
@@ -476,16 +438,13 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     } else {
       guessCell = lastGuess.cell;
       possibleValues = lastGuess.possibleValues;
-      // this.sudokuService.removeLastActionLogEntry(); // remove previous action
       if (possibleValues.length === 0) {
         return false;
       }
     }
     guessValue = possibleValues[0];   // try 1st available candidate
     possibleValues = possibleValues.slice(1);   // remove guess value
-    // this.hintService.addHintLogEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
     this.hintLog.addEntry(new ValueHint(HintType.GUESS, guessCell, guessValue));
-    // this.sudokuService.setValue(guessCell, guessValue, ActionType.GUESS_VALUE, possibleValues);
     this.sudokuService.setValue(guessCell, guessValue);
 
     // // log action
@@ -495,33 +454,7 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     return true;
   } // guess()
 
-  // /**
-  //  * FROM SudokuService
-  //  * 
-  //  * @param cell 
-  //  * @param value 
-  //  * @param actionType 
-  //  * @param possibleValues 
-  //  * @param hint 
-  //  */
-  // private setValue(cell: number, value: number, actionType: ActionType, possibleValues: number[], hint: ValueHint) {
-  //   this.sudokuService.setValue(cell, value, actionType, possibleValues, hint);
-    
-  //   // log action
-  //   let action: SetValueAction;
-  //   switch (actionType) {
-  //     case ActionType.SET_VALUE:
-  //       action = new SetValueAction(ActionType.SET_VALUE, c, newValue, hint);
-  //       break;
-  //     case ActionType.GUESS_VALUE:
-  //       action = new GuessValueAction(ActionType.GUESS_VALUE, c, newValue,
-  //           guessPossibles);
-  //       break;
-  //   } // switch
-  //   this.actionLog.addEntry(action);
-  // }
-
-  /**
+    /**
    * Find and return the cell index that has the fewest candidates. The cound
    * cell should never have less than two candidates because zero would mean
    * the cell has a value, and one would have been earlier identified as a
@@ -564,7 +497,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     // undo entries that are not guesses
     let lastAction = this.actionLog.getLastEntry();
     while (lastAction && lastAction.type != ActionType.GUESS_VALUE) {
-      // this.sudokuService.undoAction(lastAction);
       this.undoLastAction(lastAction);
       this.actionLog.removeLastEntry();
       lastAction = this.actionLog.getLastEntry();
@@ -572,7 +504,6 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
 
     if (this.actionLog.getLastEntry() &&
         this.actionLog.getLastEntry().type === ActionType.GUESS_VALUE) {
-      // this.sudokuService.undoAction(this.actionLog.getLastEntry());
       this.undoLastAction(this.actionLog.getLastEntry());
 
       return <GuessValueAction> this.actionLog.getLastEntry();   // last GUESS_VALUE action
@@ -585,14 +516,14 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
    */
   private rollbackAll() : void {
     while (this.actionLog.getLastEntry()) {
-      // this.sudokuService.undoAction(this.actionLog.getLastEntry());
       this.undoLastAction(this.actionLog.getLastEntry());
       this.actionLog.removeLastEntry();
     }
   } // rollbackAll()
 
   /**
-   * NEW
+   * Used by rollbacks.
+   * 
    * @param action 
    */
   private undoLastAction(action: Action) : void {
@@ -607,56 +538,19 @@ console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty)
     }
   }
 
-  // /**
-  //  * FROM APP COMPNONENT
-  //  * 
-  //  * button 'Undo Last Action' EXECUTION state
-  //  */
-  // private XXXundoLastAction() : void {
-  //   this.initializeHintStates();    // remove any hint
+  /*
+  The methods below are an alternative to create random sudokus. I tried them,
+  but was not convinced ot the randomness.
+  */
 
-  //   let lastAction = this.actionLog.getLastEntry();
-  //   if (lastAction === undefined) {
-  //     return;
-  //   }
-
-  //   let action = undefined;
-  //   switch (lastAction.type) {
-  //     case ActionType.SET_VALUE:
-  //       action = <SetValueAction>lastAction;
-  //       this.sudokuService.removeValue(action.cell);
-  //       break;
-  //     //case ActionType.GUESS_VALUE:
-  //     //  break;
-  //     case ActionType.REMOVE_VALUE:
-  //       action = <RemoveValueAction>lastAction;
-  //       // this.sudokuService.setValue(action.cell, action.value, action.action);
-  //       this.sudokuService.setValue(action.cell, action.value);
-  //       break;
-  //     case ActionType.REMOVE_CANDIDATE:
-  //       action = <RemoveCandidateAction>lastAction;
-  //       this.sudokuService.restoreCandidate(action.cell, action.candidate);
-  //       break;
-  //     case ActionType.RESTORE_CANDIDATE:
-  //       action = <RestoreCandidateAction>lastAction;
-  //       this.sudokuService.removeCandidate(action.cell, action.candidate);
-  //       break;
-  //   } // switch
-
-  //   // set selected cell to that of last action
-  //   this.setSelectedCell(lastAction.cell);
-  //   this.actionLog.removeLastEntry();
-  //   this.refreshActionsLog();
-  // } // undoLastAction()
-  
-  // /**
-  //  * Swap values of two given cells.
-  //  */
-  // private swapCellValues(c1: number, c2: number) {
-  //   let v1 = this.sudokuModel.cells[c1].value;
-  //   this.sudokuModel.cells[c1].value = this.sudokuModel.cells[c2].value;
-  //   this.sudokuModel.cells[c2].value = v1;
-  // } // swapCellValues()
+//  /**
+//   * Swap values of two given cells.
+//   */
+//  private swapCellValues(c1: number, c2: number) {
+//    let v1 = this.sudokuModel.cells[c1].value;
+//    this.sudokuModel.cells[c1].value = this.sudokuModel.cells[c2].value;
+//    this.sudokuModel.cells[c2].value = v1;
+//  } // swapCellValues()
   
 //   /**
 //    * Swap values of every cell in two given rows. The rows must be in the 

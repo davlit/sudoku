@@ -330,45 +330,63 @@ export class HintCounts {
    */
   toString() : string {
     let s ='';
-    s += 'NS   : ' + this.nakedSingles + '\n'
+    // s += 'NS   : ' + this.nakedSingles + '\n'
 
-    s += 'HS*  : ' + this.hiddenSinglesRow + ', ' 
-                   + this.hiddenSinglesCol + ', ' 
-                   + this.hiddenSinglesBox + '\n';
+    // s += 'HS*  : ' + this.hiddenSinglesRow + ', ' 
+    //                + this.hiddenSinglesCol + ', ' 
+    //                + this.hiddenSinglesBox + '\n';
 
-    s += 'NP*  : ' + this.nakedPairsRow + ', ' 
-                   + this.nakedPairsCol + ', ' 
-                   + this.nakedPairsBox + '\n';
+    if (this.nakedPairsRow + this.nakedPairsCol + this.nakedPairsBox > 0) {
+      s += 'NP*  : ' + this.nakedPairsRow + ', ' 
+                     + this.nakedPairsCol + ', ' 
+                     + this.nakedPairsBox + '\n';
+    }
 
-    s += 'P*   : ' + this.pointingRows  + ', ' 
-                   + this.pointingCols + '\n';
+    if (this.pointingRows + this.pointingCols > 0) {
+      s += 'P*   : ' + this.pointingRows  + ', ' 
+                     + this.pointingCols + '\n';
+    }
 
-    s += '*BR  : ' + this.rowBoxReductions + ', ' 
-                   + this.colBoxReductions + '\n';
+    if (this.rowBoxReductions + this.colBoxReductions > 0) {
+      s += '*BR  : ' + this.rowBoxReductions + ', ' 
+                     + this.colBoxReductions + '\n';
+    }
 
-    s += 'NT*  : ' + this.nakedTriplesRow + ', ' 
-                   + this.nakedTriplesCol + ', ' 
-                   + this.nakedTriplesBox + '\n';
+    if (this.nakedTriplesRow + this.nakedTriplesCol + this.nakedTriplesBox > 0) {
+      s += 'NT*  : ' + this.nakedTriplesRow + ', ' 
+                     + this.nakedTriplesCol + ', ' 
+                     + this.nakedTriplesBox + '\n';
+    }
 
-    s += 'NQ*  : ' + this.nakedQuadsRow + ', ' 
-                   + this.nakedQuadsCol + ', ' 
-                   + this.nakedQuadsBox + '\n';
+    if (this.nakedQuadsRow + this.nakedQuadsCol + this.nakedQuadsBox > 0) {
+      s += 'NQ*  : ' + this.nakedQuadsRow + ', ' 
+                     + this.nakedQuadsCol + ', ' 
+                     + this.nakedQuadsBox + '\n';
+    }
 
-    s += 'HP*  : ' + this.hiddenPairsRow + ', ' 
-                   + this.hiddenPairsCol + ', ' 
-                   + this.hiddenPairsBox + '\n';
+    if (this.hiddenPairsRow + this.hiddenPairsCol + this.hiddenPairsBox > 0) {
+      s += 'HP*  : ' + this.hiddenPairsRow + ', ' 
+                     + this.hiddenPairsCol + ', ' 
+                     + this.hiddenPairsBox + '\n';
+    }
 
-    s += 'HT*  : ' + this.hiddenTriplesRow + ', ' 
-                   + this.hiddenTriplesCol + ', ' 
-                   + this.hiddenTriplesBox + '\n';
+    if (this.hiddenTriplesRow + this.hiddenTriplesCol + this.hiddenTriplesBox > 0) {
+      s += 'HT*  : ' + this.hiddenTriplesRow + ', ' 
+                     + this.hiddenTriplesCol + ', ' 
+                     + this.hiddenTriplesBox + '\n';
+    }
 
-    s += 'HQ*  : ' + this.hiddenQuadsRow + ', ' 
-                   + this.hiddenQuadsCol + ', ' 
-                   + this.hiddenQuadsBox + '\n';
+    if (this.hiddenQuadsRow + this.hiddenQuadsCol + this.hiddenQuadsBox > 0) {
+      s += 'HQ*  : ' + this.hiddenQuadsRow + ', ' 
+                     + this.hiddenQuadsCol + ', ' 
+                     + this.hiddenQuadsBox + '\n';
+    }
 
-    s += 'G    : ' + this.guesses + '\n';
+    if (this.guesses > 0) {
+      s += 'G    : ' + this.guesses + '\n';
+    }
 
-    s += 'Total: ' + this.getTotalHints();
+    // s += 'Total: ' + this.getTotalHints();
     return s;
   }
   

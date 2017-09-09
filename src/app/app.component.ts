@@ -160,7 +160,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.initializeUserInterface();
     this.changeDetectorRef.detectChanges();
 
-    let cacheKeys: string[] = this.cacheService.getCacheKeys();
+    // let cacheKeys: string[] = this.cacheService.getCacheKeys();
 
 // console.info('\nCache keys before replenishment: ' + JSON.stringify(cacheKeys));
 
@@ -226,7 +226,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.actionLog.initialize();
     this.actionsLog = '';
     
-console.log('Sudoku:\n' + this.currentPuzzle.toString());
+console.log('\nSudoku:\n' + this.currentPuzzle.toString());
 
     // go to sudoku execution by user
     this.startUserTimer();

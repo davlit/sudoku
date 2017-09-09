@@ -139,12 +139,16 @@ export class Puzzle {
 
   toString() : string {
     let s = '';
-    s += '-Given/empty/total cells: ' 
+    // s += '-Given/empty/total cells: ' 
+    //     + this.getInitialFilledCells() + '/'
+    //     + this.getInitialEmptyCells()  + '/'
+    //     + (this.getInitialFilledCells() + this.getInitialEmptyCells()) + '\n';
+    s += '-Given/empty cells: ' 
         + this.getInitialFilledCells() + '/'
-        + this.getInitialEmptyCells()  + '/'
-        + (this.getInitialFilledCells() + this.getInitialEmptyCells()) + '\n';
-    s += '-Initial & finished values:\n';
-    s += Common.valuesArrayToString(this._initialValues) + '\n';
+        + this.getInitialEmptyCells()  + '\n';
+    // s += '-Initial & finished values:\n';
+    s += '-Finished values:\n';
+    // s += Common.valuesArrayToString(this._initialValues) + '\n';
     s += Common.valuesArrayToString(this._completedPuzzle) + '\n';
     // s += '-Creation passes: ' + this._generatePasses + '\n';
     // s += '-Difficulty desired/actual: ' 
@@ -156,7 +160,8 @@ export class Puzzle {
       s += '-Solutions count: ' + this._solutionsCount + '\n';
     }
     if (this._stats) {
-      s += '-Stats:\n' + this._stats.toString() + '\n';
+      // s += '-Stats:\n' + this._stats.toString() + '\n';
+      s += this._stats.toString() + '\n';
     }
     return s;
   }

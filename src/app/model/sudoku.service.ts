@@ -2,8 +2,8 @@ import { Puzzle } from './puzzle';
 import { NakedType } from './naked.type';
 
 import { Action,
-         GuessValueAction,
          ActionType,
+         GuessValueAction,
          RemoveCandidateAction,
          RemoveCandidatesAction,
          RestoreCandidateAction,
@@ -212,34 +212,6 @@ export class SudokuService {
       this.addCandidate(rc, oldValue);
     }
   } // removeValue()
-
-  /**
-   * Increment the occurrences of a vlues in a cell's group (row, column, and
-   * box).
-   * 
-   * @param ci cell index
-   * @param value cell value
-   */
-  private incrementGroupOccurrences(ci: number, value: number) : void {
-    let cell = this.sudokuModel.cells[ci];
-    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]++;
-    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]++;
-    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]++;
-  }
-
-  /**
-   * Decrement the occurrences of a vlues in a cell's group (row, column, and
-   * box).
-   * 
-   * @param ci cell index
-   * @param value cell value
-   */
-  private decrementGroupOccurrences(ci: number, value: number) : void {
-    let cell = this.sudokuModel.cells[ci];
-    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]--;
-    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]--;
-    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]--;
-  }
 
   /**
    * TODO update this documentation
@@ -605,6 +577,34 @@ try {
       }
     }
   } // setCellCandidates()
+
+  /**
+   * Increment the occurrences of a vlues in a cell's group (row, column, and
+   * box).
+   * 
+   * @param ci cell index
+   * @param value cell value
+   */
+  private incrementGroupOccurrences(ci: number, value: number) : void {
+    let cell = this.sudokuModel.cells[ci];
+    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]++;
+    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]++;
+    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]++;
+  }
+
+  /**
+   * Decrement the occurrences of a vlues in a cell's group (row, column, and
+   * box).
+   * 
+   * @param ci cell index
+   * @param value cell value
+   */
+  private decrementGroupOccurrences(ci: number, value: number) : void {
+    let cell = this.sudokuModel.cells[ci];
+    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]--;
+    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]--;
+    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]--;
+  }
 
   /**
    * A cell's *state* is valid if has a value and no candidates, 
