@@ -1,6 +1,7 @@
-import { Common } from '../common/common';
-import { Difficulty } from './difficulty';
-import { HintCounts } from '../hint/hintCounts';
+import { Common }            from '../common/common';
+import { Difficulty,
+         DIFFICULTY_LABELS } from './difficulty';
+import { HintCounts }        from '../hint/hintCounts';
 
 export class Puzzle {
   private _initialValues: number[];
@@ -122,45 +123,19 @@ export class Puzzle {
     return filledCells;
   }
 
-  static getDifficultyLabel(difficulty: Difficulty) : string {
-    switch (difficulty) {
-      // case Difficulty.UNKNOWN:
-      //   return 'Unknown';
-      case Difficulty.EASY:
-        return 'Easy';
-      case Difficulty.MEDIUM:
-        return 'Medium';
-      case Difficulty.HARD:
-        return 'Hard';
-      case Difficulty.HARDEST:
-        return 'Hardest';
-    }
-  }
-
   toString() : string {
     let s = '';
-    // s += '-Given/empty/total cells: ' 
-    //     + this.getInitialFilledCells() + '/'
-    //     + this.getInitialEmptyCells()  + '/'
-    //     + (this.getInitialFilledCells() + this.getInitialEmptyCells()) + '\n';
     s += '-Given/empty cells: ' 
         + this.getInitialFilledCells() + '/'
         + this.getInitialEmptyCells()  + '\n';
-    // s += '-Initial & finished values:\n';
     s += '-Finished values:\n';
-    // s += Common.valuesArrayToString(this._initialValues) + '\n';
     s += Common.valuesArrayToString(this._completedPuzzle) + '\n';
-    // s += '-Creation passes: ' + this._generatePasses + '\n';
-    // s += '-Difficulty desired/actual: ' 
-    //     + Puzzle.getDifficultyLabel(this._desiredDifficulty) + '/'
-    //     + Puzzle.getDifficultyLabel(this._actualDifficulty) + '\n';
     s += '-Difficulty: ' 
-        + Puzzle.getDifficultyLabel(this._actualDifficulty) + '\n';
+        + DIFFICULTY_LABELS[this._actualDifficulty] + '\n'; 
     if (this._solutionsCount) {
       s += '-Solutions count: ' + this._solutionsCount + '\n';
     }
     if (this._stats) {
-      // s += '-Stats:\n' + this._stats.toString() + '\n';
       s += this._stats.toString() + '\n';
     }
     return s;

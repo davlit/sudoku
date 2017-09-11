@@ -7,6 +7,7 @@ import { Observable, Subscription } from 'rxjs';
 import { TITLE, MAJOR_VERSION, VERSION, SUB_VERSION, COPYRIGHT } from './common/common'; 
 import { Common }           from './common/common';
 import { Difficulty }       from './model/difficulty';
+import { DIFFICULTY_LABELS } from './model/difficulty';
 import { SudokuService }    from './model/sudoku.service';
 import { CacheService }     from './model/cache.service';
 import { Puzzle }           from './model/puzzle';
@@ -219,7 +220,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
     // bind metadata for ui, load sudoku for user execution
     this.actualDifficulty = 
-        Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
+        // Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
+        DIFFICULTY_LABELS[this.currentPuzzle.actualDifficulty];
     this.solutionClues = this.createSolutionClues();
 
     this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);

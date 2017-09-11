@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 
 import { Common } from '../../app/common/common';
 import { Difficulty } from '../../app/model/difficulty';
+import { DIFFICULTY_LABELS } from '../../app/model/difficulty';
 import { Puzzle } from '../../app/model/puzzle';
 
 import { Action } from '../../app/action/action';
@@ -61,7 +62,8 @@ console.warn('CreationService constructor')    ;
    * will not likely know a background task is working behind the scenes.
    */
   public createSudoku(difficulty: Difficulty) : string {
-console.info('\nCreating ' + Puzzle.getDifficultyLabel(difficulty) + ' sudoku ...');
+// console.info('\nCreating ' + Puzzle.getDifficultyLabel(difficulty) + ' sudoku ...');
+console.info('\nCreating ' + DIFFICULTY_LABELS[difficulty] + ' sudoku ...');
 
     this.actionLog.initialize();
 
@@ -97,7 +99,8 @@ console.info('\nCreating ' + Puzzle.getDifficultyLabel(difficulty) + ' sudoku ..
     } // while not getting desired difficulty
 
     sudoku.generatePasses = pass;
-console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty) 
+// console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty) 
+console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty] 
     + ' in ' + sudoku.generatePasses + ' passes');
     return sudoku.serialize();
   } // createSudoku()

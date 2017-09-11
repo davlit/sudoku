@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 
-import { Difficulty }       from './difficulty';
-import { CreationService }  from '../../web-workers/creation-worker/creation.service';
+import { Difficulty,
+         DIFFICULTY_LABELS,
+         DIFFICULTY_LABELS_PADDED }  from './difficulty';
+import { Puzzle }       from './puzzle';
 
 import * as CreationWorker from 
   'worker-loader!../../web-workers/creation-worker/creation.worker.bundle.js';
@@ -35,16 +37,6 @@ const DIFFICULTIES = [Difficulty.EASY,
                       Difficulty.MEDIUM, 
                       Difficulty.HARD, 
                       Difficulty.HARDEST];
-// const KEYS: string[][] = [['easy-1',    'easy-2',    'easy-3'   ],
-//                           ['medium-1',  'medium-2',  'medium-3' ],
-//                           ['hard-1',    'hard-2',    'hard-3'   ],
-//                           ['hardest-1', 'hardest-2', 'hardest-3']];
-// xy - x(0..3) 0-easy, 1-medium, 2-hard, 3-hardest
-//      y(1..3) 3 cached sudokus of each difficulty
-// const KEYS: string[][] = [['01', '02', '03'],
-//                           ['11', '12', '13'],
-//                           ['21', '22', '23'],
-//                           ['31', '32', '33']];
 const KEYS: string[][] = [['00', '01', '02'],   // easy    1st, 2d, 3d
                           ['10', '11', '12'],   // medium  1st, 2d, 3d
                           ['20', '21', '22'],   // hard    1st, 2d, 3d
@@ -61,6 +53,10 @@ const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[3][0], KEYS[2][0],
                            KEYS[0][1], KEYS[1][1], KEYS[3][1], 
                            KEYS[0][2], KEYS[1][2], KEYS[3][2],
                            KEYS[2][1], KEYS[2][2]];
+                          //  KEYS[0][1], KEYS[0][2], 
+                          //  KEYS[3][1], KEYS[3][2], 
+                          //  KEYS[1][1], KEYS[1][2], 
+                          //  KEYS[2][1], KEYS[2][2]];
 
 /**
  * Manages the cache of prepared sudokus of varying difficulty.
@@ -68,19 +64,12 @@ const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[3][0], KEYS[2][0],
 @Injectable()
 export class CacheService {
 
-  // private creationService: CreationService = undefined;
   private creationWorker: Worker = undefined;
-  private webworkerResult: string = undefined;  
-  private webworkerStartTime: number = undefined;
+  private webWorkerRunning: boolean = false;
+  // private activeKey: string = undefined;
+  private activeDifficulty: Difficulty = undefined;
 
-  private webworkerWorking: boolean = false;
-
-  private localStorageKey: string = undefined;
-
-  constructor(
-      private messageService: MessageService
-  ) {
-      // this.creationService = new CreationService();
+  constructor(private messageService: MessageService) {
       this.creationWorker = new CreationWorker();
       this.init();
   }
@@ -102,67 +91,37 @@ export class CacheService {
   } // isSudokuAvailable()
 
   /**
-   * Get a sudoku from the cache. If none available, create one.
+   * Get a sudoku from the cache. This will use the first item of the given
+   * difficulty -- usually the [difficulty][0]. To make this a FIFO queue,
+   * we move cached sudokus forward and add the latest sudokus to the end 
+   * of the queus. 
    */  
   public getSudoku(difficulty: Difficulty) : string {
+
+console.info('\n' + DIFFICULTY_LABELS[difficulty] + ' sudoku requested by user')
+
     let sudoku: string = undefined;
     for (let key of KEYS[difficulty]) {
       sudoku = this.retrieveAndRemoveCacheItem(key);
       if (sudoku) {
-        if (USE_WEBWORKER) {
 
-          this.sendMessage('Cache withdrawl');
-          this.sendMessage('Cache changed');
+console.info('\n' + DIFFICULTY_LABELS[difficulty] + ' sudoku pulled from cache')
 
-          // as soon as a cached sudoku is used, replace it
-          this.replenishCache();
-        }
+        // move backup versions forward
+        this.moveItem(KEYS[difficulty][1], KEYS[difficulty][0]);
+        this.moveItem(KEYS[difficulty][2], KEYS[difficulty][1]);
+
+console.info('\nMessage to app: Cache changed');
+
+        this.sendMessage('Cache changed');
+
+console.info('\nCall: replenishCache()');
+
+        // as soon as a cached sudoku is used, replace it
+        this.replenishCache();
         return sudoku;
-      }
-    }
-    // sudoku = this.creationService.createSudoku(DIFFICULTIES[difficulty]);
-    return sudoku;
-  } // getSudoku()
-
-  /**
-   * Get a sudoku from the cache.
-   */  
-  public getSudoku1(difficulty: Difficulty) : string {
-    let sudoku: string = undefined;
-    // sudoku = localStorage.getItem(KEYS[difficulty][0]);
-    sudoku = this.retrieveAndRemoveCacheItem(KEYS[difficulty][0]);
-    if (sudoku) {
-
-      // move backup versions forward
-
-      // replenish cache
-
-
-      return sudoku;
-    }
-
-    
-
-
-
-
-
-
-    for (let key of KEYS[difficulty]) {
-      sudoku = this.retrieveAndRemoveCacheItem(key);
-      if (sudoku) {
-        if (USE_WEBWORKER) {
-
-          this.sendMessage('Cache withdrawl');
-          this.sendMessage('Cache changed');
-
-          // as soon as a cached sudoku is used, replace it
-          this.replenishCache();
-        }
-        return sudoku;
-      }
-    }
-    // sudoku = this.creationService.createSudoku(DIFFICULTIES[difficulty]);
+      } // if
+    } // for
     return sudoku;
   } // getSudoku()
 
@@ -171,67 +130,28 @@ export class CacheService {
    */
   public replenishCache() : void {
 
-    // this.sendMessage('Replenishing cache');
-
-    let key: string = this.getFirstEmptyKey();
-    if (key) {
-      this.createAndCache(this.getDifficulty(key), key)
+    // let web worker do one creation at a time
+    if (this.webWorkerRunning) {
+      return;   // try again later
     }
+    
+console.info('\nCache before webworker replenishment: ' 
+  + this.activeCachesToString());
 
-    // this.sendMessage('Replenished cache');
+    // priority seach to find first empty key
+    // if none found, fall through - nothing to replenish
+    for (let key of CREATE_PRIORITIES) {
+      if (this.isEmpty(key)) {
+        this.activeDifficulty = this.getDifficulty(key);
+        this.webWorkerRunning = true;
 
-    // if (!this.isSudokuAvailable(Difficulty.EASY)) {
-    //   this.createAndCache(Difficulty.EASY, KEYS[Difficulty.EASY][0]);
-    //   return;
-    // }
+console.info('\nTrigger web worker to create replacement for cache');
 
-    // if (!this.isSudokuAvailable(Difficulty.MEDIUM)) {
-    //   this.createAndCache(Difficulty.MEDIUM, KEYS[Difficulty.MEDIUM][0]);
-    //   return;
-    // }
-
-    // if (!this.isSudokuAvailable(Difficulty.HARDEST)) {
-    //   this.createAndCache(Difficulty.HARDEST, KEYS[Difficulty.HARDEST][0]);
-    //   return;
-    // }
-
-    // if (!this.isSudokuAvailable(Difficulty.HARD)) {
-    //   this.createAndCache(Difficulty.HARD, KEYS[Difficulty.HARD][0]);
-    //   return;
-    // }
-
-    // for (let diff = 0; diff < KEYS.length; diff++) {
-    //   for (let key of KEYS[diff]) {
-    //     if (!localStorage.getItem(key)) {
-
-  //         // key is not in localStorage; create a sudoku
-  //         if (USE_WEBWORKER) {
-
-  //           // WEB WORKER Option
-  //           if (!this.webworkerWorking) {
-  //             this.startWebworkerCreation(diff, key);
-  // //             this.localStorageKey = key;
-  // //             this.webworkerStartTime = Date.now();
-  // //             this.webworkerWorking = true;
-  // // console.info('Calling startWebworkerCreation() key: ' + this.localStorageKey);
-  // //             this.creationWorker.postMessage(diff);
-  //           }
-
-  //         } else {
-
-  //           // BROWSER Option
-  //           let sudoku: string = this.creationService.createSudoku(DIFFICULTIES[diff]);
-  //           localStorage.setItem(key, sudoku);
-  //         }
-      //     this.createAndCache(diff, key);
-
-      //   } else {
-
-      //   }
-      // }
-    // }
-
-    // this.sendMessage('Replenished cache');
+        // send message to web worker to create a sudoku
+        this.creationWorker.postMessage(this.activeDifficulty);
+        return;
+      } // if
+    } // for
   } // replenishCache()
 
   /**
@@ -249,23 +169,40 @@ export class CacheService {
    * Receive web worker output
    */
   private init() {
+console.info('\ninit()');
     this.creationWorker.onmessage = ((event: MessageEvent) => {
-// console.info('\ncacheService.init() creationWorker.onmessage');
-      this.webworkerWorking = false;
-      localStorage.setItem(this.localStorageKey, event.data);
 
-console.info('\nCache keys after webworker replenishment: ' 
-  + JSON.stringify(this.getCacheKeys()));
+console.info('\nReplacement received to replenish cache');
 
-    this.sendMessage('Cache addition');
+// console.info('keys: ' + this.activeCachesToString());
+
+      let newDifficulty: Difficulty = this.activeDifficulty;
+      let newKey: string = this.findFirstEmptyKey(newDifficulty);
+
+      // mark web worker as not running, cache returned sudoku,
+      // set active difficulty to null
+      this.webWorkerRunning = false;
+      this.activeDifficulty = null;
+
+console.info('\nReplacement sudoku cached');
+
+      localStorage.setItem(newKey, event.data);
+
+console.info('\nCache after webworker replenishment: ' 
+  + this.activeCachesToString());
+
+console.info('\nMessage to app: Cache changed');
+
+    // notify AppComponent that cache has changed
     this.sendMessage('Cache changed');
 
       // This is a loop. Since replenishCache() engages a web worker to
-      // create a sudoku, and this method, creationWorker.onmessage(), is
+      // create a sudoku, and this function, creationWorker.onmessage(),
       // is called unpon the web worker's completion, calling 
       // replenish.cache() here creates a loop. However, replenishCache()
-      // stops when the cache is full. So whenever replenishCache() is the
-      // loop will continue until the cache is full.
+      // stops when the cache is full. So whenever replenishCache() finds
+      // an empty cache slot, the loop will continue. The cycle will stop
+      // when all cache slots are full.
       this.replenishCache();
     });
   } // init()
@@ -282,85 +219,64 @@ console.info('\nCache keys after webworker replenishment: '
   } // getCacheKeys()
 
   /**
+   * Within each difficulty move caches forward in the queue so that the queue
+   * is FIFO (first in, first out). In other words created and cached sudokus
+   * should be "consumed" in order.
+   */
+  private advanceCaches() {
+    for (let diff of DIFFICULTIES) {
+
+      // if 1 is empty, move 2 -> 1
+      if (this.isEmpty(KEYS[diff][0])) {
+        this.moveItem(KEYS[diff][1], KEYS[diff][0]);
+      }
+
+      // if 2 is empty, move 3 -> 2
+      if (this.isEmpty(KEYS[diff][1])) {
+        this.moveItem(KEYS[diff][2], KEYS[diff][1]);
+      }
+
+      // if 1 is empty, move 2 -> 1
+      if (this.isEmpty(KEYS[diff][0])) {
+        this.moveItem(KEYS[diff][1], KEYS[diff][0]);
+      }
+    } // for
+  } //advanCeaches()
+
+  /**
+   * 
+   */
+  private activeCachesToString() : string {
+    let s: string = '\n';
+    for (let diff of DIFFICULTIES) {
+      // s += Puzzle.getDifficultyLabelPadded(diff) + ': ';
+      s += DIFFICULTY_LABELS_PADDED[diff] + ': ';
+      for (let i of [0, 1, 2]) {
+        if (this.hasItem(KEYS[diff][i])) {
+          s += (i + 1) + ',';
+        }
+      }
+      s = s.replace(/,\s*$/, ''); // remove trailing comma
+      s += '\n';
+    }
+    return s;
+  } // activeCachesToString()
+
+  /**
    * Remove the cached item with given key;
    */
   private removeCacheItem(key: string) {
     localStorage.removeItem(key);
   } // removeCacheItem
 
+  /**
+   * 
+   * @param message 
+   */
   private sendMessage(message: string): void {
     // send message to subscribers via observable subject
     this.messageService.sendMessage(message);
   }
-
-  private clearMessage(): void {
-    // clear message
-    this.messageService.clearMessage();
-  }
-
-  /**
-   * Create and cache a sudoku.
-   * 
-   * @param diff desired difficulty
-   * @param key storage key
-   */
-  private createAndCache(difficulty: Difficulty, key: string) {
-
-    // key is not in localStorage; create a sudoku
-    if (USE_WEBWORKER) {
-
-      // WEB WORKER Option
-      if (!this.webworkerWorking) {
-        // this.startWebworkerCreation(diff, key);
-        this.localStorageKey = key;
-        this.webworkerStartTime = Date.now();
-        this.webworkerWorking = true;
-// console.info('\nCalling startWebworkerCreation() key: ' + this.localStorageKey);
-        this.creationWorker.postMessage(difficulty);
-      }
-
-    } else {
-
-      // BROWSER Option
-      // let sudoku: string = this.creationService.createSudoku(DIFFICULTIES[difficulty]);
-      // localStorage.setItem(key, sudoku);
-    }
-  } // createAndCache()
-
-   /**
-   * Post a message to a web worker. The message contains the desired difficulty.
-   * This message triggers the web worker which works in background. The 
-   * result of the background task is posted by the web worker and this
-   * service is alerted and reacts in the ngOnInit() function above.
-   * 
-   * Called by: TODO ... cacheService
-   */
-//   private startWebworkerCreation(difficulty: Difficulty, key: string) {
-//     this.localStorageKey = key;
-//     this.webworkerStartTime = Date.now();
-//     this.webworkerWorking = true;
-// console.info('Calling startWebworkerCreation() key: ' + this.localStorageKey);
-//     this.creationWorker.postMessage(difficulty);
-//   } // startWebworkerCreation()
-
-  /**
-   * Get a list of cache keys for cached sudokus.
-   */
-  private allCacheKeys() : string {
-    let list = '';
-    for (let i = 0; i < localStorage.length; i++) {
-      list += localStorage.key(i) + ' ';
-    }
-    return list;
-  } // allCacheKeys()
-
-  /**
-   * Retrieve sudoku specified by key from the cache. The item remains 
-   * in the cache.
-   */
-  private retrieveCacheItem(key: string) : string {
-    return localStorage.getItem(key);
-  } // retrieveCacheItem()
 
   /**
    * Retrieve sudoku specified by key from the cache. The item is removed
@@ -371,6 +287,21 @@ console.info('\nCache keys after webworker replenishment: '
     this.removeCacheItem(key);
     return item;
   } // retrieveAndRemoveCacheItem()
+
+  /**
+   * Find the first available cache slot for a given difficulty. If none,
+   * reutrn null.
+   * 
+   * @param difficulty 
+   */
+  private findFirstEmptyKey(difficulty: Difficulty) : string {
+    for (let i of [0, 1, 2]) {
+      if (this.isEmpty(KEYS[difficulty][i])) {
+        return KEYS[difficulty][i];
+      }
+    }
+    return null;
+  }
 
   /**
    * Move an item from one key to another.
@@ -415,18 +346,6 @@ console.info('\nCache keys after webworker replenishment: '
   private isEmpty(key: string) : boolean {
     return localStorage.getItem(key) == null;
   } // isEmpty()
-
-  /**
-   * 
-   */
-  private getFirstEmptyKey() : string {
-    for (let key of CREATE_PRIORITIES) {
-      if (this.isEmpty(key)) {
-        return key;
-      }
-    }
-    return null;
-  } // getFirstEmptyKey()
 
   /**
    * Convert the first character of the key to an int which correlates to the

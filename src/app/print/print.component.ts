@@ -3,7 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { Common } from '../common/common';
 // import { Sudoku } from '../model/sudoku';
 import { SudokuService } from '../model/sudoku.service';
-import { Puzzle } from '../model/puzzle';
+// import { Puzzle } from '../model/puzzle';
+import { DIFFICULTY_LABELS } from '../model/difficulty';
 
 @Component({
   selector: 'app-container',
@@ -21,7 +22,8 @@ export class PrintComponent implements OnInit {
   ngOnInit() {}
 
   getActualDifficulty() {
-    return Puzzle.getDifficultyLabel(this.sudokuService.getCurrentSudoku().actualDifficulty);
+    // return Puzzle.getDifficultyLabel(this.sudokuService.getCurrentSudoku().actualDifficulty);
+    return DIFFICULTY_LABELS[this.sudokuService.getCurrentSudoku().actualDifficulty];
   }
 
   /**

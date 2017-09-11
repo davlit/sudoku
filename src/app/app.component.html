@@ -84,35 +84,35 @@ s: sudoku, b: box, v: value, k: candidate
 
       <p>Select a new Sudoku:</p>
 
-      <button *ngIf="easyAvailable" (click)="generate(0)" class="diff easy" 
-        tooltip="Solvable finding naked or hidden singles">
+      <button *ngIf="easyAvailable" (click)="generate(0)" class="diff easy">
+        <!-- tooltip="Solvable finding naked or hidden singles"> -->
         Easy</button>
-      <button *ngIf="!easyAvailable" class="diff easy strike"
-        tooltip="Loading ...">
+      <button *ngIf="!easyAvailable" class="diff easy strike">
+        <!-- tooltip="Loading ..."> -->
         Easy</button>
       &nbsp;
 
-      <button *ngIf="mediumAvailable" (click)="generate(1)" class="diff medium"
-        tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions">
+      <button *ngIf="mediumAvailable" (click)="generate(1)" class="diff medium">
+        <!-- tooltip="Solvable finding naked pairs, pointing rows/columns, and box reductions"> -->
         Medium</button>
-      <button *ngIf="!mediumAvailable" class="diff medium strike"
-        tooltip="Loading ...">
+      <button *ngIf="!mediumAvailable" class="diff medium strike">
+        <!-- tooltip="Loading ..."> -->
         Medium</button>
       &nbsp;
 
-      <button *ngIf="hardAvailable" (click)="generate(2)" class="diff hard" 
-        tooltip="Solvable finding naked triples/quads or hidden pairs/triples">
+      <button *ngIf="hardAvailable" (click)="generate(2)" class="diff hard">
+        <!-- tooltip="Solvable finding naked triples/quads or hidden pairs/triples"> -->
         Hard</button>
-      <button *ngIf="!hardAvailable" class="diff hard strike"
-        tooltip="Loading ...">
+      <button *ngIf="!hardAvailable" class="diff hard strike">
+        <!-- tooltip="Loading ..."> -->
         Hard</button>
       &nbsp;
 
-      <button *ngIf="hardestAvailable" (click)="generate(3)" class="diff hardest" 
-        tooltip="Solvable using more advanced techniques or guessing">
+      <button *ngIf="hardestAvailable" (click)="generate(3)" class="diff hardest">
+        <!-- tooltip="Solvable using more advanced techniques or guessing"> -->
         Hardest</button>
-      <button *ngIf="!hardestAvailable" class="diff hardest strike"
-        tooltip="Loading ...">
+      <button *ngIf="!hardestAvailable" class="diff hardest strike">
+        <!-- tooltip="Loading ..."> -->
         Hardest</button>
       <!-- <br/> -->
 
@@ -160,17 +160,17 @@ s: sudoku, b: box, v: value, k: candidate
 
       <div class="controlsRow cRow02">
         <button *ngIf="!candidatesShowing" class="exec start" 
-            (click)="toggleCandidates()"
-            tooltip="Display the candidates in open cells">
+            (click)="toggleCandidates()">
+            <!-- tooltip="Display the candidates in open cells"> -->
             Show candidates</button>
         <button *ngIf="candidatesShowing" class="exec stop" 
-            (click)="toggleCandidates()"
-            tooltip="Hide the candidates in open cells">
+            (click)="toggleCandidates()">
+            <!-- tooltip="Hide the candidates in open cells"> -->
             Hide candidates</button>
         <span [hidden]="!candidatesShowing">
           <span *ngFor="let k of [1,2,3,4,5,6,7,8,9]" class="cands">
-            <button class="general" (click)="candidateVisible(k)"
-                tooltip="Show only candidate {{k}}">
+            <button class="general" (click)="candidateVisible(k)">
+                <!-- tooltip="Show only candidate {{k}}"> -->
                 {{k}}</button>
           </span>
         </span>
@@ -179,8 +179,8 @@ s: sudoku, b: box, v: value, k: candidate
       <div class="controlsRow cRow03">
         <button *ngIf="candidatesModified" 
             class="general" 
-            (click)="refreshCandidates()"
-            tooltip="Candidates have been manually removed -- this will restore them">
+            (click)="refreshCandidates()">
+            <!-- tooltip="Candidates have been manually removed -- this will restore them"> -->
             Refresh candidates
         </button>
         <button *ngIf="!candidatesModified" 
@@ -193,13 +193,13 @@ s: sudoku, b: box, v: value, k: candidate
         <div [ngSwitch]="hintState">
           <button *ngSwitchCase="hintStates.READY" 
               class="exec start" 
-              (click)="handleHintClick()"
-              tooltip="Suggest a valid move">
+              (click)="handleHintClick()">
+              <!-- tooltip="Suggest a valid move"> -->
               Get hint</button>
           <button *ngSwitchCase="hintStates.ACTIVE"
               class="exec stop" 
-              (click)="handleHintClick()"
-              tooltip="Automatically execute the suggested move">
+              (click)="handleHintClick()">
+              <!-- tooltip="Automatically execute the suggested move"> -->
               Apply hint</button>
           {{hintMessage}}              
         <span *ngSwitchCase="hintStates.NO_HINT">
@@ -211,13 +211,13 @@ s: sudoku, b: box, v: value, k: candidate
       <div class="controlsRow cRow05">
         <div [ngSwitch]="autoSolveState">
           <button *ngSwitchCase="autoSolveStates.READY" 
-              class="exec start" (click)="handleAutoSolveClick()"
-              tooltip="Automatically solve the sudoku using hints">
+              class="exec start" (click)="handleAutoSolveClick()">
+              <!-- tooltip="Automatically solve the sudoku using hints"> -->
               Auto solve start</button>
           <button *ngSwitchCase="autoSolveStates.RUNNING
               || autoSolveStates.PENDING_STOP" 
-              class="exec stop" (click)="handleAutoSolveClick()"
-              tooltip="Stop the action">
+              class="exec stop" (click)="handleAutoSolveClick()">
+              <!-- tooltip="Stop the action"> -->
               Auto solve stop</button>
           <span *ngSwitchCase="autoSolveStates.NO_HINT
               || autoSolveStates.PENDING_STOP">
@@ -252,9 +252,10 @@ s: sudoku, b: box, v: value, k: candidate
       </div>
 
       <div class="controlsRow cRow10">
-         <button class="general" (click)="restartCurrentPuzzle()"
-            tooltip="Start over on same sudoku" 
-            placement="bottom">Restart sudoku</button>&nbsp;
+         <button class="general" (click)="restartCurrentPuzzle()">
+            <!-- tooltip="Start over on same sudoku"  -->
+            <!-- placement="bottom"> -->
+            Restart sudoku</button>&nbsp;
         <button class="general" (click)="startNewPuzzle()">New sudoku</button> 
       </div>
 
@@ -312,13 +313,13 @@ s: sudoku, b: box, v: value, k: candidate
       <p>Hints viewed/applied: {{hintsViewed}}/{{hintsApplied}}</p>
 
       <p>
-        <button class="general" (click)="restartCurrentPuzzle()"
-            tooltip="Start over on same sudoku" 
-            placement="top">
+        <button class="general" (click)="restartCurrentPuzzle()">
+            <!-- tooltip="Start over on same sudoku"  -->
+            <!-- placement="top"> -->
             Restart sudoku</button>&nbsp;
-        <button class="general" (click)="startNewPuzzle()"
-            tooltip="Get a new sudoku" 
-            placement="top">
+        <button class="general" (click)="startNewPuzzle()">
+            <!-- tooltip="Get a new sudoku"  -->
+            <!-- placement="top"> -->
             New sudoku</button>
       </p>
 
