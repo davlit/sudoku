@@ -1,11 +1,13 @@
 <div id="appContainer">
 
 <div id="header">
-  <span class="appTitle">&nbsp;{{title}}</span>
-  <!-- <span class="appVersion">&nbsp;&nbsp;&nbsp;{{version}}</span> -->
+  <!-- <span class="appTitle">&nbsp;{{title}}</span> -->
+  <div class="appTitle">&nbsp;{{title}}</div>
+  <!-- <div class="creating"></div> -->
+
 
   <!-- testing -->
-    <button (click)="emptyCache()">Empty cache</button>  
+     <button (click)="emptyCache()">Empty cache</button>   
 
 <!-- ANIMATED PROGRESS BAR - DEMO -->
 <!--
@@ -306,7 +308,7 @@ s: sudoku, b: box, v: value, k: candidate
     <!-- ========== play-solved ========== -->
     <div *ngSwitchCase="PlayStates.SOLVED" class="exec-text">
 
-      <p>SOLVED!</p>
+      <p>{{actualDifficulty}} SOLVED!</p>
 
       <p>Elapsed time: {{elapsedTime}}</p>
 

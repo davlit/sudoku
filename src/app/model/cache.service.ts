@@ -20,7 +20,7 @@ localStorage.setItem(key: string, item: string) : void
   -- if yes, value is updated
 localStorage.getItem(key: string) : string 
   -- if key/value pair exists
-  -- if yes, returns value associated with key
+  -- if yes, returns value (string) associated with key
   -- if no, returns null (not undefined!)
 localStorage.length : number 
   --  returns number of keys
@@ -41,6 +41,9 @@ const KEYS: string[][] = [['00', '01', '02'],   // easy    1st, 2d, 3d
                           ['10', '11', '12'],   // medium  1st, 2d, 3d
                           ['20', '21', '22'],   // hard    1st, 2d, 3d
                           ['30', '31', '32']];  // hardest 1st, 2d, 3d
+// const KEYS: string[][] = [['00', '01', '02'],   // easy    1st, 2d, 3d
+//                           ['10', '11', '12'],   // medium  1st, 2d, 3d
+//                           ['20', '21', '22']];  // hard    1st, 2d, 3d
 
 /**
  * This establishes a priority for creating sudokus. The "hard" cand take
@@ -49,14 +52,18 @@ const KEYS: string[][] = [['00', '01', '02'],   // easy    1st, 2d, 3d
  * After we have 1 of all the difficulties, we quickly finish out the set of
  * the faster ones, then finish with additional "hard" ones.
  */                          
-const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[3][0], KEYS[2][0], 
-                           KEYS[0][1], KEYS[1][1], KEYS[3][1], 
-                           KEYS[0][2], KEYS[1][2], KEYS[3][2],
-                           KEYS[2][1], KEYS[2][2]];
+// const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[3][0], KEYS[2][0], 
+//                            KEYS[0][1], KEYS[1][1], KEYS[3][1], 
+//                            KEYS[0][2], KEYS[1][2], KEYS[3][2],
+//                            KEYS[2][1], KEYS[2][2]];
                           //  KEYS[0][1], KEYS[0][2], 
                           //  KEYS[3][1], KEYS[3][2], 
                           //  KEYS[1][1], KEYS[1][2], 
                           //  KEYS[2][1], KEYS[2][2]];
+const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[2][0], 
+                           KEYS[0][1], KEYS[1][1],  
+                           KEYS[0][2], KEYS[1][2], 
+                           KEYS[2][1], KEYS[2][2]];
 
 /**
  * Manages the cache of prepared sudokus of varying difficulty.
@@ -79,9 +86,26 @@ export class CacheService {
   // -------------------------------------------------------------------------
 
   /**
+   * Get an array of current localStorage keys.
+   */
+  public getCacheKeys() : string[] {
+    let keys: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      keys.push(localStorage.key(i));
+    }
+    return keys;
+  } // getCacheKeys()
+
+  /**
    * Returns true if a sudoku of given difficulty is cached.
    */
   public isSudokuAvailable(difficulty: Difficulty) : boolean {
+
+    // TEMP TESTING
+    if (difficulty == Difficulty.HARDEST) {
+      return false;
+    }
+
     for (let key of KEYS[difficulty]) {
       if (localStorage.getItem(key)) {
         return true;
@@ -98,24 +122,24 @@ export class CacheService {
    */  
   public getSudoku(difficulty: Difficulty) : string {
 
-console.info('\n' + DIFFICULTY_LABELS[difficulty] + ' sudoku requested by user')
+console.info('\n1. ' + DIFFICULTY_LABELS[difficulty] + ' sudoku requested by user')
 
     let sudoku: string = undefined;
     for (let key of KEYS[difficulty]) {
       sudoku = this.retrieveAndRemoveCacheItem(key);
       if (sudoku) {
 
-console.info('\n' + DIFFICULTY_LABELS[difficulty] + ' sudoku pulled from cache')
+console.info('\n2. ' + DIFFICULTY_LABELS[difficulty] + ' sudoku pulled from cache')
 
         // move backup versions forward
         this.moveItem(KEYS[difficulty][1], KEYS[difficulty][0]);
         this.moveItem(KEYS[difficulty][2], KEYS[difficulty][1]);
 
-console.info('\nMessage to app: Cache changed');
+console.info('\n3. Message to app: Cache changed');
 
         this.sendMessage('Cache changed');
 
-console.info('\nCall: replenishCache()');
+console.info('\n4. Call: replenishCache()');
 
         // as soon as a cached sudoku is used, replace it
         this.replenishCache();
@@ -135,7 +159,7 @@ console.info('\nCall: replenishCache()');
       return;   // try again later
     }
     
-console.info('\nCache before webworker replenishment: ' 
+console.info('\n5. Cache before webworker replenishment: ' 
   + this.activeCachesToString());
 
     // priority seach to find first empty key
@@ -145,13 +169,14 @@ console.info('\nCache before webworker replenishment: '
         this.activeDifficulty = this.getDifficulty(key);
         this.webWorkerRunning = true;
 
-console.info('\nTrigger web worker to create replacement for cache');
+console.info('\n6. Trigger web worker to create replacement for cache');
 
         // send message to web worker to create a sudoku
         this.creationWorker.postMessage(this.activeDifficulty);
         return;
       } // if
     } // for
+    return;
   } // replenishCache()
 
   /**
@@ -160,6 +185,25 @@ console.info('\nTrigger web worker to create replacement for cache');
   public emptyCache() : void {
     localStorage.clear()
   } // emptyCache()
+
+  /**
+   * 
+   */
+  public activeCachesToString() : string {
+    let s: string = '\n';
+    for (let diff of DIFFICULTIES) {
+      // s += Puzzle.getDifficultyLabelPadded(diff) + ': ';
+      s += DIFFICULTY_LABELS_PADDED[diff] + ': ';
+      for (let i of [0, 1, 2]) {
+        if (this.hasItem(KEYS[diff][i])) {
+          s += (i + 1) + ',';
+        }
+      }
+      s = s.replace(/,\s*$/, ''); // remove trailing comma
+      s += '\n';
+    }
+    return s;
+  } // activeCachesToString()
 
   // -------------------------------------------------------------------------
   //  Private methods
@@ -172,7 +216,7 @@ console.info('\nTrigger web worker to create replacement for cache');
 console.info('\ninit()');
     this.creationWorker.onmessage = ((event: MessageEvent) => {
 
-console.info('\nReplacement received to replenish cache');
+console.info('\n7. Replacement received to replenish cache');
 
 // console.info('keys: ' + this.activeCachesToString());
 
@@ -184,14 +228,14 @@ console.info('\nReplacement received to replenish cache');
       this.webWorkerRunning = false;
       this.activeDifficulty = null;
 
-console.info('\nReplacement sudoku cached');
+console.info('\n8. Replacement sudoku cached');
 
       localStorage.setItem(newKey, event.data);
 
-console.info('\nCache after webworker replenishment: ' 
+console.info('\n9. Cache after webworker replenishment: ' 
   + this.activeCachesToString());
 
-console.info('\nMessage to app: Cache changed');
+console.info('\n10. Message to app: Cache changed');
 
     // notify AppComponent that cache has changed
     this.sendMessage('Cache changed');
@@ -207,16 +251,16 @@ console.info('\nMessage to app: Cache changed');
     });
   } // init()
   
-  /**
-   * Get an array of current localStorage keys.
-   */
-  private getCacheKeys() : string[] {
-    let keys: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      keys.push(localStorage.key(i));
-    }
-    return keys;
-  } // getCacheKeys()
+  // /**
+  //  * Get an array of current localStorage keys.
+  //  */
+  // private getCacheKeys() : string[] {
+  //   let keys: string[] = [];
+  //   for (let i = 0; i < localStorage.length; i++) {
+  //     keys.push(localStorage.key(i));
+  //   }
+  //   return keys;
+  // } // getCacheKeys()
 
   /**
    * Within each difficulty move caches forward in the queue so that the queue
@@ -244,25 +288,6 @@ console.info('\nMessage to app: Cache changed');
   } //advanCeaches()
 
   /**
-   * 
-   */
-  private activeCachesToString() : string {
-    let s: string = '\n';
-    for (let diff of DIFFICULTIES) {
-      // s += Puzzle.getDifficultyLabelPadded(diff) + ': ';
-      s += DIFFICULTY_LABELS_PADDED[diff] + ': ';
-      for (let i of [0, 1, 2]) {
-        if (this.hasItem(KEYS[diff][i])) {
-          s += (i + 1) + ',';
-        }
-      }
-      s = s.replace(/,\s*$/, ''); // remove trailing comma
-      s += '\n';
-    }
-    return s;
-  } // activeCachesToString()
-
-  /**
    * Remove the cached item with given key;
    */
   private removeCacheItem(key: string) {
@@ -270,11 +295,11 @@ console.info('\nMessage to app: Cache changed');
   } // removeCacheItem
 
   /**
+   * Send message to subscribers via observable subject
    * 
    * @param message 
    */
   private sendMessage(message: string): void {
-    // send message to subscribers via observable subject
     this.messageService.sendMessage(message);
   }
 
@@ -355,7 +380,7 @@ console.info('\nMessage to app: Cache changed');
    */
   private getDifficulty(key: string) : number {
     return parseInt(key.charAt(0));
-  }
+  } // getDifficulty()
 
-}
+} // class CreateService
 

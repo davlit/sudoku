@@ -22,8 +22,8 @@ export class PrintComponent implements OnInit {
   ngOnInit() {}
 
   getActualDifficulty() {
-    // return Puzzle.getDifficultyLabel(this.sudokuService.getCurrentSudoku().actualDifficulty);
-    return DIFFICULTY_LABELS[this.sudokuService.getCurrentSudoku().actualDifficulty];
+    // return Puzzle.getDifficultyLabel(this.sudokuService.getCurrentSudoku().difficulty);
+    return DIFFICULTY_LABELS[this.sudokuService.getCurrentSudoku().difficulty];
   }
 
   /**

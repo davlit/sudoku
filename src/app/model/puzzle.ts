@@ -6,31 +6,28 @@ import { HintCounts }        from '../hint/hintCounts';
 export class Puzzle {
   private _initialValues: number[];
   private _completedPuzzle: number[];
-  private _desiredDifficulty: Difficulty;
-  private _actualDifficulty: Difficulty;
+  private _difficulty: Difficulty;
   private _generatePasses: number;
   private _solutionsCount: number;
-  private _stats: HintCounts;
+  private _hintCounts: HintCounts;
 
   constructor() {
     this._initialValues = undefined;
     this._completedPuzzle = undefined;
-    this._desiredDifficulty = undefined;
-    this._actualDifficulty = undefined;
+    this._difficulty = undefined;
     this._generatePasses = undefined;
     this._solutionsCount = undefined;
-    this._stats = undefined;
+    this._hintCounts = undefined;
   }
 
   serialize() : string {
     return JSON.stringify({
       "_initialValues": this._initialValues,
       "_completedPuzzle": this._completedPuzzle,
-      "_desiredDifficulty": this._desiredDifficulty,
-      "_actualDifficulty": this._actualDifficulty,
+      "_difficulty": this._difficulty,
       "_generatePasses": this._generatePasses,
       "_solutionsCount": this._solutionsCount,
-      "_stats": this._stats.serialize()
+      "_hintCounts": this._hintCounts.serialize()
     });
   } // serialize()
 
@@ -39,11 +36,10 @@ export class Puzzle {
     let puzzle = new Puzzle();
     puzzle._initialValues = data._initialValues;
     puzzle._completedPuzzle = JSON.parse('[' + data._completedPuzzle + ']');
-    puzzle._desiredDifficulty = data._desiredDifficulty;
-    puzzle._actualDifficulty = data._actualDifficulty;
+    puzzle._difficulty = data._difficulty;
     puzzle._generatePasses = data._generatePasses;
     puzzle._solutionsCount = data._solutionsCount;
-    puzzle._stats = HintCounts.deserialize(data._stats);
+    puzzle._hintCounts = HintCounts.deserialize(data._hintCounts);
     return puzzle;
   } // deserialize()
 
@@ -63,20 +59,12 @@ export class Puzzle {
     this._completedPuzzle = completedPuzzle;
   }
 
-  get desiredDifficulty() : Difficulty {
-    return this._desiredDifficulty;
+  get difficulty() : Difficulty {
+    return this._difficulty;
   }
 
-  set desiredDifficulty(difficulty: Difficulty) {
-    this._desiredDifficulty = difficulty;
-  }
-
-  get actualDifficulty() : Difficulty {
-    return this._actualDifficulty;
-  }
-
-  set actualDifficulty(difficulty: Difficulty) {
-    this._actualDifficulty = difficulty;
+  set difficulty(difficulty: Difficulty) {
+    this._difficulty = difficulty;
   }
 
   get generatePasses() : number {
@@ -95,12 +83,12 @@ export class Puzzle {
     this._solutionsCount = solutionsCount;
   }
 
-  get stats() : HintCounts {
-    return this._stats;
+  get hintCounts() : HintCounts {
+    return this._hintCounts;
   }
 
-  set stats(stats: HintCounts) {
-    this._stats = stats;
+  set hintCounts(hintCounts: HintCounts) {
+    this._hintCounts = hintCounts;
   }
 
   getInitialEmptyCells() {
@@ -131,12 +119,12 @@ export class Puzzle {
     s += '-Finished values:\n';
     s += Common.valuesArrayToString(this._completedPuzzle) + '\n';
     s += '-Difficulty: ' 
-        + DIFFICULTY_LABELS[this._actualDifficulty] + '\n'; 
+        + DIFFICULTY_LABELS[this._difficulty] + '\n'; 
     if (this._solutionsCount) {
       s += '-Solutions count: ' + this._solutionsCount + '\n';
     }
-    if (this._stats) {
-      s += this._stats.toString() + '\n';
+    if (this._hintCounts) {
+      s += this._hintCounts.toString() + '\n';
     }
     return s;
   }

@@ -61,14 +61,14 @@ console.warn('CreationService constructor')    ;
    * Web Worker. This allows the user interface to be responsive. The user
    * will not likely know a background task is working behind the scenes.
    */
-  public createSudoku(difficulty: Difficulty) : string {
+  public createSudoku(desiredDiff: Difficulty) : string {
 // console.info('\nCreating ' + Puzzle.getDifficultyLabel(difficulty) + ' sudoku ...');
-console.info('\nCreating ' + DIFFICULTY_LABELS[difficulty] + ' sudoku ...');
+console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff] + ' sudoku ...');
 
     this.actionLog.initialize();
 
     let sudoku = new Puzzle();
-    sudoku.desiredDifficulty = difficulty;
+    // sudoku.desiredDifficulty = difficulty;
 
     // step 1 - generate random finished sudoku
     sudoku.completedPuzzle = this.makeRandomSolution();
@@ -78,13 +78,14 @@ console.info('\nCreating ' + DIFFICULTY_LABELS[difficulty] + ' sudoku ...');
     let pass = 0;
 
     // loop until we get sudoku of desired difficulty
-    let desiredDifficulty = sudoku.desiredDifficulty;
-    while (sudoku.actualDifficulty != desiredDifficulty) {
+    let desiredDifficulty = desiredDiff;
+    while (sudoku.difficulty != desiredDiff) {
       pass++;
 
       // step 2 - create starting values by paring cells
 // console.log('Pass: ' + pass);
-      this.getStartingValues(sudoku);
+      // this.pareToInitialValues(sudoku, desiredDifficulty);
+      this.pareToInitialValues1(sudoku, desiredDifficulty);
 
       if (sudoku.initialValues === undefined) {
         continue;   // desired difficulty has not been attained
@@ -100,7 +101,7 @@ console.info('\nCreating ' + DIFFICULTY_LABELS[difficulty] + ' sudoku ...');
 
     sudoku.generatePasses = pass;
 // console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty) 
-console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty] 
+console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty] 
     + ' in ' + sudoku.generatePasses + ' passes');
     return sudoku.serialize();
   } // createSudoku()
@@ -166,8 +167,10 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
 
   /**
    * [Step 2]
+   * Remove symetric pairs of cell values to yield a sudoku with a set of
+   * symetric initial values.
    */
-  private getStartingValues(puzzle: Puzzle) : void {
+  private pareToInitialValues(puzzle: Puzzle, desiredDiff: Difficulty) : void {
 
     let start: number = Date.now();   // for elapsed time
 
@@ -203,14 +206,14 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
 
 // console.info('Step 2a:\n' + this.sudokuService.toGridString()); 
 
-      switch (puzzle.desiredDifficulty) {
+      switch (desiredDiff) {
 
         // no guessing cases
         case Difficulty.EASY:
         case Difficulty.MEDIUM:
         case Difficulty.HARD:
           let hard: boolean = false;
-          let hint: Hint = this.hintService.getHint(puzzle.desiredDifficulty);
+          let hint: Hint = this.hintService.getHint(desiredDiff);
           // while (this.hintService.getHint(puzzle.desiredDifficulty)) {
           while (hint) {
 
@@ -221,7 +224,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
 
             // this.hintService.applyHint();
             this.applyHint(hint);
-            hint = this.hintService.getHint(puzzle.desiredDifficulty);
+            hint = this.hintService.getHint(desiredDiff);
           } // while
           let solved = this.sudokuService.isSolved();
           this.rollbackAll();
@@ -231,6 +234,8 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
             }
             continue NEXT_CELL;    // don't restore sym cells
           } // if not solved, fall through to restore pared cells
+          
+          break;
 
         // guess when no hints available
         case Difficulty.HARDEST:
@@ -248,7 +253,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
     // TODO
     // at end of step 2 no initial values is a signal that desired difficulty
     // is not being attained, so no use going on to step 3
-    if (puzzle.desiredDifficulty === Difficulty.HARD
+    if (desiredDiff === Difficulty.HARD
         && hardCount === 0) {
       puzzle.initialValues = undefined;
     } else {
@@ -259,7 +264,54 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
     // let elapsed: number = Date.now() - start;
     // console.info('Step 2 elapsed: ' + elapsed + 'ms');
 
-  } // getStartingValues() [step 2 - no guesses]
+  } // pareToInitialValues() [step 2 - no guesses]
+  
+  /**
+   * [Step 2]
+   * Remove symetric pairs of cell values to yield a sudoku with a set of
+   * symetric initial values.
+   */
+  private pareToInitialValues1(puzzle: Puzzle, desiredDiff: Difficulty) : void {
+
+// let start: number = Date.now();   // for elapsed time
+
+    this.sudokuService.setAllValues(puzzle.completedPuzzle);
+    this.initializeLogs();
+    this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
+    this.randomValues = Common.shuffleArray(VALUES.slice());
+    let randomParingCells = Common.shuffleArray(CELLS.slice(0, 41));
+
+    for (let ci of randomParingCells) {
+      let symCi = 80 - ci;
+  
+      // save then remove values of symmetric twins 
+      let savedValue = this.sudokuService.getValue(ci)
+      let savedSymValue = this.sudokuService.getValue(symCi);
+      this.sudokuService.removeValue(ci);
+      this.sudokuService.removeValue(symCi);
+      
+          let hint: Hint = this.hintService.getHint(desiredDiff);
+          while (hint) {
+            this.applyHint(hint);
+            hint = this.hintService.getHint(desiredDiff);
+          } // while there is a hint
+
+          let solved: boolean = this.sudokuService.isSolved();
+          this.rollbackAll(); // remove attempted solution values
+          if (!solved) {
+
+            // no solution with these removals, so restore and remove another pair
+            this.sudokuService.setValue(ci, savedValue);
+            this.sudokuService.setValue(symCi, savedSymValue);
+          }
+    } // for next random symmetric pairs of cells to pare
+
+    puzzle.initialValues = this.sudokuService.cellsToValuesArray();
+
+// let elapsed: number = Date.now() - start;
+// console.info('step 2 elapsed: ' + elapsed + 'ms');
+
+  } // pareToInitialValues1() [step 2 - no guesses]
   
   /**
    * [Step 3]
@@ -285,8 +337,8 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
 
     puzzle.completedPuzzle = this.sudokuService.cellsToValuesArray();
     // puzzle.stats = this.hintService.getHintCounts();
-    puzzle.stats = this.hintLog.getHintCounts();
-    puzzle.actualDifficulty = puzzle.stats.getActualDifficulty();
+    puzzle.hintCounts = this.hintLog.getHintCounts();
+    puzzle.difficulty = puzzle.hintCounts.getActualDifficulty();
 
     let elapsed: number = Date.now() - start;
     // console.log('Step 3 elapsed: ' + elapsed + 'ms');
@@ -466,30 +518,30 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.actualDifficulty]
    */
   private findFewestCandidatesCell() : number {
     let minCands = 10;
-    let minCandsCell: number = -1;
+    let fewestCandsCell: number = -1;
     let currentCellCands: number;
-    for (let c of this.randomCellIndexes) {
+    for (let ci of this.randomCellIndexes) {
 
-      if (this.sudokuService.hasValue(c)) {
+      if (this.sudokuService.hasValue(ci)) {
         continue;
       }
 
-      currentCellCands = this.sudokuService.getNumberOfCandidates(c);
+      currentCellCands = this.sudokuService.getNumberOfCandidates(ci);
       if (currentCellCands === 2) {
-        return c;   // can't get lower than 2
+        return ci;   // can't get lower than 2
       }
 
       if (currentCellCands < minCands) {
         minCands = currentCellCands;
-        minCandsCell = c;
+        fewestCandsCell = ci;
       }
 
       // needed?
-      if (minCands <= 2) {
-        break;	// 0 --> value, 1 --> naked single
-      }
-    }
-    return minCandsCell;
+      // if (minCands <= 2) {
+      //   break;	// 0 --> value, 1 --> naked single
+      // }
+    } // for
+    return fewestCandsCell;
   } // findFewestCandidatesCell()
 
   /**

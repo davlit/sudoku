@@ -10,6 +10,7 @@ import { Difficulty }       from './model/difficulty';
 import { DIFFICULTY_LABELS } from './model/difficulty';
 import { SudokuService }    from './model/sudoku.service';
 import { CacheService }     from './model/cache.service';
+// import { Cache }     from './model/cache';
 import { Puzzle }           from './model/puzzle';
 import { Hint }             from './hint/hint';
 import { HintService }      from './hint/hint.service';
@@ -80,6 +81,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
     private cacheService: CacheService,
+    // private cache: Cache,
 
     private messageService: MessageService
   ) {
@@ -90,13 +92,17 @@ export class AppComponent implements OnInit, OnDestroy {
     this.messageSubscription = this.messageService.getMessage()
         .subscribe(message => { 
           this.message = message; 
-          // console.info('\nMessage received: ' + this.message.text);
+console.info('\nMessage received: ' + this.message.text);
 
-          if (this.message.text === 'Cache changed') {
+          if (this.message.text === 'Cache replenished') {
             this.easyAvailable = this.cacheService.isSudokuAvailable(Difficulty.EASY);
             this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
             this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);
             this.hardestAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARDEST);
+            // this.easyAvailable = this.cache.isSudokuAvailable(Difficulty.EASY);
+            // this.mediumAvailable = this.cache.isSudokuAvailable(Difficulty.MEDIUM);
+            // this.hardAvailable = this.cache.isSudokuAvailable(Difficulty.HARD);
+            // this.hardestAvailable = this.cache.isSudokuAvailable(Difficulty.HARDEST);
             
             this.changeDetectorRef.detectChanges();
           }
@@ -161,7 +167,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.initializeUserInterface();
     this.changeDetectorRef.detectChanges();
 
-    // let cacheKeys: string[] = this.cacheService.getCacheKeys();
+    let cacheKeys: string[] = this.cacheService.getCacheKeys();
+    // let cacheKeys: string[] = this.cache.getCacheKeys();
+
+console.info('\nX. Cache on ngOnInit(): ' 
+  // + this.cache.activeCachesToString());
+  + this.cacheService.activeCachesToString());
 
 // console.info('\nCache keys before replenishment: ' + JSON.stringify(cacheKeys));
 
@@ -175,7 +186,12 @@ export class AppComponent implements OnInit, OnDestroy {
     this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
     this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);
     this.hardestAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARDEST);
+    // this.easyAvailable = this.cache.isSudokuAvailable(Difficulty.EASY);
+    // this.mediumAvailable = this.cache.isSudokuAvailable(Difficulty.MEDIUM);
+    // this.hardAvailable = this.cache.isSudokuAvailable(Difficulty.HARD);
+    // this.hardestAvailable = this.cache.isSudokuAvailable(Difficulty.HARDEST);
 
+    // this.cache.replenishCache();
     this.cacheService.replenishCache();
 
   } // ngOnInit()
@@ -217,11 +233,12 @@ export class AppComponent implements OnInit, OnDestroy {
    */
   generate(difficulty: Difficulty) : void {
     this.currentPuzzle = Puzzle.deserialize(this.cacheService.getSudoku(difficulty));
+    // this.currentPuzzle = Puzzle.deserialize(this.cache.getSudoku(difficulty));
 
     // bind metadata for ui, load sudoku for user execution
     this.actualDifficulty = 
         // Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
-        DIFFICULTY_LABELS[this.currentPuzzle.actualDifficulty];
+        DIFFICULTY_LABELS[this.currentPuzzle.difficulty];
     this.solutionClues = this.createSolutionClues();
 
     this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
@@ -348,6 +365,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    */
   emptyCache() {
     this.cacheService.emptyCache();
+    // this.cache.emptyCache();
   }
 
   /**
@@ -714,35 +732,35 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    * Using puzzle statistics, prepare a solution clues string;
    */
   createSolutionClues() : string {
-    let stats : HintCounts = <HintCounts> this.currentPuzzle.stats;
+    let hintCounts : HintCounts = <HintCounts> this.currentPuzzle.hintCounts;
     let s: string = '';
 
-    if (stats.getNakedPairs() > 0) {
-      s += stats.getNakedPairs() + ' Naked pairs\n';
+    if (hintCounts.getNakedPairs() > 0) {
+      s += hintCounts.getNakedPairs() + ' Naked pairs\n';
     }
-    if (stats.getPointingRowsCols() > 0) {
-        s += stats.getPointingRowsCols() + ' Pointing rows or columns\n';
+    if (hintCounts.getPointingRowsCols() > 0) {
+        s += hintCounts.getPointingRowsCols() + ' Pointing rows or columns\n';
     }
-    if (stats.getBoxReductions() > 0) {
-        s += stats.getBoxReductions() + ' Box reductions\n';
+    if (hintCounts.getBoxReductions() > 0) {
+        s += hintCounts.getBoxReductions() + ' Box reductions\n';
     }
-    if (stats.getNakedTriples() > 0) {
-        s += stats.getNakedTriples() + ' Naked triples\n';
+    if (hintCounts.getNakedTriples() > 0) {
+        s += hintCounts.getNakedTriples() + ' Naked triples\n';
     }
-    if (stats.getNakedQuads() > 0) {
-        s += stats.getNakedQuads() + ' Naked quads\n';
+    if (hintCounts.getNakedQuads() > 0) {
+        s += hintCounts.getNakedQuads() + ' Naked quads\n';
     }
-    if (stats.getHiddenPairs() > 0) {
-        s += stats.getHiddenPairs() + ' Hidden pairs\n';
+    if (hintCounts.getHiddenPairs() > 0) {
+        s += hintCounts.getHiddenPairs() + ' Hidden pairs\n';
     }
-    if (stats.getHiddenTriples() > 0) {
-        s += stats.getHiddenTriples() + ' Hidden triples\n';
+    if (hintCounts.getHiddenTriples() > 0) {
+        s += hintCounts.getHiddenTriples() + ' Hidden triples\n';
     }
-    if (stats.getHiddenQuads() > 0) {
-        s += stats.getHiddenQuads() + ' Hidden quads\n';
+    if (hintCounts.getHiddenQuads() > 0) {
+        s += hintCounts.getHiddenQuads() + ' Hidden quads\n';
     }
-    if (stats.getGuesses() > 0) {
-        s += stats.getGuesses() + ' Guesses\n';
+    if (hintCounts.getGuesses() > 0) {
+        s += hintCounts.getGuesses() + ' Guesses\n';
     }
 
     s += '*';
@@ -890,6 +908,8 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    * 
    */
   setCellValue(ci: number, v: number) : void {
+
+console.info('completedPuzzle: ' + this.currentPuzzle.completedPuzzle);
 
     // check for new values not that of solution
     if (v != this.currentPuzzle.completedPuzzle[ci]) {

@@ -2,86 +2,348 @@ import { HintType } from './hint.type';
 import { Difficulty } from '../model/difficulty';
 
 export class HintCounts {
+  private _nakedSingles: number;
 
-  constructor() {}
+  private _hiddenSinglesRow: number;
+  private _hiddenSinglesCol: number;
+  private _hiddenSinglesBox: number;
 
-  nakedSingles: number = 0;
+  private _nakedPairsRow: number;
+  private _nakedPairsCol: number;
+  private _nakedPairsBox: number;
 
-  hiddenSinglesRow: number = 0;
-  hiddenSinglesCol: number = 0;
-  hiddenSinglesBox: number = 0;
+  private _pointingRows: number;
+  private _pointingCols: number;
 
-  nakedPairsRow: number = 0;
-  nakedPairsCol: number = 0;
-  nakedPairsBox: number = 0;
+  private _rowBoxReductions: number;
+  private _colBoxReductions: number;
 
-  pointingRows: number = 0;
-  pointingCols: number = 0;
+  private _nakedTriplesRow: number;
+  private _nakedTriplesCol: number;
+  private _nakedTriplesBox: number;
 
-  rowBoxReductions: number = 0;
-  colBoxReductions: number = 0;
+  private _nakedQuadsRow: number;
+  private _nakedQuadsCol: number;
+  private _nakedQuadsBox: number;
 
-  nakedTriplesRow: number = 0;
-  nakedTriplesCol: number = 0;
-  nakedTriplesBox: number = 0;
+  private _hiddenPairsRow: number;
+  private _hiddenPairsCol: number;
+  private _hiddenPairsBox: number;
 
-  nakedQuadsRow: number = 0;
-  nakedQuadsCol: number = 0;
-  nakedQuadsBox: number = 0;
+  private _hiddenTriplesRow: number;
+  private _hiddenTriplesCol: number;
+  private _hiddenTriplesBox: number;
 
-  hiddenPairsRow: number = 0;
-  hiddenPairsCol: number = 0;
-  hiddenPairsBox: number = 0;
+  private _hiddenQuadsRow: number;
+  private _hiddenQuadsCol: number;
+  private _hiddenQuadsBox: number;
 
-  hiddenTriplesRow: number = 0;
-  hiddenTriplesCol: number = 0;
-  hiddenTriplesBox: number = 0;
+  private _guesses: number;
 
-  hiddenQuadsRow: number = 0;
-  hiddenQuadsCol: number = 0;
-  hiddenQuadsBox: number = 0;
+  constructor() {
+    this._nakedSingles = 0;
 
-  guesses: number = 0;
+    this._hiddenSinglesRow = 0;
+    this._hiddenSinglesCol = 0;
+    this._hiddenSinglesBox = 0;
+
+    this._nakedPairsRow = 0;
+    this._nakedPairsCol = 0;
+    this._nakedPairsBox = 0;
+
+    this._pointingRows = 0;
+    this._pointingCols = 0;
+
+    this._rowBoxReductions = 0;
+    this._colBoxReductions = 0;
+
+    this._nakedTriplesRow = 0;
+    this._nakedTriplesCol = 0;
+    this._nakedTriplesBox = 0;
+
+    this._nakedQuadsRow = 0;
+    this._nakedQuadsCol = 0;
+    this._nakedQuadsBox = 0;
+
+    this._hiddenPairsRow = 0;
+    this._hiddenPairsCol = 0;
+    this._hiddenPairsBox = 0;
+
+    this._hiddenTriplesRow = 0;
+    this._hiddenTriplesCol = 0;
+    this._hiddenTriplesBox = 0;
+
+    this._hiddenQuadsRow = 0;
+    this._hiddenQuadsCol = 0;
+    this._hiddenQuadsBox = 0;
+
+    this._guesses = 0;
+  } // constructor
+
+  get nakedSingles() : number {
+    return this._nakedSingles;
+  }
+
+  get hiddenSinglesRow() : number {
+    return this._hiddenSinglesRow;
+  }
+  get hiddenSinglesCol() : number {
+    return this._hiddenSinglesCol;
+  }
+  get hiddenSinglesBox() : number {
+    return this._hiddenSinglesBox;
+  }
+
+  get nakedPairsRow() : number {
+    return this._nakedPairsRow;
+  }
+  get nakedPairsCol() : number {
+    return this._nakedPairsCol;
+  }
+  get nakedPairsBox() : number {
+    return this._nakedPairsBox;
+  }
+
+  get pointingRows() : number {
+    return this._pointingRows;
+  }
+  get pointingCols() : number {
+    return this._pointingCols;
+  }
+
+  get rowBoxReductions() : number {
+    return this._rowBoxReductions;
+  }
+  get colBoxReductions() : number {
+    return this._colBoxReductions;
+  }
+
+  get nakedTriplesRow() : number {
+    return this._nakedTriplesRow;
+  }
+  get nakedTriplesCol() : number {
+    return this._nakedTriplesCol;
+  }
+  get nakedTriplesBox() : number {
+    return this._nakedTriplesBox;
+  }
+
+  get nakedQuadsRow() : number {
+    return this._nakedQuadsRow;
+  }
+  get nakedQuadsCol() : number {
+    return this._nakedQuadsCol;
+  }
+  get nakedQuadsBox() : number {
+    return this._nakedQuadsBox;
+  }
+
+  get hiddenPairsRow() : number {
+    return this._hiddenPairsRow;
+  }
+  get hiddenPairsCol() : number {
+    return this._hiddenPairsCol;
+  }
+  get hiddenPairsBox() : number {
+    return this._hiddenPairsBox;
+  }
+
+  get hiddenTriplesRow() : number {
+    return this._hiddenTriplesRow;
+  }
+  get hiddenTriplesCol() : number {
+    return this._hiddenTriplesCol;
+  }
+  get hiddenTriplesBox() : number {
+    return this._hiddenTriplesBox;
+  }
+
+  get hiddenQuadsRow() : number {
+    return this._hiddenQuadsRow;
+  }
+  get hiddenQuadsCol() : number {
+    return this._hiddenQuadsCol;
+  }
+  get hiddenQuadsBox() : number {
+    return this._hiddenQuadsBox;
+  }
+
+  get guesses() : number {
+    return this._guesses;
+  }
+
+
+  set nakedSingles(n: number) {
+    this._nakedSingles = n;
+  }
+
+  set hiddenSinglesRow(n: number) {
+    this._hiddenSinglesRow = n;
+  }
+  set hiddenSinglesCol(n: number) {
+    this._hiddenSinglesCol = n;
+  }
+  set hiddenSinglesBox(n: number) {
+    this._hiddenSinglesBox = n;
+  }
+
+  set nakedPairsRow(n: number) {
+    this._nakedPairsRow = n;
+  }
+  set nakedPairsCol(n: number) {
+    this._nakedPairsCol = n;
+  }
+  set nakedPairsBox(n: number) {
+    this._nakedPairsBox = n;
+  }
+
+  set pointingRows(n: number) {
+    this._pointingRows = n;
+  }
+  set pointingCols(n: number) {
+    this._pointingCols = n;
+  }
+
+  set rowBoxReductions(n: number) {
+    this._rowBoxReductions = n;
+  }
+  set colBoxReductions(n: number) {
+    this._colBoxReductions = n;
+  }
+
+  set nakedTriplesRow(n: number) {
+    this._nakedTriplesRow = n;
+  }
+  set nakedTriplesCol(n: number) {
+    this._nakedTriplesCol = n;
+  }
+  set nakedTriplesBox(n: number) {
+    this._nakedTriplesBox = n;
+  }
+
+  set nakedQuadsRow(n: number) {
+    this._nakedQuadsRow = n;
+  }
+  set nakedQuadsCol(n: number) {
+    this._nakedQuadsCol = n;
+  }
+  set nakedQuadsBox(n: number) {
+    this._nakedQuadsBox = n;
+  }
+
+  set hiddenPairsRow(n: number) {
+    this._hiddenPairsRow = n;
+  }
+  set hiddenPairsCol(n: number) {
+    this._hiddenPairsCol = n;
+  }
+  set hiddenPairsBox(n: number) {
+    this._hiddenPairsBox = n;
+  }
+
+  set hiddenTriplesRow(n: number) {
+    this._hiddenTriplesRow = n;
+  }
+  set hiddenTriplesCol(n: number) {
+    this._hiddenTriplesCol = n;
+  }
+  set hiddenTriplesBox(n: number) {
+    this._hiddenTriplesBox = n;
+  }
+
+  set hiddenQuadsRow(n: number) {
+    this._hiddenQuadsRow = n;
+  }
+  set hiddenQuadsCol(n: number) {
+    this._hiddenQuadsCol = n;
+  }
+  set hiddenQuadsBox(n: number) {
+    this._hiddenQuadsBox = n;
+  }
+
+  set guesses(n: number) {
+    this._guesses = n;
+  }
+
+
+
+  // nakedSingles: number = 0;
+
+  // hiddenSinglesRow: number = 0;
+  // hiddenSinglesCol: number = 0;
+  // hiddenSinglesBox: number = 0;
+
+  // nakedPairsRow: number = 0;
+  // nakedPairsCol: number = 0;
+  // nakedPairsBox: number = 0;
+
+  // pointingRows: number = 0;
+  // pointingCols: number = 0;
+
+  // rowBoxReductions: number = 0;
+  // colBoxReductions: number = 0;
+
+  // nakedTriplesRow: number = 0;
+  // nakedTriplesCol: number = 0;
+  // nakedTriplesBox: number = 0;
+
+  // nakedQuadsRow: number = 0;
+  // nakedQuadsCol: number = 0;
+  // nakedQuadsBox: number = 0;
+
+  // hiddenPairsRow: number = 0;
+  // hiddenPairsCol: number = 0;
+  // hiddenPairsBox: number = 0;
+
+  // hiddenTriplesRow: number = 0;
+  // hiddenTriplesCol: number = 0;
+  // hiddenTriplesBox: number = 0;
+
+  // hiddenQuadsRow: number = 0;
+  // hiddenQuadsCol: number = 0;
+  // hiddenQuadsBox: number = 0;
+
+  // guesses: number = 0;
 
   serialize() : string {
     return JSON.stringify({
-      "nakedSingles": this.nakedSingles,
+      "nakedSingles": this._nakedSingles,
 
-      "hiddenSinglesRow": this.hiddenSinglesRow,
-      "hiddenSinglesCol": this.hiddenSinglesCol,
-      "hiddenSinglesBox": this.hiddenSinglesBox,
+      "hiddenSinglesRow": this._hiddenSinglesRow,
+      "hiddenSinglesCol": this._hiddenSinglesCol,
+      "hiddenSinglesBox": this._hiddenSinglesBox,
 
-      "nakedPairsRow": this.nakedPairsRow,
-      "nakedPairsCol": this.nakedPairsCol,
-      "nakedPairsBox": this.nakedPairsBox,
+      "nakedPairsRow": this._nakedPairsRow,
+      "nakedPairsCol": this._nakedPairsCol,
+      "nakedPairsBox": this._nakedPairsBox,
 
-      "pointingRows": this.pointingRows,
-      "pointingCols": this.pointingCols,
+      "pointingRows": this._pointingRows,
+      "pointingCols": this._pointingCols,
 
-      "rowBoxReductions": this.rowBoxReductions,
-      "colBoxReductions": this.colBoxReductions,
+      "rowBoxReductions": this._rowBoxReductions,
+      "colBoxReductions": this._colBoxReductions,
 
-      "nakedTriplesRow": this.nakedTriplesRow,
-      "nakedTriplesCol": this.nakedTriplesCol,
-      "nakedTriplesBox": this.nakedTriplesBox,
+      "nakedTriplesRow": this._nakedTriplesRow,
+      "nakedTriplesCol": this._nakedTriplesCol,
+      "nakedTriplesBox": this._nakedTriplesBox,
 
-      "nakedQuadsRow": this.nakedQuadsRow,
-      "nakedQuadsCol": this.nakedQuadsCol,
-      "nakedQuadsBox": this.nakedQuadsBox,
+      "nakedQuadsRow": this._nakedQuadsRow,
+      "nakedQuadsCol": this._nakedQuadsCol,
+      "nakedQuadsBox": this._nakedQuadsBox,
 
-      "hiddenPairsRow": this.hiddenPairsRow,
-      "hiddenPairsCol": this.hiddenPairsCol,
-      "hiddenPairsBox": this.hiddenPairsBox,
+      "hiddenPairsRow": this._hiddenPairsRow,
+      "hiddenPairsCol": this._hiddenPairsCol,
+      "hiddenPairsBox": this._hiddenPairsBox,
 
-      "hiddenTriplesRow": this.hiddenTriplesRow,
-      "hiddenTriplesCol": this.hiddenTriplesCol,
-      "hiddenTriplesBox": this.hiddenTriplesBox,
+      "hiddenTriplesRow": this._hiddenTriplesRow,
+      "hiddenTriplesCol": this._hiddenTriplesCol,
+      "hiddenTriplesBox": this._hiddenTriplesBox,
 
-      "hiddenQuadsRow": this.hiddenQuadsRow,
-      "hiddenQuadsCol": this.hiddenQuadsCol,
-      "hiddenQuadsBox": this.hiddenQuadsBox,
+      "hiddenQuadsRow": this._hiddenQuadsRow,
+      "hiddenQuadsCol": this._hiddenQuadsCol,
+      "hiddenQuadsBox": this._hiddenQuadsBox,
 
-      "guesses": this.guesses
+      "guesses": this._guesses
     });
   }
 
@@ -132,171 +394,171 @@ export class HintCounts {
   incrementHintCount(hintType: HintType) {
     switch (hintType) {
       case HintType.NAKED_SINGLE:
-        this.nakedSingles++;
+        this._nakedSingles++;
       case HintType.HIDDEN_SINGLE_ROW:
-        this.hiddenSinglesRow++;
+        this._hiddenSinglesRow++;
       case HintType.HIDDEN_SINGLE_COL:
-        this.hiddenSinglesCol++;
+        this._hiddenSinglesCol++;
       case HintType.HIDDEN_SINGLE_BOX:
-        this.hiddenSinglesBox++;
+        this._hiddenSinglesBox++;
       case HintType.NAKED_PAIRS_ROW:
-        this.nakedPairsRow++;
+        this._nakedPairsRow++;
       case HintType.NAKED_PAIRS_COL:
-        this.nakedPairsCol++;
+        this._nakedPairsCol++;
       case HintType.NAKED_PAIRS_BOX:
-        this.nakedPairsBox++;
+        this._nakedPairsBox++;
       case HintType.POINTING_ROW:
-        this.pointingRows++;
+        this._pointingRows++;
       case HintType.POINTING_COL:
-        this.pointingCols++;
+        this._pointingCols++;
       case HintType.ROW_BOX_REDUCTION:
-        this.rowBoxReductions++;
+        this._rowBoxReductions++;
       case HintType.COL_BOX_REDUCTION:
-        this.colBoxReductions++;
+        this._colBoxReductions++;
       case HintType.NAKED_TRIPLES_ROW:
-        this.nakedTriplesRow++;
+        this._nakedTriplesRow++;
       case HintType.NAKED_TRIPLES_COL:
-        this.nakedTriplesCol++;
+        this._nakedTriplesCol++;
       case HintType.NAKED_TRIPLES_BOX:
-        this.nakedTriplesBox++;
+        this._nakedTriplesBox++;
       case HintType.HIDDEN_PAIRS_ROW:
-        this.hiddenPairsRow++;
+        this._hiddenPairsRow++;
       case HintType.HIDDEN_PAIRS_COL:
-        this.hiddenPairsCol++;
+        this._hiddenPairsCol++;
       case HintType.HIDDEN_PAIRS_BOX:
-        this.hiddenPairsBox++;
+        this._hiddenPairsBox++;
       case HintType.NAKED_QUADS_ROW:
-        this.nakedQuadsRow++;
+        this._nakedQuadsRow++;
       case HintType.NAKED_QUADS_COL:
-        this.nakedQuadsCol++;
+        this._nakedQuadsCol++;
       case HintType.NAKED_QUADS_BOX:
-        this.nakedQuadsBox++;
+        this._nakedQuadsBox++;
       case HintType.HIDDEN_TRIPLES_ROW:
-        this.hiddenTriplesRow++;
+        this._hiddenTriplesRow++;
       case HintType.HIDDEN_TRIPLES_COL:
-        this.hiddenTriplesCol++;
+        this._hiddenTriplesCol++;
       case HintType.HIDDEN_TRIPLES_BOX:
-        this.hiddenTriplesBox++;
+        this._hiddenTriplesBox++;
       case HintType.HIDDEN_QUADS_ROW:
-        this.hiddenQuadsRow++;
+        this._hiddenQuadsRow++;
       case HintType.HIDDEN_QUADS_COL:
-        this.hiddenQuadsCol++;
+        this._hiddenQuadsCol++;
       case HintType.HIDDEN_QUADS_BOX:
-        this.hiddenQuadsBox++;
+        this._hiddenQuadsBox++;
       case HintType.GUESS:
-        this.guesses++;
+        this._guesses++;
     }
   }
 
   getNakedSingles() : number {
-    return this.nakedSingles;
+    return this._nakedSingles;
   }
 
   getHiddenSingles() : number {
-    return this.hiddenSinglesRow
-         + this.hiddenSinglesCol
-         + this.hiddenSinglesBox;
+    return this._hiddenSinglesRow
+         + this._hiddenSinglesCol
+         + this._hiddenSinglesBox;
   }
 
   getNakedPairs() : number {
-    return this.nakedPairsRow
-         + this.nakedPairsCol
-         + this.nakedPairsBox;
+    return this._nakedPairsRow
+         + this._nakedPairsCol
+         + this._nakedPairsBox;
   }
 
   getPointingRowsCols() : number {
-    return this.pointingRows
-         + this.pointingCols;
+    return this._pointingRows
+         + this._pointingCols;
   }
 
   getBoxReductions() : number {
-    return this.rowBoxReductions
-         + this.colBoxReductions;
+    return this._rowBoxReductions
+         + this._colBoxReductions;
   }
 
   getNakedTriples() : number {
-    return this.nakedTriplesRow
-         + this.nakedTriplesCol
-         + this.nakedTriplesBox;
+    return this._nakedTriplesRow
+         + this._nakedTriplesCol
+         + this._nakedTriplesBox;
   }
 
   getNakedQuads() : number {
-    return this.nakedQuadsRow
-         + this.nakedQuadsCol
-         + this.nakedQuadsBox;
+    return this._nakedQuadsRow
+         + this._nakedQuadsCol
+         + this._nakedQuadsBox;
   }
 
   getHiddenPairs() : number {
-    return this.hiddenPairsRow
-         + this.hiddenPairsCol
-         + this.hiddenPairsBox;
+    return this._hiddenPairsRow
+         + this._hiddenPairsCol
+         + this._hiddenPairsBox;
   }
 
   getHiddenTriples() : number {
-    return this.hiddenTriplesRow
-         + this.hiddenTriplesCol
-         + this.hiddenTriplesBox;
+    return this._hiddenTriplesRow
+         + this._hiddenTriplesCol
+         + this._hiddenTriplesBox;
   }
 
   getHiddenQuads() : number {
-    return this.hiddenQuadsRow
-         + this.hiddenQuadsCol
-         + this.hiddenQuadsBox;
+    return this._hiddenQuadsRow
+         + this._hiddenQuadsCol
+         + this._hiddenQuadsBox;
   }
 
   getGuesses() : number {
-    return this.guesses;
+    return this._guesses;
   }
 
   getTotalHints() : number {
     return 0 
-      + this.nakedSingles 
+      + this._nakedSingles 
 
-      + this.hiddenSinglesRow 
-      + this.hiddenSinglesCol 
-      + this.hiddenSinglesBox
+      + this._hiddenSinglesRow 
+      + this._hiddenSinglesCol 
+      + this._hiddenSinglesBox
 
-      + this.nakedPairsRow 
-      + this.nakedPairsCol 
-      + this.nakedPairsBox
+      + this._nakedPairsRow 
+      + this._nakedPairsCol 
+      + this._nakedPairsBox
 
-      + this.pointingRows  
-      + this.pointingCols
+      + this._pointingRows  
+      + this._pointingCols
 
-      + this.rowBoxReductions 
-      + this.colBoxReductions
+      + this._rowBoxReductions 
+      + this._colBoxReductions
 
-      + this.nakedTriplesRow 
-      + this.nakedTriplesCol 
-      + this.nakedTriplesBox
+      + this._nakedTriplesRow 
+      + this._nakedTriplesCol 
+      + this._nakedTriplesBox
 
-      + this.nakedQuadsRow
-      + this.nakedQuadsCol
-      + this.nakedQuadsBox
+      + this._nakedQuadsRow
+      + this._nakedQuadsCol
+      + this._nakedQuadsBox
 
-      + this.hiddenPairsRow 
-      + this.hiddenPairsCol 
-      + this.hiddenPairsBox
+      + this._hiddenPairsRow 
+      + this._hiddenPairsCol 
+      + this._hiddenPairsBox
 
-      + this.hiddenTriplesRow 
-      + this.hiddenTriplesCol 
-      + this.hiddenTriplesBox
+      + this._hiddenTriplesRow 
+      + this._hiddenTriplesCol 
+      + this._hiddenTriplesBox
 
-      + this.hiddenQuadsRow 
-      + this.hiddenQuadsCol 
-      + this.hiddenQuadsBox
+      + this._hiddenQuadsRow 
+      + this._hiddenQuadsCol 
+      + this._hiddenQuadsBox
 
-      + this.guesses;
+      + this._guesses;
   }
 
   /**
    * Determine the difficulty of a sudoku based on the techniques required to
    * achieve the solution.
    */
-  getActualDifficulty() : Difficulty {
+  public getActualDifficulty() : Difficulty {
 
     // HARDEST
-    if (this.guesses > 0) {
+    if (this._guesses > 0) {
       return Difficulty.HARDEST;
     } 
     
@@ -317,73 +579,89 @@ export class HintCounts {
     }
     
     // EASY
-    if (   this.getHiddenSingles() > 0
-        || this.nakedSingles       > 0) {
-      return Difficulty.EASY;
-    }
+    // if (   this.getHiddenSingles() > 0
+    //     // || this.nakedSingles       > 0) {
+    //     || this.getNakedSingles()  > 0) {
+    //   return Difficulty.EASY;
+    // }
 
     return  Difficulty.EASY;
   } // getDifficultyType()
 
   /**
+   * Prints hint counts based on entries in the hint log. Some data are
+   * supressed if zero.
    * 
+   * Abbreviations
+   * *   - R - row, C - column, or B - box
+   * NS  - naked singles (row, column, or box doesn't matter)
+   * HS* - hidden single (row/col/box)
+   * NP* - naked pairs (row/col/box)
+   * P*  - pointing (row/column)
+   * *BR - (row/col) box reduction
+   * NT* - naked triples (row/col/box)
+   * NQ* - naked quads (row/col/box)
+   * HP* - hidden pairs (row/col/box)
+   * HT* - hidden triples (row/col/box)
+   * HQ* - hidden quads (row/col/box)
+   * G   - guesses  (row, column, or box doesn't matter)
    */
-  toString() : string {
+  public toString() : string {
     let s ='';
-    // s += 'NS   : ' + this.nakedSingles + '\n'
+    // s += 'NS   : ' + this._nakedSingles + '\n'
 
-    // s += 'HS*  : ' + this.hiddenSinglesRow + ', ' 
-    //                + this.hiddenSinglesCol + ', ' 
-    //                + this.hiddenSinglesBox + '\n';
+    // s += 'HS*  : ' + this._hiddenSinglesRow + ', ' 
+    //                + this._hiddenSinglesCol + ', ' 
+    //                + this._hiddenSinglesBox + '\n';
 
-    if (this.nakedPairsRow + this.nakedPairsCol + this.nakedPairsBox > 0) {
-      s += 'NP*  : ' + this.nakedPairsRow + ', ' 
-                     + this.nakedPairsCol + ', ' 
-                     + this.nakedPairsBox + '\n';
+    if (this._nakedPairsRow + this._nakedPairsCol + this._nakedPairsBox > 0) {
+      s += 'NP*  : ' + this._nakedPairsRow + ', ' 
+                     + this._nakedPairsCol + ', ' 
+                     + this._nakedPairsBox + '\n';
     }
 
-    if (this.pointingRows + this.pointingCols > 0) {
-      s += 'P*   : ' + this.pointingRows  + ', ' 
-                     + this.pointingCols + '\n';
+    if (this._pointingRows + this._pointingCols > 0) {
+      s += 'P*   : ' + this._pointingRows  + ', ' 
+                     + this._pointingCols + '\n';
     }
 
-    if (this.rowBoxReductions + this.colBoxReductions > 0) {
-      s += '*BR  : ' + this.rowBoxReductions + ', ' 
-                     + this.colBoxReductions + '\n';
+    if (this._rowBoxReductions + this._colBoxReductions > 0) {
+      s += '*BR  : ' + this._rowBoxReductions + ', ' 
+                     + this._colBoxReductions + '\n';
     }
 
-    if (this.nakedTriplesRow + this.nakedTriplesCol + this.nakedTriplesBox > 0) {
-      s += 'NT*  : ' + this.nakedTriplesRow + ', ' 
-                     + this.nakedTriplesCol + ', ' 
-                     + this.nakedTriplesBox + '\n';
+    if (this._nakedTriplesRow + this._nakedTriplesCol + this._nakedTriplesBox > 0) {
+      s += 'NT*  : ' + this._nakedTriplesRow + ', ' 
+                     + this._nakedTriplesCol + ', ' 
+                     + this._nakedTriplesBox + '\n';
     }
 
-    if (this.nakedQuadsRow + this.nakedQuadsCol + this.nakedQuadsBox > 0) {
-      s += 'NQ*  : ' + this.nakedQuadsRow + ', ' 
-                     + this.nakedQuadsCol + ', ' 
-                     + this.nakedQuadsBox + '\n';
+    if (this._nakedQuadsRow + this._nakedQuadsCol + this._nakedQuadsBox > 0) {
+      s += 'NQ*  : ' + this._nakedQuadsRow + ', ' 
+                     + this._nakedQuadsCol + ', ' 
+                     + this._nakedQuadsBox + '\n';
     }
 
-    if (this.hiddenPairsRow + this.hiddenPairsCol + this.hiddenPairsBox > 0) {
-      s += 'HP*  : ' + this.hiddenPairsRow + ', ' 
-                     + this.hiddenPairsCol + ', ' 
-                     + this.hiddenPairsBox + '\n';
+    if (this._hiddenPairsRow + this._hiddenPairsCol + this._hiddenPairsBox > 0) {
+      s += 'HP*  : ' + this._hiddenPairsRow + ', ' 
+                     + this._hiddenPairsCol + ', ' 
+                     + this._hiddenPairsBox + '\n';
     }
 
-    if (this.hiddenTriplesRow + this.hiddenTriplesCol + this.hiddenTriplesBox > 0) {
-      s += 'HT*  : ' + this.hiddenTriplesRow + ', ' 
-                     + this.hiddenTriplesCol + ', ' 
-                     + this.hiddenTriplesBox + '\n';
+    if (this._hiddenTriplesRow + this._hiddenTriplesCol + this._hiddenTriplesBox > 0) {
+      s += 'HT*  : ' + this._hiddenTriplesRow + ', ' 
+                     + this._hiddenTriplesCol + ', ' 
+                     + this._hiddenTriplesBox + '\n';
     }
 
-    if (this.hiddenQuadsRow + this.hiddenQuadsCol + this.hiddenQuadsBox > 0) {
-      s += 'HQ*  : ' + this.hiddenQuadsRow + ', ' 
-                     + this.hiddenQuadsCol + ', ' 
-                     + this.hiddenQuadsBox + '\n';
+    if (this._hiddenQuadsRow + this._hiddenQuadsCol + this._hiddenQuadsBox > 0) {
+      s += 'HQ*  : ' + this._hiddenQuadsRow + ', ' 
+                     + this._hiddenQuadsCol + ', ' 
+                     + this._hiddenQuadsBox + '\n';
     }
 
-    if (this.guesses > 0) {
-      s += 'G    : ' + this.guesses + '\n';
+    if (this._guesses > 0) {
+      s += 'G    : ' + this._guesses + '\n';
     }
 
     // s += 'Total: ' + this.getTotalHints();

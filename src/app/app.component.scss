@@ -41,15 +41,38 @@ $margin-size: (100 - ($grid-size * 2)) / 2;
 #header {
   grid-column: col 1 / span 1;
   grid-row: row 1;
+  align-content: center;
 }
 
-span.appTitle {
+div.appTitle {
   float: left;
   font-size: (3 * $k-font-size);
   font-weight: bold;
   color: $green2;
+  float: left;
 }
 
+.creating {
+  border: 0.1vw solid $tan2;
+  border-radius: 50%;
+  border-top: 0.2vw solid $green1;
+  width: 2vw;
+  height: 2vw;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+  align-self: center;
+  float: left;
+}
+
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 //  --------------------------------------------------------------------------
 //  SUDOKU GRID
 //  --------------------------------------------------------------------------
