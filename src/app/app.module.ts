@@ -10,7 +10,6 @@ import { AppComponent } from './app.component';
 // import { PlayComponent } from './play/play.component';
 import { PrintComponent } from './print/print.component';
 import { CacheService }         from './model/cache.service';
-// import { Cache }         from './model/cache';
 // import { CounterComponent } from './play/counter/counter.component';
 import { SudokuService }         from './model/sudoku.service';
 import { ActionLogService }      from './action/action-log.service';
@@ -38,7 +37,6 @@ import { MessageService } from './common/message.service';
   ],
   providers: [
     CacheService,
-    // Cache,
     MessageService
   ],
   bootstrap: [AppComponent]

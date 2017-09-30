@@ -10,7 +10,6 @@ import { Difficulty }       from './model/difficulty';
 import { DIFFICULTY_LABELS } from './model/difficulty';
 import { SudokuService }    from './model/sudoku.service';
 import { CacheService }     from './model/cache.service';
-// import { Cache }     from './model/cache';
 import { Puzzle }           from './model/puzzle';
 import { Hint }             from './hint/hint';
 import { HintService }      from './hint/hint.service';
@@ -81,7 +80,6 @@ export class AppComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef, 
     private ngZone: NgZone,
     private cacheService: CacheService,
-    // private cache: Cache,
 
     private messageService: MessageService
   ) {
@@ -99,10 +97,6 @@ console.info('\nMessage received: ' + this.message.text);
             this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
             this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);
             this.hardestAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARDEST);
-            // this.easyAvailable = this.cache.isSudokuAvailable(Difficulty.EASY);
-            // this.mediumAvailable = this.cache.isSudokuAvailable(Difficulty.MEDIUM);
-            // this.hardAvailable = this.cache.isSudokuAvailable(Difficulty.HARD);
-            // this.hardestAvailable = this.cache.isSudokuAvailable(Difficulty.HARDEST);
             
             this.changeDetectorRef.detectChanges();
           }
@@ -168,11 +162,9 @@ console.info('\nMessage received: ' + this.message.text);
     this.changeDetectorRef.detectChanges();
 
     let cacheKeys: string[] = this.cacheService.getCacheKeys();
-    // let cacheKeys: string[] = this.cache.getCacheKeys();
 
 console.info('\nX. Cache on ngOnInit(): ' 
-  // + this.cache.activeCachesToString());
-  + this.cacheService.activeCachesToString());
+    + this.cacheService.activeCachesToString());
 
 // console.info('\nCache keys before replenishment: ' + JSON.stringify(cacheKeys));
 
@@ -186,12 +178,7 @@ console.info('\nX. Cache on ngOnInit(): '
     this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
     this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);
     this.hardestAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARDEST);
-    // this.easyAvailable = this.cache.isSudokuAvailable(Difficulty.EASY);
-    // this.mediumAvailable = this.cache.isSudokuAvailable(Difficulty.MEDIUM);
-    // this.hardAvailable = this.cache.isSudokuAvailable(Difficulty.HARD);
-    // this.hardestAvailable = this.cache.isSudokuAvailable(Difficulty.HARDEST);
 
-    // this.cache.replenishCache();
     this.cacheService.replenishCache();
 
   } // ngOnInit()
@@ -233,7 +220,6 @@ console.info('\nX. Cache on ngOnInit(): '
    */
   generate(difficulty: Difficulty) : void {
     this.currentPuzzle = Puzzle.deserialize(this.cacheService.getSudoku(difficulty));
-    // this.currentPuzzle = Puzzle.deserialize(this.cache.getSudoku(difficulty));
 
     // bind metadata for ui, load sudoku for user execution
     this.actualDifficulty = 
@@ -365,7 +351,6 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    */
   emptyCache() {
     this.cacheService.emptyCache();
-    // this.cache.emptyCache();
   }
 
   /**
