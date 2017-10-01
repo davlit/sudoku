@@ -321,3 +321,36 @@ undoLastAction()
   ...
   remove last action log entry
   refresh action log
+
+Communication between AppComponent, CacheService, and CreationWorker  
+====================================================================
+2 mechanisms: 
+  AppComponent <-> CacheService uses Web Worker methods
+  CacheService <-> CreationWorker uses Observable & Subject
+    for the latter see 
+      http://jasonwatmore.com/post/2016/12/01/angular-2-communicating-between-components-with-observable-subject
+Steps
+1 - AppComponent requests something of CacheService
+    a - Request from AppComponent
+        ngOnInit() this.cacheService.replenishCache();
+        generate(.) this.cacheService.getSudoku(.)
+    b - Receipt by CacheService
+        replenishCache()
+        getSudoku(.)
+2 - CacheService requests something of CreationWorker
+    a - Request from CacheService
+        replenishCache() this.creationWorker.postMessage(.)
+        getSudoku(.) -> replenishCache() this.creationWorker.postMessage(.)
+    b - Receipt by CreationWorker
+        onmessage event creationService.createSudoku(.)
+        -- CreationService creates a sudoku in background: web worker --
+3 - CreationWorker sends a newly created sudoku to CacheService
+    a - Sudoku send from CreationWorker
+        onmessage customPostMessage(.)
+    b - Sudoku received by CacheService and is cached
+        init() creationWorker.onmessage event
+4 - CacheService sends the sudoku to AppComponent
+    a - Notification send from CacheService
+        onmessage sendMessage(.)
+    b - Notification received by AppComponent
+        constructor messageSubscription

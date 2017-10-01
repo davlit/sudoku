@@ -90,13 +90,14 @@ export class AppComponent implements OnInit, OnDestroy {
     this.desiredDifficulty = Difficulty.MEDIUM;   // default
     this.valuesComplete = new Array(10);
     this.candidatesVisible = new Array(10);
-    
+
     this.messageSubscription = this.messageService.getMessage()
         .subscribe(message => { 
           this.message = message; 
 console.info('\nMessage received: ' + this.message.text);
 
-          if (this.message.text === 'Cache replenished') {
+          if (this.message.text === 'Cache changed') {
+console.info('\nMessage processed');
             this.easyAvailable = this.cacheService.isSudokuAvailable(Difficulty.EASY);
             this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
             this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);

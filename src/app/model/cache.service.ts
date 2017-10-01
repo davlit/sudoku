@@ -140,7 +140,9 @@ console.info('\n4. Call: replenishCache()');
         // as soon as a cached sudoku is used, replace it
         this.replenishCache();
         return sudoku;
-      } // if
+      } else {
+        this.replenishCache();
+      } // if/else
     } // for
     return sudoku;
   } // getSudoku()
@@ -232,8 +234,8 @@ console.info('\n9. Cache after webworker replenishment: '
 
 console.info('\n10. Message to app: Cache changed');
 
-    // notify AppComponent that cache has changed
-    this.sendMessage('Cache changed');
+      // notify AppComponent that cache has changed
+      this.sendMessage('Cache changed');
 
       // This is a loop. Since replenishCache() engages a web worker to
       // create a sudoku, and this function, creationWorker.onmessage(),
