@@ -87,6 +87,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.hintService = new HintService(this.sudokuService);
     this.actionLog = new ActionLogService();
 
+    this.desiredDifficulty = Difficulty.MEDIUM;   // default
+    this.valuesComplete = new Array(10);
+    this.candidatesVisible = new Array(10);
+    
     this.messageSubscription = this.messageService.getMessage()
         .subscribe(message => { 
           this.message = message; 
@@ -110,13 +114,6 @@ console.info('\nMessage received: ' + this.message.text);
   DEFAULT_DIFFICULTY = Difficulty.MEDIUM;
   AUTO_SOLVE_DELAY = 250;	// msec
   
-  difficulties = [
-    { value: Difficulty.EASY,    label: 'Easy' },
-    { value: Difficulty.MEDIUM,  label: 'Medium' },
-    { value: Difficulty.HARD,    label: 'Hard' },
-    { value: Difficulty.HARDEST, label: 'Hardest' },
-  ];
-
   // -----------------------------------------------------------------------
   // properties
   // -----------------------------------------------------------------------
@@ -154,9 +151,9 @@ console.info('\nMessage received: ' + this.message.text);
   subscription: Subscription;
 
   ngOnInit() {
-    this.desiredDifficulty = Difficulty.MEDIUM;   // default
-    this.valuesComplete = new Array(10);
-    this.candidatesVisible = new Array(10);
+    // this.desiredDifficulty = Difficulty.MEDIUM;   // default
+    // this.valuesComplete = new Array(10);
+    // this.candidatesVisible = new Array(10);
 
     this.initializeUserInterface();
     this.changeDetectorRef.detectChanges();
@@ -224,7 +221,7 @@ console.info('\nX. Cache on ngOnInit(): '
     // bind metadata for ui, load sudoku for user execution
     this.actualDifficulty = 
         // Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
-        DIFFICULTY_LABELS[this.currentPuzzle.difficulty];
+        DIFFICULTY_LABELS[this.currentPuzzle.difficulty].label;
     this.solutionClues = this.createSolutionClues();
 
     this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);

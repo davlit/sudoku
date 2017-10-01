@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { Difficulty,
-         DIFFICULTY_LABELS,
-         DIFFICULTY_LABELS_PADDED }  from './difficulty';
+         DIFFICULTIES,
+         DIFFICULTY_LABELS }  from './difficulty';
 import { Puzzle }       from './puzzle';
 
 import * as CreationWorker from 
@@ -33,10 +33,6 @@ localStorage.clear() : void
  */
 
 const USE_WEBWORKER = true;
-const DIFFICULTIES = [Difficulty.EASY, 
-                      Difficulty.MEDIUM, 
-                      Difficulty.HARD, 
-                      Difficulty.HARDEST];
 const KEYS: string[][] = [['00', '01', '02'],   // easy    1st, 2d, 3d
                           ['10', '11', '12'],   // medium  1st, 2d, 3d
                           ['20', '21', '22'],   // hard    1st, 2d, 3d
@@ -122,14 +118,14 @@ export class CacheService {
    */  
   public getSudoku(difficulty: Difficulty) : string {
 
-console.info('\n1. ' + DIFFICULTY_LABELS[difficulty] + ' sudoku requested by user')
+console.info('\n1. ' + DIFFICULTY_LABELS[difficulty].label + ' sudoku requested by user')
 
     let sudoku: string = undefined;
     for (let key of KEYS[difficulty]) {
       sudoku = this.retrieveAndRemoveCacheItem(key);
       if (sudoku) {
 
-console.info('\n2. ' + DIFFICULTY_LABELS[difficulty] + ' sudoku pulled from cache')
+console.info('\n2. ' + DIFFICULTY_LABELS[difficulty].label + ' sudoku pulled from cache')
 
         // move backup versions forward
         this.moveItem(KEYS[difficulty][1], KEYS[difficulty][0]);
@@ -171,7 +167,7 @@ console.info('\n5. Cache before webworker replenishment: '
 
 console.info('\n6. Trigger web worker to create replacement for cache');
 
-        // send message to web worker to create a sudoku
+        // send message to web worker to create *one* needed sudoku
         this.creationWorker.postMessage(this.activeDifficulty);
         return;
       } // if
@@ -192,8 +188,7 @@ console.info('\n6. Trigger web worker to create replacement for cache');
   public activeCachesToString() : string {
     let s: string = '\n';
     for (let diff of DIFFICULTIES) {
-      // s += Puzzle.getDifficultyLabelPadded(diff) + ': ';
-      s += DIFFICULTY_LABELS_PADDED[diff] + ': ';
+      s += DIFFICULTY_LABELS[diff].padded + ': ';
       for (let i of [0, 1, 2]) {
         if (this.hasItem(KEYS[diff][i])) {
           s += (i + 1) + ',';

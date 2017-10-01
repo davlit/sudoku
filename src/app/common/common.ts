@@ -1,7 +1,7 @@
 export const TITLE = 'Sudoku Helper';
 export const MAJOR_VERSION = '0';
 export const VERSION = '18';
-export const SUB_VERSION = '8';
+export const SUB_VERSION = '9';
 export const COPYRIGHT = 
     'Copyright © 2016-2017 by David Little. All Rights Reserved.';
 
@@ -55,14 +55,6 @@ export const BOX_CELLS: number[][] = [[ 0,  1,  2,  9, 10, 11, 18, 19, 20],
                                       [57, 58, 59, 66, 67, 68, 75, 76, 77],
                                       [60, 61, 62, 69, 70, 71, 78, 79, 80]];
 
-import { Difficulty,
-         DIFFICULTY_LABELS,
-         DIFFICULTY_LABELS_PADDED }  from '../model/difficulty';
-
-export const DIFFICULTIES = [Difficulty.EASY, 
-                      Difficulty.MEDIUM, 
-                      Difficulty.HARD, 
-                      Difficulty.HARDEST];
 export const KEYS: string[][] = 
     [['00', '01', '02'],   // easy    1st, 2d, 3d
      ['10', '11', '12'],   // medium  1st, 2d, 3d
