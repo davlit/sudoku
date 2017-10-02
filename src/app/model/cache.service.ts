@@ -48,18 +48,18 @@ const KEYS: string[][] = [['00', '01', '02'],   // easy    1st, 2d, 3d
  * After we have 1 of all the difficulties, we quickly finish out the set of
  * the faster ones, then finish with additional "hard" ones.
  */                          
-// const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[3][0], KEYS[2][0], 
-//                            KEYS[0][1], KEYS[1][1], KEYS[3][1], 
-//                            KEYS[0][2], KEYS[1][2], KEYS[3][2],
-//                            KEYS[2][1], KEYS[2][2]];
+const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[3][0], KEYS[2][0], 
+                           KEYS[0][1], KEYS[1][1], KEYS[3][1], 
+                           KEYS[0][2], KEYS[1][2], KEYS[3][2],
+                           KEYS[2][1], KEYS[2][2]];
                           //  KEYS[0][1], KEYS[0][2], 
                           //  KEYS[3][1], KEYS[3][2], 
                           //  KEYS[1][1], KEYS[1][2], 
                           //  KEYS[2][1], KEYS[2][2]];
-const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[2][0], 
-                           KEYS[0][1], KEYS[1][1],  
-                           KEYS[0][2], KEYS[1][2], 
-                           KEYS[2][1], KEYS[2][2]];
+// const CREATE_PRIORITIES = [KEYS[0][0], KEYS[1][0], KEYS[2][0], 
+//                            KEYS[0][1], KEYS[1][1],  
+//                            KEYS[0][2], KEYS[1][2], 
+//                            KEYS[2][1], KEYS[2][2]];
 
 /**
  * Manages the cache of prepared sudokus of varying difficulty.
@@ -96,12 +96,6 @@ export class CacheService {
    * Returns true if a sudoku of given difficulty is cached.
    */
   public isSudokuAvailable(difficulty: Difficulty) : boolean {
-
-    // TEMP TESTING
-    if (difficulty == Difficulty.HARDEST) {
-      return false;
-    }
-
     for (let key of KEYS[difficulty]) {
       if (localStorage.getItem(key)) {
         return true;

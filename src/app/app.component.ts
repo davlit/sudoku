@@ -94,10 +94,10 @@ export class AppComponent implements OnInit, OnDestroy {
     this.messageSubscription = this.messageService.getMessage()
         .subscribe(message => { 
           this.message = message; 
-console.info('\nMessage received: ' + this.message.text);
+// console.info('\nMessage received: ' + this.message.text);
 
           if (this.message.text === 'Cache changed') {
-console.info('\nMessage processed');
+// console.info('\nMessage processed');
             this.easyAvailable = this.cacheService.isSudokuAvailable(Difficulty.EASY);
             this.mediumAvailable = this.cacheService.isSudokuAvailable(Difficulty.MEDIUM);
             this.hardAvailable = this.cacheService.isSudokuAvailable(Difficulty.HARD);
@@ -241,7 +241,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    */
   handleKeyPress(keyEvent: any) : void {
       
-    // console.log('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
+    console.info('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
     
     if (this.playState != PlayStates.ENTRY 
         && this.playState != PlayStates.EXECUTE) {
@@ -267,6 +267,10 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     // console.info();
     
     switch(keyCode) {
+      // diagnostic
+      case 192:   //tilde key
+        this.emptyCache();
+        return;
       case 37:		// left arrow - wrap to previous row
         uc--;
         if (uc < 1) {
@@ -892,7 +896,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    */
   setCellValue(ci: number, v: number) : void {
 
-console.info('completedPuzzle: ' + this.currentPuzzle.completedPuzzle);
+// console.info('completedPuzzle: ' + this.currentPuzzle.completedPuzzle);
 
     // check for new values not that of solution
     if (v != this.currentPuzzle.completedPuzzle[ci]) {

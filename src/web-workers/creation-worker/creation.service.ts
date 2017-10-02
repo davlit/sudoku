@@ -63,7 +63,7 @@ console.warn('CreationService constructor')    ;
    */
   public createSudoku(desiredDiff: Difficulty) : string {
 // console.info('\nCreating ' + Puzzle.getDifficultyLabel(difficulty) + ' sudoku ...');
-console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff] + ' sudoku ...');
+console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff].label + ' sudoku ...');
 
     this.actionLog.initialize();
 
@@ -85,7 +85,7 @@ console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff] + ' sudoku ...');
       // step 2 - create starting values by paring cells
 // console.log('Pass: ' + pass);
       // this.pareToInitialValues(sudoku, desiredDifficulty);
-      this.pareToInitialValues1(sudoku, desiredDifficulty);
+      this.pareToInitialValues(sudoku, desiredDifficulty);
 
       if (sudoku.initialValues === undefined) {
         continue;   // desired difficulty has not been attained
@@ -101,7 +101,7 @@ console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff] + ' sudoku ...');
 
     sudoku.generatePasses = pass;
 // console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty) 
-console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty] 
+console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label 
     + ' in ' + sudoku.generatePasses + ' passes');
     return sudoku.serialize();
   } // createSudoku()
@@ -170,7 +170,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty]
    * Remove symetric pairs of cell values to yield a sudoku with a set of
    * symetric initial values.
    */
-  private pareToInitialValues(puzzle: Puzzle, desiredDiff: Difficulty) : void {
+  private pareToInitialValues0(puzzle: Puzzle, desiredDiff: Difficulty) : void {
 
     let start: number = Date.now();   // for elapsed time
 
@@ -188,16 +188,16 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty]
     // just scan half (plus center) cells (0..40); symC is in other half
     let pairsRemoved = 0;
     NEXT_CELL:
-    for (let c of randomParingCells) {
+    for (let ci of randomParingCells) {
 
       // cell & sym cell are 180deg rotationally symmetric
-      let symC = 80 - c;
+      let symCi = 80 - ci;
   
       // save then remove values of symmetric twins 
-      let savedValue = this.sudokuService.getValue(c)
-      let savedSymValue = this.sudokuService.getValue(symC);
-      this.sudokuService.removeValue(c);
-      this.sudokuService.removeValue(symC);
+      let savedValue = this.sudokuService.getValue(ci)
+      let savedSymValue = this.sudokuService.getValue(symCi);
+      this.sudokuService.removeValue(ci);
+      this.sudokuService.removeValue(symCi);
       
       // pare first 9 pairs without solving (for speed)
       if (++pairsRemoved <= 9) {
@@ -226,6 +226,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty]
             this.applyHint(hint);
             hint = this.hintService.getHint(desiredDiff);
           } // while
+
           let solved = this.sudokuService.isSolved();
           this.rollbackAll();
           if (solved) {
@@ -246,8 +247,8 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty]
           } // if multiple solutions, fall through to restore pared cells
       } // switch
 
-      this.sudokuService.setValue(c, savedValue);
-      this.sudokuService.setValue(symC, savedSymValue);
+      this.sudokuService.setValue(ci, savedValue);
+      this.sudokuService.setValue(symCi, savedSymValue);
     } // for next random symmetric pairs of cells to pare
 
     // TODO
@@ -264,14 +265,14 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty]
     // let elapsed: number = Date.now() - start;
     // console.info('Step 2 elapsed: ' + elapsed + 'ms');
 
-  } // pareToInitialValues() [step 2 - no guesses]
+  } // pareToInitialValues0() [step 2 - no guesses]
   
   /**
    * [Step 2]
    * Remove symetric pairs of cell values to yield a sudoku with a set of
    * symetric initial values.
    */
-  private pareToInitialValues1(puzzle: Puzzle, desiredDiff: Difficulty) : void {
+  private pareToInitialValues(puzzle: Puzzle, desiredDiff: Difficulty) : void {
 
 // let start: number = Date.now();   // for elapsed time
 
@@ -280,30 +281,46 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty]
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues = Common.shuffleArray(VALUES.slice());
     let randomParingCells = Common.shuffleArray(CELLS.slice(0, 41));
+    let splitPoint = 9;
 
-    for (let ci of randomParingCells) {
+    // pare first 9 pairs without solving (for speed)
+    for (let ci of randomParingCells.slice(0, splitPoint)) {
+      this.sudokuService.removeValue(ci);
+      this.sudokuService.removeValue(80 - ci);
+    }
+
+    // just scan half (plus center) cells (0..40); symC is in other half
+    for (let ci of randomParingCells.slice(splitPoint)) {
       let symCi = 80 - ci;
+      let restorePair: boolean;
   
       // save then remove values of symmetric twins 
       let savedValue = this.sudokuService.getValue(ci)
       let savedSymValue = this.sudokuService.getValue(symCi);
       this.sudokuService.removeValue(ci);
       this.sudokuService.removeValue(symCi);
+
+      if (desiredDiff != Difficulty.HARDEST) {
       
-          let hint: Hint = this.hintService.getHint(desiredDiff);
-          while (hint) {
-            this.applyHint(hint);
-            hint = this.hintService.getHint(desiredDiff);
-          } // while there is a hint
+        // hint loop: loop until no more hints
+        let hint: Hint = this.hintService.getHint(desiredDiff);
+        while (hint) {
+          this.applyHint(hint);
+          hint = this.hintService.getHint(desiredDiff);
+        } // while there is a hint
 
-          let solved: boolean = this.sudokuService.isSolved();
-          this.rollbackAll(); // remove attempted solution values
-          if (!solved) {
+        // restore pair if no solution without this pair
+        restorePair = !this.sudokuService.isSolved();
+      } else {  // difficulty: HARDEST
+        restorePair = this.countSolutions() > 1;
+      } // else
 
-            // no solution with these removals, so restore and remove another pair
-            this.sudokuService.setValue(ci, savedValue);
-            this.sudokuService.setValue(symCi, savedSymValue);
-          }
+      this.rollbackAll(); // remove attempted solution values
+      if (restorePair) {
+        this.sudokuService.setValue(ci, savedValue);
+        this.sudokuService.setValue(symCi, savedSymValue);
+      }
+
     } // for next random symmetric pairs of cells to pare
 
     puzzle.initialValues = this.sudokuService.cellsToValuesArray();
@@ -311,7 +328,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty]
 // let elapsed: number = Date.now() - start;
 // console.info('step 2 elapsed: ' + elapsed + 'ms');
 
-  } // pareToInitialValues1() [step 2 - no guesses]
+  } // pareToInitialValues() [step 2]
   
   /**
    * [Step 3]
