@@ -1,14 +1,12 @@
-// import { ActionType } from './action.type';
-import { Hint } from '../hint/hint';
-import { ValueHint } from '../hint/hint';
-import { CandidatesHint } from '../hint/hint';
-import { Common } from '../common/common';
+import { Hint,
+         ValueHint,
+         CandidatesHint } from '../hint/hint';
+import { Common }         from '../common/common';
 
 export const enum ActionType {
   SET_VALUE,
   GUESS_VALUE,
   REMOVE_VALUE,
-  // SET_INITIAL,
   REMOVE_CANDIDATE,
   REMOVE_CANDIDATES,
   RESTORE_CANDIDATE,
@@ -77,8 +75,8 @@ abstract class BaseValueAction extends Action {
 
 export class SetValueAction extends BaseValueAction {
 
-  constructor(type: ActionType, cell: number, value: number, hint?: ValueHint) {
-    super(type, cell, value, hint);
+  constructor(cell: number, value: number, hint?: ValueHint) {
+    super(ActionType.SET_VALUE, cell, value, hint);
   }
 
   toString() {
@@ -98,9 +96,9 @@ export class SetValueAction extends BaseValueAction {
 export class GuessValueAction extends BaseValueAction {
   private _possibleValues: number[];
 
-  constructor(type: ActionType, cell: number, value: number,
+  constructor(cell: number, value: number,
       possibleValues: number[]) {
-    super(type, cell, value);
+    super(ActionType.GUESS_VALUE, cell, value);
     this._possibleValues = possibleValues;
   }
 
@@ -121,8 +119,8 @@ export class GuessValueAction extends BaseValueAction {
 
 export class RemoveValueAction extends BaseValueAction {
 
-  constructor(type: ActionType, cell: number, value: number) {
-    super(type, cell, value);
+  constructor(cell: number, value: number) {
+    super(ActionType.REMOVE_VALUE, cell, value);
   }
 
   toString() : string {
@@ -158,8 +156,8 @@ abstract class BaseCandidateAction extends Action {
 
 export class RemoveCandidateAction extends BaseCandidateAction {
 
-  constructor(type: ActionType, cell: number, candidate: number, hint?: CandidatesHint) {
-    super(type, cell, candidate, hint);
+  constructor(cell: number, candidate: number, hint?: CandidatesHint) {
+    super(ActionType.REMOVE_CANDIDATE, cell, candidate, hint);
   }
 
   toString() {
@@ -178,8 +176,8 @@ export class RemoveCandidateAction extends BaseCandidateAction {
 
 export class RestoreCandidateAction extends BaseCandidateAction {
 
-  constructor(type: ActionType, cell: number, candidate: number) {
-    super(type, cell, candidate);
+  constructor(cell: number, candidate: number) {
+    super(ActionType.RESTORE_CANDIDATE, cell, candidate);
   }
 
   toString() {
@@ -189,8 +187,6 @@ export class RestoreCandidateAction extends BaseCandidateAction {
   }
     
 } // class RestoreCandidateAction
-
-
 
 abstract class BaseCandidatesAction extends Action {
   private _candidates: {cell: number, candidate: number}[];
@@ -212,8 +208,8 @@ abstract class BaseCandidatesAction extends Action {
 
 export class RemoveCandidatesAction extends BaseCandidatesAction {
 
-  constructor(type: ActionType, cell: number, candidate: number, candidates: {cell: number, candidate: number}[], hint?: CandidatesHint) {
-    super(type, candidates, hint);
+  constructor(cell: number, candidate: number, candidates: {cell: number, candidate: number}[], hint?: CandidatesHint) {
+    super(ActionType.REMOVE_CANDIDATES, candidates, hint);
   }
 
   /* e.g.: Remove candidates 7 in (4,3), 4 in (7,5), 9 in (3,1) */
@@ -234,8 +230,8 @@ export class RemoveCandidatesAction extends BaseCandidatesAction {
 
 export class RestoreCandidatesAction extends BaseCandidatesAction {
 
-  constructor(type: ActionType, cell: number, candidate: number, candidates: {cell: number, candidate: number}[], hint?: CandidatesHint) {
-    super(type, candidates, hint);
+  constructor(cell: number, candidate: number, candidates: {cell: number, candidate: number}[], hint?: CandidatesHint) {
+    super(ActionType.REMOVE_CANDIDATES, candidates, hint);
   }
 
   /* e.g.: Restores candidates 7 in (4,3), 4 in (7,5), 9 in (3,1) */

@@ -480,7 +480,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
         let vHint: ValueHint = <ValueHint> hint;
         this.sudokuService.setValue(vHint.cell, vHint.value);
         this.actionLog.addEntry(
-            new SetValueAction(ActionType.SET_VALUE, vHint.cell, vHint.value, vHint));
+            new SetValueAction(vHint.cell, vHint.value, vHint));
         break;
       default:
         let kHint: CandidatesHint = <CandidatesHint> hint;
@@ -488,7 +488,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
         for (let remove of removes) {
           this.sudokuService.removeCandidate(remove.cell, remove.candidate);
           this.actionLog.addEntry(
-              new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, remove.cell, remove.candidate, kHint));
+              new RemoveCandidateAction(remove.cell, remove.candidate, kHint));
         }
     } // switch
     hint = undefined;
@@ -521,7 +521,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
 
     // // log action
     this.actionLog.addEntry(
-        new GuessValueAction(ActionType.GUESS_VALUE, guessCell, guessValue, possibleValues));
+        new GuessValueAction(guessCell, guessValue, possibleValues));
 
     return true;
   } // guess()

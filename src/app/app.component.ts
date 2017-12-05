@@ -467,15 +467,13 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
         this.sudokuService.removeCandidate(cellIdx, k);
 
         // log action
-        this.actionLog.addEntry(
-            new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, cellIdx, k));
+        this.actionLog.addEntry(new RemoveCandidateAction(cellIdx, k));
 
       } else {
         this.sudokuService.restoreCandidate(cellIdx, k);
 
         // log action
-        this.actionLog.addEntry(
-            new RestoreCandidateAction(ActionType.RESTORE_CANDIDATE, cellIdx, k));
+        this.actionLog.addEntry(new RestoreCandidateAction(cellIdx, k));
       }
     }
     this.candidatesModified = true;
@@ -863,7 +861,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
 
         // // log action
         this.actionLog.addEntry(
-            new SetValueAction(ActionType.SET_VALUE, vHint.cell, vHint.value, vHint));
+            new SetValueAction(vHint.cell, vHint.value, vHint));
 
         break;
       default:
@@ -875,7 +873,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
 
         // log action
         this.actionLog.addEntry(
-            new RemoveCandidateAction(ActionType.REMOVE_CANDIDATE, remove.cell, remove.candidate, kHint));
+            new RemoveCandidateAction(remove.cell, remove.candidate, kHint));
 
         }
     } // switch
@@ -899,7 +897,8 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
 // console.info('completedPuzzle: ' + this.currentPuzzle.completedPuzzle);
 
     // check for new values not that of solution
-    if (v != this.currentPuzzle.completedPuzzle[ci]) {
+    if (this.currentPuzzle.completedPuzzle
+        && v != this.currentPuzzle.completedPuzzle[ci]) {
       console.warn('Not the solution value');
     }
 
@@ -908,8 +907,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     }
     // this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
     this.sudokuService.setValue(ci, v);
-    this.actionLog.addEntry(
-        new SetValueAction(ActionType.SET_VALUE, ci, v));
+    this.actionLog.addEntry(new SetValueAction(ci, v));
 
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     if (this.sudokuService.isSolved()) {
@@ -927,8 +925,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
       return;   // nothing to remove
     }
     this.sudokuService.removeValue(ci);
-    this.actionLog.addEntry(
-        new RemoveValueAction(ActionType.REMOVE_VALUE, ci, oldValue));
+    this.actionLog.addEntry(new RemoveValueAction(ci, oldValue));
     this.valuesComplete[oldValue] = this.sudokuService.isValueComplete(oldValue);
     this.refreshActionsLog();
   } // removeCellValue()
@@ -1031,10 +1028,18 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
 
   loadTestPuzzle(initialValues: string) : void {
     this.currentPuzzle = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
+    this.startUserTimer();
     this.playState = PlayStates.EXECUTE;
   }
 
   
+  testExternal() {
+    this.loadTestPuzzle(
+      // rated 5 stars -- requires 1 guess
+      '3...4.81.......7.3..12..........4.7.8.6...1.9.4.1..........73..1.9.......87.2...6'
+    );
+  }
+
   testNakedTriple() {
     this.loadTestPuzzle(
       // naked triple col 2, 138 in 2,2 2,4 2,7

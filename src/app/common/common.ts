@@ -1,9 +1,9 @@
 export const TITLE = 'Sudoku Helper';
 export const MAJOR_VERSION = '0';
-export const VERSION = '19';
+export const VERSION = '20';
 export const SUB_VERSION = '0';
 export const COPYRIGHT = 
-    'Copyright © 2016-2017 by David Little. All Rights Reserved.';
+    'Copyright © 2016-2018 by David Little. All Rights Reserved.';
 
 export const VALUES: number[] =       [ 1,  2,  3,  4,  5,  6,  7,  8,  9];
 export const CANDIDATES: number[] = VALUES;
@@ -54,12 +54,6 @@ export const BOX_CELLS: number[][] = [[ 0,  1,  2,  9, 10, 11, 18, 19, 20],
                                       [54, 55, 56, 63, 64, 65, 72, 73, 74],
                                       [57, 58, 59, 66, 67, 68, 75, 76, 77],
                                       [60, 61, 62, 69, 70, 71, 78, 79, 80]];
-
-export const KEYS: string[][] = 
-    [['00', '01', '02'],   // easy    1st, 2d, 3d
-     ['10', '11', '12'],   // medium  1st, 2d, 3d
-     ['20', '21', '22'],   // hard    1st, 2d, 3d
-     ['30', '31', '32']];  // hardest 1st, 2d, 3d
 
 // a completely valid sudoku
 export const ROOT_VALUES: number[] =  [ 1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -132,9 +126,9 @@ export class Common {
    * v - value (one-based 1..9, but zero --> no value)
    * zr, zc, zb - internal row, col, box index (zero-based 0..8)
    * 
-   * CONVERSIONS
+   * CONVERSIONS - cell index (ci 0..80) is king
    * vb, vc --> ci
-   * ci --> ur, uc, ub -- userRow, ...
+   * ci --> ur, uc, ub -- user row/col/box
    * ci --> zr, zc, zb
    */
 
@@ -147,17 +141,15 @@ export class Common {
   //   return (Math.floor(vb / 3) * 18) + (vb * 3) + (Math.floor(vc / 3) * 6) + vc;
   // } // cellIdx()
 
-  /** Get row number 1..9 from cell index 0..80. */ 
+  /** Get row/column/box number (0..8) from cell index (0..80) */
   static userRow(cellIdx: number) : number {
     return Math.floor(cellIdx / 9) + 1;
   }
 
-  /** Get row number 1..9 from cell index 0..80. */ 
   static userCol(cellIdx: number) : number {
     return (cellIdx % 9) + 1;
   }
 
-  /** Get row number 1..9 from cell index 0..80. */ 
   static userBox(cellIdx: number) : number {
     return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3) + 1;
   }
@@ -172,27 +164,17 @@ export class Common {
   // static cellIdx(r: number, c: number) : number {
   //   return 9 * r + c - 10;    // ((r - 1) * 9) + (c - 1)
   // }
-static urcToCellIdx(r: number, c: number) : number {
+  static urcToCellIdx(r: number, c: number) : number {
     return 9 * r + c - 10;    // ((r - 1) * 9) + (c - 1)
   }
 
-  /**
-   * Translate cell index (0..80) to row index (0..8).
-   */
+  /** Get row/column/box index (0..8) from cell index (0..80) */
   static rowIdx(cellIdx: number) : number {
     return Math.floor(cellIdx / 9);
   }
-
-  /**
-   * Translate cell index (0..80) to col index (0..8).
-   */
   static colIdx(cellIdx: number) : number {
     return cellIdx % 9;
   }
-
-  /** 
-   * Translate cell index (0..80) to box index (0..8).
-   */
   static boxIdx(cellIdx: number) : number {
     return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3);
   }
@@ -275,18 +257,6 @@ static urcToCellIdx(r: number, c: number) : number {
     }
     return quads;
   }
-
-  // static rowIdx(cellIdx: number) : number {
-  //   return Math.floor(cellIdx / 9);
-  // }
-
-  // static colIdx(cellIdx: number) : number {
-  //   return cellIdx % 9;
-  // }
-
-  // static boxIdx(cellIdx: number) : number {
-  //   return (Math.floor(cellIdx / 27) * 3) + Math.floor((cellIdx % 9) / 3);
-  // }
 
   // use: formatString('{0} is dead, but {1} is alive!', ['ASP', 'ASP.NET']);
   static formatString(format: string, args: any[]) {
