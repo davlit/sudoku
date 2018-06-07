@@ -1,6 +1,6 @@
 export const TITLE = 'Sudoku Helper';
-export const MAJOR_VERSION = '0';
-export const VERSION = '20';
+export const MAJOR_VERSION = '1';
+export const VERSION = '0';
 export const SUB_VERSION = '0';
 export const COPYRIGHT = 
     'Copyright © 2016-2018 by David Little. All Rights Reserved.';

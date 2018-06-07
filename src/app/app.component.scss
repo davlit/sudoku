@@ -139,7 +139,11 @@ div.invalid {
   color: $red3;
 }
 
-.value {
+div.incorrect {
+  color: $red2;
+}
+  
+  .value {
   cursor: default;
 }
 

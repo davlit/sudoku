@@ -356,7 +356,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
   }
 
   /**
-   * 
+   * Returns true if this cell contains in initial value.
    * Function based on view's cell indexes in html code.
    */
   isCellLocked_(vb: number, vc: number) : boolean {
@@ -364,8 +364,8 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
   } // isCellLocked()
   
   /**
-   * 
-   * Function based on view's cell indexes in html code.
+   * Returns true if this cell contains in initial value.
+   * Function based on cell's index.
    */
   isCellLocked(ci: number) : boolean {
     return this.currentPuzzle &&
@@ -373,19 +373,30 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
   } // isCellLocked()
   
   /**
-   * 
+   * Returns true if this cell is the currently selected cell.
    */
   isSelectedCell(vb: number, vc: number) : boolean {
     return this.selectedCell === this.viewToCellIdx(vb, vc);
   } // isSelectedCell()
   
   /**
-   * 
+   * Returns true if this cell's value is repeated in the cell's
+   * row, column, or box.
    * Function based on view's cell indexes in html code.
    */
   isCellInvalid(vb: number, vc: number) : boolean {
     return !this.sudokuService.isCellValid(this.viewToCellIdx(vb, vc));
-  } // isCellInvalid_()
+  } // isCellInvalid()
+  
+  /**
+   * Returns true if this cell's value is not the solution's value.
+   * Function based on view's cell indexes in html code.
+   */
+  isValueIncorrect(vb: number, vc: number) : boolean {
+    let ci = this.viewToCellIdx(vb, vc);
+    return this.sudokuService.isCellValid(ci)
+        && this.sudokuService.getValue(ci) != this.currentPuzzle.completedPuzzle[ci];
+  } // isCellValueWrong()
   
   /**
    * Function based on view's cell indexes in html code.
@@ -617,7 +628,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
   handleChoiceClearClick() : void {
     this.initializeHintStates();    // remove any hint
     this.removeCellValue(this.selectedCell);
-  } // handleChoiceClearClick_()
+  } // handleChoiceClearClick()
 
   /**
    * button 'Undo Last Action' EXECUTION state

@@ -25,22 +25,37 @@ https://github.com/ReactiveX/rxjs/blob/master/MIGRATION.md
 
 https://www.youtube.com/watch?v=ei7FsoXKPl0 -- 34:20 into it
 
-Publish app on github pages
----------------------------
+How To's
+========
+
+How to Run locally
+------------------
+$ cd ~/dev/js/sudoku
+$ ng serve
+http://localhost:4200
+
+How to Deploy to Tomcat
+-----------------------
+$ cd ~/dev/js/sudoku
+$ ng build --base-href=/sudoku/
+$ sudo mkdir /var/lib/tomcat8/webapps/sudoku
+$ sudo cp -r dist/* /var/lib/tomcat8/webapps/sudoku/
+http://localhost:8080/sudoku
+
+How to Publish app on github pages
+----------------------------------
 Ref: https://github.com/angular-buch/angular-cli-ghpages
 One-time: $ npm i -g angular-cli-ghpages
           $ cd <project-dir>/
           $ cd sudoku/
 General:  $ ng build --prod --base-href "https://USERNAME.github.io/REPOSITORY_NAME/"
-Specific: $ ng build --prod --base-href "https://davlit.github.io/sudoku/"
+Specific: $ 
+
+cd ng build --prod --base-href "https://davlit.github.io/sudoku/"
           $ angular-cli-ghpages
 Browser:  https://davlit.github.io/sudoku
 
-
-Run:
-$ ng serve
-
-http://localhost:4200
+========
 
 Deploy 1 -- Dev Platform
 ------------------------

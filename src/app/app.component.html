@@ -27,7 +27,7 @@ Sudoku grid based on
     - 3 rows and 3 columns of cells
 - total of 81 cells
 Sudoku model is based on 9 rows and 9 columns of cells
-s: sudoku, b: box, v: value, k: candidate
+s: sudoku, b: box, c: cell, v: value, k: candidate
  -->
 <!-- <div id="gridsection">
  <div class="pcell" (keyup)="handleKeyPress($event)" 
@@ -35,10 +35,10 @@ s: sudoku, b: box, v: value, k: candidate
 <div id="gridsection" (keyup)="handleKeyPress($event)" 
     oncontextmenu="return false;" tabindex="1">
   <div class="bcontainer">
-    <div *ngFor="let vb of [0,1,2,3,4,5,6,7,8]">
+    <div *ngFor="let vb of [0,1,2,3,4,5,6,7,8]"> <!-- 9 value boxes -->
       <!-- <div class="bcell"> -->
         <div class="scontainer">
-          <div *ngFor="let vc of [0,1,2,3,4,5,6,7,8]">
+          <div *ngFor="let vc of [0,1,2,3,4,5,6,7,8]">  <!-- 81 value cells -->
             <div class="scell" [ngSwitch]="hasValue(vb, vc)"
                 [ngClass]="{
                   'selected': isSelectedCell(vb, vc)}"
@@ -48,14 +48,15 @@ s: sudoku, b: box, v: value, k: candidate
               <div *ngSwitchCase="true" class="value"
                 [ngClass]="{
                   'locked':   isCellLocked_(vb, vc),
-                  'invalid':  isCellInvalid(vb, vc)}">
+                  'invalid':  isCellInvalid(vb, vc),
+                  'incorrect': isValueIncorrect(vb, vc)}">
                 {{valueToChar_(vb, vc)}}
               </div>
               <!-- end opt 1 -->
 
               <!-- opt 2: candidates -->
               <div *ngSwitchCase="false" class="kcontainer">
-                <div *ngFor="let k of [1,2,3,4,5,6,7,8,9]">
+                <div *ngFor="let k of [1,2,3,4,5,6,7,8,9]"> <!-- 729 candidates (81x9) -->
                   <div class="kcell" 
                       (dblclick)="handleCandidateClick(vb, vc, k)">
                     <span class="candidate"
