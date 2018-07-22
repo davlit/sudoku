@@ -212,19 +212,27 @@ s: sudoku, b: box, c: cell, v: value, k: candidate
       </div>
 
       <div class="controlsRow cRow05">
+        <!-- not using for now
         <div [ngSwitch]="autoSolveState">
           <button *ngSwitchCase="autoSolveStates.READY" 
               class="exec start" (click)="handleAutoSolveClick()">
-              <!-- tooltip="Automatically solve the sudoku using hints"> -->
+              <!-- tooltip="Automatically solve the sudoku using hints">
               Auto solve start</button>
           <button *ngSwitchCase="autoSolveStates.RUNNING
               || autoSolveStates.PENDING_STOP" 
               class="exec stop" (click)="handleAutoSolveClick()">
-              <!-- tooltip="Stop the action"> -->
+              <!-- tooltip="Stop the action">
               Auto solve stop</button>
           <span *ngSwitchCase="autoSolveStates.NO_HINT
               || autoSolveStates.PENDING_STOP">
               Auto solve not available</span>
+        </div>
+        -->
+        <div>
+          <button *ngIf="autoFinish && candidatesShowing" 
+              class="exec start" (click)="handleAutoFinishClick()">
+              <!-- tooltip="Automatically solve the sudoku using hints"> -->
+              Auto finish</button>
         </div>
       </div>
 

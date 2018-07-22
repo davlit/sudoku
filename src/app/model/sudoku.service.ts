@@ -137,7 +137,7 @@ export class SudokuService {
    * @param newValue 
    */
   public setValue(ci: number, newValue: number) : void {
-   let cell = this.sudokuModel.cells[ci];
+    let cell = this.sudokuModel.cells[ci];
 
     // if cell has value, remove it first
     if (cell.hasValue()) {
@@ -159,7 +159,7 @@ export class SudokuService {
       if (!this.hasValue(rc)) {
         this.removeCandidate(rc, newValue);
       }
-    }            
+    }
   } // setValue()
 
   /**
@@ -528,6 +528,13 @@ try {
       }
     }
   } // refreshCandidates()
+
+  /**
+   * 
+   */
+  public copyModel() : SudokuModel {
+    return this.sudokuModel.copyModel();
+  }
 
   // -------------------------------------------------------------------------
   // private methods

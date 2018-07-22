@@ -2,12 +2,7 @@ import { Cell } from './cell';
 import { Group } from './group';
 import { Common,
          CELLS,
-        //  VALUES,
-        //  CANDIDATES,
          GROUPS,
-        //  ROWS,
-        //  COLS,
-        //  BOXS,
          ROW_CELLS,
          COL_CELLS,
          BOX_CELLS } from  '../common/common';
@@ -68,32 +63,20 @@ export class SudokuModel {
     return this._boxs;
   }
 
+  /**
+   * Make a copy of the entire model.
+   */
+  public copyModel() : SudokuModel {
+    let copiedModel = new SudokuModel;
+    for (let c of CELLS) {
+      copiedModel._cells[c] = this._cells[c].copyCell();
+    }
+    for (let g of GROUPS) {
+      copiedModel._rows[g] = this._rows[g].copyGroup();
+      copiedModel._cols[g] = this._cols[g].copyGroup();
+      copiedModel._boxs[g] = this._boxs[g].copyGroup();
+    }
+    return copiedModel;
+  } // copyModel()
+
 } // class SudokuModel
-
-
-// export class SudokuModel {
-//   cells: Cell[]
-//   rows: Group[];
-//   cols: Group[];
-//   boxs: Group[];
-  
-//   constructor() {
-//     this.cells = new Array(81);
-//     this.rows = new Array(9);
-//     this.cols = new Array(9);
-//     this.boxs = new Array(9);
-
-//     for (let g of GROUPS) {
-//       this.rows[g] = new Group(ROW_CELLS[g]);
-//       this.cols[g] = new Group(COL_CELLS[g]);
-//       this.boxs[g] = new Group(BOX_CELLS[g]);
-//     }
-
-//     for (let c of CELLS) {
-//       this.cells[c] = new Cell(
-//           Common.rowIdx(c), Common.colIdx(c), Common.boxIdx(c));
-//     }
-//   }
-
-// } // class SudokuModel
-

@@ -25,6 +25,7 @@ import { RemoveCandidateAction }      from './action/action';
 import { RestoreCandidateAction }      from './action/action';
 import { NakedType }        from './model/naked.type';
 import { CombinationIterator } from './common/combination.iterator';
+import { PseudoSudokuService } from './model/pseudo-sudoku.service';
 
 import { ActionLogService } from './action/action-log.service';
 
@@ -72,6 +73,7 @@ export class AppComponent implements OnInit, OnDestroy {
   hintState = HintStates.NO_HINT;
   autoSolveStates = AutoSolveStates;
   autoSolveState = AutoSolveStates.NO_HINT;
+  autoFinish = false;
 
   message: any;
   messageSubscription: Subscription;
@@ -563,12 +565,15 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
   // button 'Get', 'Apply' EXECUTION state
   handleHintClick() : void {
     switch (this.hintState) {
-    case HintStates.READY:
-      this.findHint();
-      break;
-    case HintStates.ACTIVE:
-      // this.applyHint();
-      this.applyHint(this.hint);
+      case HintStates.READY:
+        this.findHint();
+        if (this.hint) {
+          this.hintsViewed++;
+        }
+        break;
+      case HintStates.ACTIVE:
+        this.applyHint(this.hint);
+        this.hintsApplied++;
     }
   }
   
@@ -595,6 +600,16 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
       case AutoSolveStates.NO_HINT:   // no button to click
         // ???
     } // switch      
+  } // handleAutoSolveClick()
+
+  /**
+   * 
+   */
+  handleAutoFinishClick() : void {
+    if (this.autoFinish) {
+      this.autoSolveState = AutoSolveStates.RUNNING;
+      this.autoSolveLoop();
+    }
   } // handleAutoSolveClick()
 
   /**
@@ -651,7 +666,6 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
       //  break;
       case ActionType.REMOVE_VALUE:
         action = <RemoveValueAction>lastAction;
-        // this.sudokuService.setValue(action.cell, action.value, action.action);
         this.sudokuService.setValue(action.cell, action.value);
         break;
       case ActionType.REMOVE_CANDIDATE:
@@ -837,7 +851,6 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     this.hint = this.hintService.getHint(Difficulty.HARDEST);
     if (this.hint) {
       this.hintState = HintStates.ACTIVE
-      this.hintsViewed++;
       this.hintMessage = this.hint.toString();
       this.setSelectedCell(this.hint.getCell());
     } else {
@@ -866,29 +879,20 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
       case HintType.HIDDEN_SINGLE_COL:
       case HintType.HIDDEN_SINGLE_BOX:
         let vHint: ValueHint = <ValueHint> hint;
-        // this.sudokuService.setValue(vHint.cell, vHint.value, ActionType.SET_VALUE, undefined, 
-        //     vHint);
         this.sudokuService.setValue(vHint.cell, vHint.value);
-
-        // // log action
         this.actionLog.addEntry(
             new SetValueAction(vHint.cell, vHint.value, vHint));
-
         break;
       default:
         let kHint: CandidatesHint = <CandidatesHint> hint;
         let removes = kHint.removes;
         for (let remove of removes) {
-          // this.sudokuService.removeCandidate(remove.cell, remove.candidate, kHint);
           this.sudokuService.removeCandidate(remove.cell, remove.candidate);
-
-        // log action
         this.actionLog.addEntry(
             new RemoveCandidateAction(remove.cell, remove.candidate, kHint));
 
         }
     } // switch
-    this.hintsApplied++;
     if (this.hint.getActionType() === ActionType.SET_VALUE) {
       let value = this.hint.getValue();
       this.valuesComplete[value] = this.sudokuService.isValueComplete(value);
@@ -916,15 +920,21 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     if (this.sudokuService.getValue(ci) != v) {
       this.removeCellValue(ci);
     }
-    // this.sudokuService.setValue(ci, v, ActionType.SET_VALUE);
     this.sudokuService.setValue(ci, v);
     this.actionLog.addEntry(new SetValueAction(ci, v));
-
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
+    this.refreshActionsLog();
     if (this.sudokuService.isSolved()) {
       this.handlePuzzleComplete();
+    } else {
+      let pseudoSudokuService = new PseudoSudokuService(this.sudokuService.copyModel())
+      if (pseudoSudokuService.hasNakedSinglesSolution()) {
+
+        // FLAG
+        this.autoFinish = true;
+        console.warn('Has nakedSingles solution!');
+      }
     }
-      this.refreshActionsLog();
   } // setCellValue()
 
   /**
@@ -1022,6 +1032,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     this.playState = PlayStates.NEW;
     // this.generating = false;
     this.hint = undefined;
+    this.autoFinish = false;
     this.initializeHintStates();    // remove any hint
     this.actionsLog = '';
     this.desiredDifficulty = this.DEFAULT_DIFFICULTY;

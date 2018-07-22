@@ -36,11 +36,12 @@ http://localhost:4200
 
 How to Deploy to Tomcat
 -----------------------
-$ cd ~/dev/js/sudoku
-$ ng build --base-href=/sudoku/
-$ sudo mkdir /var/lib/tomcat8/webapps/sudoku
-$ sudo cp -r dist/* /var/lib/tomcat8/webapps/sudoku/
-http://localhost:8080/sudoku
+$ cd ~/dev/js/sudoku                                  // be in project
+$ ng build --base-href=/sudoku/                       // build to a dist dir
+$ sudo mkdir /var/lib/tomcat8/webapps/sudoku          // (1st time only)
+$ sudo rm -rf /var/lib/tomcat8/webapps/sudoku         // remove old from Tomcat
+$ sudo cp -r dist/* /var/lib/tomcat8/webapps/sudoku/  // copy dist contents to Tomcat
+http://localhost:8080/sudoku                          // run app from tomcat
 
 How to Publish app on github pages
 ----------------------------------
