@@ -34,27 +34,55 @@ $ cd ~/dev/js/sudoku
 $ ng serve
 http://localhost:4200
 
+How to Manage Versions
+----------------------
+Develop code in VSCode
+Test in localhost:4200
+  $ cd ~/dev/js/sudoku
+  $ ng serve
+  Browser: localhost:4200
+Increment MajorVersion/Version/MinorVersion in common.ts
+Commit in VSCode
+Deploy to Tomcat (see below "How to Deploy to Tomcat")
+Sync with github (see below "How to Sync with GitHub")
+Publish to github pages (see below "How to Publish App on GitHub Pages")
+
 How to Deploy to Tomcat
 -----------------------
 $ cd ~/dev/js/sudoku                                  // be in project
 $ ng build --base-href=/sudoku/                       // build to a dist dir
 $ sudo mkdir /var/lib/tomcat8/webapps/sudoku          // (1st time only)
-$ sudo rm -rf /var/lib/tomcat8/webapps/sudoku         // remove old from Tomcat
+$ sudo rm -rf /var/lib/tomcat8/webapps/sudoku/*       // remove old app files
 $ sudo cp -r dist/* /var/lib/tomcat8/webapps/sudoku/  // copy dist contents to Tomcat
 http://localhost:8080/sudoku                          // run app from tomcat
+Clear browser cache (see below "How to Clear Chrome Browser Cache")
+Ctrl-shift i                                          // open console (Chrome)
+Click/hold reload (circle arrow)
+Select "Empty Cache and Hard Reload"                  // clears browser cache & reload app
+Close Chrome cosole ('X')
 
-How to Publish app on github pages
+How to Sync with GitHub
+-----------------------
+In VSCode, on lower left blue bar, click on circular arrows
+In dialog box click OK
+Enter GitHub username and password as prompted
+
+How to Publish App on GitHub Pages
 ----------------------------------
 Ref: https://github.com/angular-buch/angular-cli-ghpages
-One-time: $ npm i -g angular-cli-ghpages
-          $ cd <project-dir>/
-          $ cd sudoku/
-General:  $ ng build --prod --base-href "https://USERNAME.github.io/REPOSITORY_NAME/"
-Specific: $ 
+One time only: $ npm i -g angular-cli-ghpages                     // install github pages
+$ cd ~/dev/js/sudoku                                              // be in project
+$ ng build --prod --base-href "https://davlit.github.io/sudoku/"  // build to a dist dir
+$ angular-cli-ghpages                                             // deploy to github pages
+Browser:  https://davlit.github.io/sudoku                         // run in browser
+Clear browser cache (see below "How to Clear Chrome Browser Cache")
 
-cd ng build --prod --base-href "https://davlit.github.io/sudoku/"
-          $ angular-cli-ghpages
-Browser:  https://davlit.github.io/sudoku
+How to Clear Chrome Browser Cache
+---------------------------------
+Ctrl-shift i                                          // open console (Chrome)
+Click/hold reload (circle arrow)
+Select "Empty Cache and Hard Reload"                  // clears browser cache & reload app
+Close Chrome cosole ('X')
 
 ========
 
