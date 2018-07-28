@@ -282,9 +282,17 @@ cands { margin-left: 1px; }
 textarea {
   font-family: monospace;
   width: 40vw;
-  height: 9vw;
   font-size: (0.67 * $k-font-size);
   background-color: $tan1;
+  resize: none;
+}
+
+textarea.actionLog {
+  height: 10vw;
+}
+
+textarea.instructions {
+  height: 17vw;
 }
 
 .dim {
