@@ -398,3 +398,11 @@ Steps
         onmessage sendMessage(.)
     b - Notification received by AppComponent
         constructor messageSubscription
+
+Brute Force Solver
+==================
+https://www.youtube.com/watch?v=y1ahOBeyM40
+
+see app.component
+- applyAvailableHints()
+- solve()

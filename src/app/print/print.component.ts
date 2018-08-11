@@ -23,7 +23,7 @@ export class PrintComponent implements OnInit {
 
   getActualDifficulty() {
     // return Puzzle.getDifficultyLabel(this.sudokuService.getCurrentSudoku().difficulty);
-    return DIFFICULTY_LABELS[this.sudokuService.getCurrentSudoku().difficulty];
+    // return DIFFICULTY_LABELS[this.sudokuService.getCurrentSudoku().difficulty];
   }
 
   /**

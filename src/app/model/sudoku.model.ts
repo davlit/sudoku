@@ -38,9 +38,6 @@ export class SudokuModel {
       this._cells[ci].initialize();
     }
     for (let g of GROUPS) {
-      // this.initializeGroup(this.sudokuModel.rows[g]);
-      // this.initializeGroup(this.sudokuModel.cols[g]);
-      // this.initializeGroup(this.sudokuModel.boxs[g]);
       this._rows[g].initialize();
       this._cols[g].initialize();
       this._boxs[g].initialize();

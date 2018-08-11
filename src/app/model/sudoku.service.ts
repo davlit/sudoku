@@ -23,6 +23,13 @@ import { Common,
 
 import { CellCandidate } from '../common/cell.candidate';
 
+import { Difficulty }       from '../model/difficulty';
+import { DIFFICULTY_LABELS } from '../model/difficulty';
+import { Hint }             from '../hint/hint';
+import { HintService }      from '../hint/hint.service';
+import { ValueHint }        from '../hint/hint';
+import { CandidatesHint }   from '../hint/hint';
+import { HintType }         from '../hint/hint.type';
 import { SudokuModel } from './sudoku.model';
 import { Cell } from './cell';
 import { Group } from './group';
@@ -41,14 +48,19 @@ import { Group } from './group';
  */
 export class SudokuService {
 
-  private currentSudoku: Puzzle = undefined;
+  // private currentSudoku: Puzzle = undefined;
   private sudokuModel: SudokuModel = undefined;
+  private hintService: HintService = undefined;
+  // ----- enter properties -----
+  maxDifficulty: Difficulty;
+
 
   /**
    * Create and initialize the data model.
    */
   constructor() {
     this.sudokuModel = new SudokuModel();
+    this.hintService = new HintService(this);
     this.initializeModel();
   } // constructor()
 
@@ -69,9 +81,9 @@ export class SudokuService {
   /**
    * TODO not sure this is needed. Used by Print sudoku.
    */
-  public getCurrentSudoku() : Puzzle {
-    return this.currentSudoku;
-  } // getCurrentSudoku()
+  // public getCurrentSudoku() : Puzzle {
+  //   return this.currentSudoku;
+  // } // getCurrentSudoku()
 
   /**
    * Sets up a sudoku puzzle with a set of initial vallues. The initial values
@@ -98,6 +110,24 @@ export class SudokuService {
   } // loadProvidedSudoku()
 
   /**
+   * Returns the curren state of the model.
+   */
+  public takeModelSnapshot() : SudokuModel{
+    return this.sudokuModel.copyModel();
+  } // takeModelSnapshot()
+
+  /**
+   * Replace the current model state with another. This is used in conjucntion
+   * with copy model which delivers a snapshot of the model state. This method
+   * replaces the current model which could be an earlier snapshot.
+   * 
+   * @param newModel
+   */
+  public replaceModel(newModel: SudokuModel) {
+    this.sudokuModel = newModel;
+  }
+
+  /**
    * Sets a given value in every cell and set all groups to complete.
    * Used by CreationService to set a full grid of values.
    */
@@ -122,6 +152,19 @@ export class SudokuService {
   public getValue(ci: number) : number {
     return this.sudokuModel.cells[ci].value;
   } // getValue()
+
+  /**
+   * 
+   * @param puzzle 
+   */
+  public transferCellValuesToGivens(puzzle) : void {
+    let givens: number[] = [];
+    for (let ci of CELLS) {
+      givens.push(this.sudokuModel.cells[ci].value);
+    }
+    puzzle.initialValues = givens;
+    puzzle.completedPuzzle = givens;
+  }
 
   /**
    * Sets value of a cell to the given value. In the specified cell, all 
@@ -530,11 +573,187 @@ try {
   } // refreshCandidates()
 
   /**
+   * Add given candidate to given cell.
+   * - cannot add candidate to cell that has a givenValue
+   * - cannot add candidate if a related cell has that givenValue
    * 
+   * Called by:
+   * - undoAction() - undo REMOVE_CANDIDATE
+   * - removeValue()
+   */
+    public addCandidate(c: number, k: number) : void {
+
+      // do not add if givenValue exists
+      if (this.sudokuModel.cells[c].value > 0) {
+        // console.error('Cannot add candidate to cell with a givenValue.');
+        return;
+      }
+  
+      // do not add if any related cell has that givenValue
+      for (let rc of Common.getRelatedCells(c)) {
+        if (this.sudokuModel.cells[rc].value === k) {
+          return;
+        }
+      }
+  
+      // add candidate
+      this.sudokuModel.cells[c].candidates[k] = true;
+    } // addCandidate()
+  
+  /**
+   * Returns a copy of the current model state.
    */
   public copyModel() : SudokuModel {
     return this.sudokuModel.copyModel();
   }
+
+  /**
+   * Represent the givenValues of the sudoku as a grid string.
+   */
+  public toGridString() : string {
+    return this.arrayToGridString(this.cellValuesToArray());
+  } // toGridString()
+
+  /**
+   * Represent the givenValues of the sudoku as a single line string.
+   */
+  public toLineString() : string {
+    return this.toOneLineString();
+  } // toGridString()
+
+  /**
+   * Checks if sudoku givens are 180deg rotationally symetric.
+   */
+  public isSymetric() : boolean {
+    for (let ci = 0; ci < 40; ci++) {
+      if (this.hasValue(ci) && !this.hasValue(80 - ci)) {
+        return false;
+      }
+    }
+    return true;
+  }
+  
+  /**
+   * Part of solving sudoku by brute force. see Solve()
+   */
+  private applyAvailableHints() {
+    let hint: Hint = undefined;
+    let difficultyRating = undefined;
+
+    console.info(this.toLineString());
+
+    // get hint of any difficulty; loop until no hints
+    while (hint = this.hintService.getHint(Difficulty.HARDEST)) {
+
+      difficultyRating = hint.getDifficultyRating();
+
+      // this will ratchet up with sucsessive interations
+      if (!this.maxDifficulty || difficultyRating > this.maxDifficulty) {
+        this.maxDifficulty = difficultyRating;
+      }
+
+      switch (hint.type) {
+
+        // value hints (easy)
+        case HintType.NAKED_SINGLE:
+        case HintType.HIDDEN_SINGLE_ROW:
+        case HintType.HIDDEN_SINGLE_COL:
+        case HintType.HIDDEN_SINGLE_BOX:
+          let vHint: ValueHint = <ValueHint> hint;
+          this.setValue(vHint.cell, vHint.value);
+          break;
+
+        // candidate hints (medium/hard)
+        default:
+          let kHint: CandidatesHint = <CandidatesHint> hint;
+          let removes = kHint.removes;
+          for (let remove of removes) {
+            this.removeCandidate(remove.cell, remove.candidate);
+          }
+      } // switch
+
+      // console.info(this.toLineString());
+
+    } // while
+  } // applyAvailableHints()
+
+  /**
+   * See https://www.youtube.com/watch?v=y1ahOBeyM40 (3min in)
+   * 
+   * If true returned -> sudoku is solved (is it unique???)
+   * If false returned -> there is no solution
+   */
+  public solve() : boolean {
+
+    let snapshot: SudokuModel = undefined;
+
+    console.info('Using hints');
+
+    // fill in "obvious" cells until we run out; if the puzzle is solved,
+    // return true
+    this.applyAvailableHints();
+    if (this.isSolved()) {
+      return true;
+    }
+
+    // see if there is a contradiction
+    if (this.isImpossible()) {
+      console.info('*** Contradiction ***');
+      return false;
+    }
+
+    // being here means we need to guess; did not completely solve, but not
+    // impossible at this point
+
+    // take snapshot of model state before guessing
+    snapshot = this.takeModelSnapshot();
+
+    console.info('Guessing -- Snapshot taken:\n' + this.toLineString());
+    
+    this.maxDifficulty = Difficulty.HARDEST;
+
+    // find first empty cell (has candidates)
+    let emptyCell: number = undefined;
+    for (let ci of CELLS) {
+      if (this.getValue(ci) == 0) {
+        emptyCell = ci;
+        break;
+      }
+    }
+
+    // get all candidates for the emoty cell
+    let candidates: number[] = this.getCandidates(emptyCell);
+
+    // loop through candidates, try each
+    for (let candidate of candidates) {
+
+      console.info('Guess cell: ' + emptyCell + ', candidate: ' + candidate);
+
+      this.setValue(emptyCell, candidate);
+
+      // recursively call this function; if the lower call retruns true,
+      // return true from this level
+      if (this.solve() == true) {     // recursive call
+        return true;                  // this unwinds the recursion
+
+      // lower level returned false -> contridiction/impossible
+      } else {
+
+        // restore SNAPSHOT here?
+        this.replaceModel(snapshot);
+
+        console.info('Snapshot restored:\n' + this.toLineString());
+        // undo all changes: 
+        // remove cell value, 
+        // restore cell candidates
+        // restore affiliated cells' candidates
+        //this.........
+      }
+    } // for - fall out of this loop when all candidates have been tried
+  
+    return false;
+  } // solve()
+  
 
   // -------------------------------------------------------------------------
   // private methods
@@ -726,14 +945,6 @@ try {
   } // toOneLineString()
 
   /**
-   * Represent the givenValues of the sudoku as a grid string.
-   */
-  // private toGridString() : string {
-  public toGridString() : string {
-    return this.arrayToGridString(this.cellValuesToArray());
-  } // toGridString()
-
-  /**
    * Represent the state of a row as a string.
    */
   private rowToString(r: number) : string {
@@ -836,35 +1047,6 @@ try {
     return this.getCandidates(Common.urcToCellIdx(r, c));
   }
         
-  /**
-   * Add given candidate to given cell.
-   * - cannot add candidate to cell that has a givenValue
-   * - cannot add candidate if a related cell has that givenValue
-   * 
-   * Called by:
-   * - undoAction() - undo REMOVE_CANDIDATE
-   * - removeValue()
-   */
-  // private addCandidate(c: number, k: number) : void {
-  public addCandidate(c: number, k: number) : void {
-
-    // do not add if givenValue exists
-    if (this.sudokuModel.cells[c].value > 0) {
-      // console.error('Cannot add candidate to cell with a givenValue.');
-      return;
-    }
-
-    // do not add if any related cell has that givenValue
-    for (let rc of Common.getRelatedCells(c)) {
-      if (this.sudokuModel.cells[rc].value === k) {
-        return;
-      }
-    }
-
-    // add candidate
-    this.sudokuModel.cells[c].candidates[k] = true;
-  } // addCandidate()
-
   /**
    * 
    */

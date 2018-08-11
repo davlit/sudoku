@@ -6,9 +6,11 @@ import { Observable, Subscription } from 'rxjs';
 
 import { TITLE, MAJOR_VERSION, VERSION, SUB_VERSION, COPYRIGHT } from './common/common'; 
 import { Common }           from './common/common';
+import { CELLS }            from './common/common';
 import { Difficulty }       from './model/difficulty';
 import { DIFFICULTY_LABELS } from './model/difficulty';
 import { SudokuService }    from './model/sudoku.service';
+import { SudokuModel }      from './model/sudoku.model';
 import { CacheService }     from './model/cache.service';
 import { Puzzle }           from './model/puzzle';
 import { Hint }             from './hint/hint';
@@ -26,6 +28,7 @@ import { RestoreCandidateAction }      from './action/action';
 import { NakedType }        from './model/naked.type';
 import { CombinationIterator } from './common/combination.iterator';
 import { PseudoSudokuService } from './model/pseudo-sudoku.service';
+import { CreationService } from '../././web-workers/creation-worker/creation.service';
 
 import { ActionLogService } from './action/action-log.service';
 
@@ -65,6 +68,7 @@ export class AppComponent implements OnInit, OnDestroy {
   copyright = COPYRIGHT;
   sudokuService: SudokuService;
   hintService: HintService;
+  creationService: CreationService;
   actionLog: ActionLogService;
 
   // ----- state properties -----
@@ -108,6 +112,7 @@ export class AppComponent implements OnInit, OnDestroy {
             this.changeDetectorRef.detectChanges();
           }
         });
+    this.creationService = new CreationService(); // used for entry
   }
 
   // -----------------------------------------------------------------------
@@ -130,6 +135,9 @@ export class AppComponent implements OnInit, OnDestroy {
   mediumAvailable: boolean;
   hardAvailable: boolean;
   hardestAvailable: boolean;
+
+  // // ----- enter properties -----
+  // maxDifficulty: Difficulty;
 
   // ----- execute properties -----
   actualDifficulty: string;
@@ -395,6 +403,9 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    * Function based on view's cell indexes in html code.
    */
   isValueIncorrect(vb: number, vc: number) : boolean {
+    if (this.playState != PlayStates.EXECUTE) {
+      return false;
+    }
     let ci = this.viewToCellIdx(vb, vc);
     return this.sudokuService.isCellValid(ci)
         && this.sudokuService.getValue(ci) != this.currentPuzzle.completedPuzzle[ci];
@@ -575,15 +586,15 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
         this.applyHint(this.hint);
         this.hintsApplied++;
     }
-  }
+  } // handleHintClick
   
   /**
    * 
    */
-  autoSolveButton() : boolean {
-    return this.autoSolveState != AutoSolveStates.NO_HINT
-        && this.hintState != HintStates.NO_HINT; 
-  } // autoSolveButton()
+  // autoSolveButton() : boolean {
+  //   return this.autoSolveState != AutoSolveStates.NO_HINT
+  //       && this.hintState != HintStates.NO_HINT; 
+  // } // autoSolveButton()
   
   /**
    * 
@@ -705,6 +716,73 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     this.sudokuService.initializeModel();
     this.playState = PlayStates.NEW;
   } // startNewPuzzle()
+
+  /**
+   * 
+   */
+  enterPuzzle() : void {
+    this.currentPuzzle = Puzzle.getEmptyPuzzle();
+    this.playState = PlayStates.ENTRY;
+  }
+
+  /**
+   * 
+           <!--
+        button: press when entry complete
+        conditons after entry
+          is symetric
+          is solvable
+          difficulty
+        -->
+*/
+  entryFinished() : void {
+
+    // set given values
+    this.sudokuService.transferCellValuesToGivens(this.currentPuzzle);
+
+    if (!this.sudokuService.isSymetric()) {
+      console.info('Is NOT symetric.')
+      // TODO: warn user, correct or accept
+    } else {
+      console.info('Is symetric.')
+    }
+
+    // solve silently
+    // this.solve();
+
+    // this.solve();
+    this.sudokuService.solve();
+    // determine difficulty
+    // for (let ci of CELLS) {
+    //   this.currentPuzzle.initialValues[ci] = this..sudokuModel.cells[ci].value;
+    // }
+console.info('Puzzle 1: ' + this.currentPuzzle.toString());
+
+    /*
+    get hint (loop)
+    if hint
+      determine difficulty (1st time)
+      promote difficulty, if exceeds previous diff
+      apply hint
+      if solved
+        complete currentPuzzle w/solution
+        set/display difficulty
+        convert entered given from green to black
+        this.playState = PlayStates.EXECUTE
+        user takes over
+      else (not solved)
+        loop to get hint
+    if no hint (not solved)
+      guess - brute force solve
+      set difficulty HARDEST
+      convert entered given from green to black
+      this.playState = PlayStates.EXECUTE
+      user takes over
+    */ 
+
+console.info('Puzzle 2: ' + this.currentPuzzle.toString());
+    this.playState = PlayStates.EXECUTE;
+  }
 
   /**
    * 
@@ -904,6 +982,130 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     this.hint = undefined;
   } // applyHint()
 
+
+
+  // /**
+  //  * Part of solving sudoku by brute force. see Solve()
+  //  */
+  // applyAvailableHints() {
+  //   let hint: Hint = undefined;
+  //   let difficultyRating = undefined;
+
+  //   console.info(this.sudokuService.toLineString());
+
+  //   // get hint of any difficulty; loop until no hints
+  //   while (hint = this.hintService.getHint(Difficulty.HARDEST)) {
+
+  //     difficultyRating = hint.getDifficultyRating();
+
+  //     // this will ratchet up with sucsessive interations
+  //     if (!this.maxDifficulty || difficultyRating > this.maxDifficulty) {
+  //       this.maxDifficulty = difficultyRating;
+  //     }
+
+  //     switch (hint.type) {
+
+  //       // value hints (easy)
+  //       case HintType.NAKED_SINGLE:
+  //       case HintType.HIDDEN_SINGLE_ROW:
+  //       case HintType.HIDDEN_SINGLE_COL:
+  //       case HintType.HIDDEN_SINGLE_BOX:
+  //         let vHint: ValueHint = <ValueHint> hint;
+  //         this.sudokuService.setValue(vHint.cell, vHint.value);
+  //         break;
+
+  //       // candidate hints (medium/hard)
+  //       default:
+  //         let kHint: CandidatesHint = <CandidatesHint> hint;
+  //         let removes = kHint.removes;
+  //         for (let remove of removes) {
+  //           this.sudokuService.removeCandidate(remove.cell, remove.candidate);
+  //         }
+  //     } // switch
+
+  //     // console.info(this.sudokuService.toLineString());
+
+  //   } // while
+  // } // applyAvailableHints()
+
+  // /**
+  //  * See https://www.youtube.com/watch?v=y1ahOBeyM40 (3min in)
+  //  * 
+  //  * If true returned -> sudoku is solved (is it unique???)
+  //  * If false returned -> there is no solution
+  //  */
+  // solve() : boolean {
+
+  //   let snapshot: SudokuModel = undefined;
+
+  //   console.info('Using hints');
+
+  //   // fill in "obvious" cells until we run out; if the puzzle is solved,
+  //   // return true
+  //   this.applyAvailableHints();
+  //   if (this.sudokuService.isSolved()) {
+  //     return true;
+  //   }
+
+  //   // see if there is a contradiction
+  //   if (this.sudokuService.isImpossible()) {
+  //     console.info('*** Contradiction ***');
+  //     return false;
+  //   }
+
+  //   // being here means we need to guess; did not completely solve, but not
+  //   // impossible at this point
+
+  //   // take snapshot of model state before guessing
+  //   snapshot = this.sudokuService.takeModelSnapshot();
+
+  //   console.info('Guessing -- Snapshot taken:\n' + this.sudokuService.toLineString());
+    
+  //   this.maxDifficulty = Difficulty.HARDEST;
+
+  //   // find first empty cell (has candidates)
+  //   let emptyCell: number = undefined;
+  //   for (let ci of CELLS) {
+  //     if (this.sudokuService.getValue(ci) == 0) {
+  //       emptyCell = ci;
+  //       break;
+  //     }
+  //   }
+
+  //   // get all candidates for the emoty cell
+  //   let candidates: number[] = this.sudokuService.getCandidates(emptyCell);
+
+  //   // loop through candidates, try each
+  //   for (let candidate of candidates) {
+
+  //     console.info('Guess cell: ' + emptyCell + ', candidate: ' + candidate);
+
+  //     this.sudokuService.setValue(emptyCell, candidate);
+
+  //     // recursively call this function; if the lower call retruns true,
+  //     // return true from this level
+  //     if (this.solve() == true) {     // recursive call
+  //       return true;                  // this unwinds the recursion
+
+  //     // lower level returned false -> contridiction/impossible
+  //     } else {
+
+  //       // restore SNAPSHOT here?
+  //       this.sudokuService.replaceModel(snapshot);
+
+  //       console.info('Snapshot restored:\n' + this.sudokuService.toLineString());
+  //       // undo all changes: 
+  //       // remove cell value, 
+  //       // restore cell candidates
+  //       // restore affiliated cells' candidates
+  //       //this.sudokuService.........
+  //     }
+  //   } // for - fall out of this loop when all candidates have been tried
+  
+  //   return false;
+  // } // solve()
+  
+
   /**
    * 
    */
@@ -1050,8 +1252,18 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
 
   loadTestPuzzle(initialValues: string) : void {
     this.currentPuzzle = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
-    this.startUserTimer();
-    this.playState = PlayStates.EXECUTE;
+    this.sudokuService.transferCellValuesToGivens(this.currentPuzzle);
+
+    // this.maxDifficulty = undefined;
+
+    console.info('Testing\n' + this.sudokuService.toGridString());
+    // this.solve();
+    this.sudokuService.solve();
+    // console.info('Difficulty: ' + DIFFICULTY_LABELS[this.maxDifficulty].label);
+    console.info('Difficulty: ' + DIFFICULTY_LABELS[this.sudokuService.maxDifficulty].label);
+    console.info('Testing\n' + this.sudokuService.toGridString());
+    // this.startUserTimer();
+    // this.playState = PlayStates.EXECUTE;
   }
 
   
