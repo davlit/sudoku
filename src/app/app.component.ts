@@ -6,13 +6,11 @@ import { Observable, Subscription } from 'rxjs';
 
 import { TITLE, MAJOR_VERSION, VERSION, SUB_VERSION, COPYRIGHT } from './common/common'; 
 import { Common }           from './common/common';
-import { CELLS }            from './common/common';
 import { Difficulty }       from './model/difficulty';
 import { DIFFICULTY_LABELS } from './model/difficulty';
 import { SudokuService }    from './model/sudoku.service';
-import { SudokuModel }      from './model/sudoku.model';
 import { CacheService }     from './model/cache.service';
-import { Puzzle }           from './model/puzzle';
+import { Sudoku }           from './model/sudoku';
 import { Hint }             from './hint/hint';
 import { HintService }      from './hint/hint.service';
 import { ValueHint }        from './hint/hint';
@@ -20,18 +18,14 @@ import { CandidatesHint }   from './hint/hint';
 import { HintType }         from './hint/hint.type';
 import { HintCounts }       from './hint/hintCounts';
 import { ActionType }       from './action/action';
-import { Action }           from './action/action';
 import { SetValueAction }      from './action/action';
 import { RemoveValueAction }      from './action/action';
 import { RemoveCandidateAction }      from './action/action';
 import { RestoreCandidateAction }      from './action/action';
 import { NakedType }        from './model/naked.type';
-import { CombinationIterator } from './common/combination.iterator';
 import { PseudoSudokuService } from './model/pseudo-sudoku.service';
 import { CreationService } from '../././web-workers/creation-worker/creation.service';
-
 import { ActionLogService } from './action/action-log.service';
-
 import { MessageService } from './common/message.service';
  
 // test
@@ -154,7 +148,7 @@ export class AppComponent implements OnInit, OnDestroy {
   hintsApplied: number;
   
   // ----- solved properties -----
-  currentPuzzle: Puzzle;
+  currentSudoku: Sudoku;
   hint: Hint;
   candidatesVisible: boolean[];
   selectedCell: number;
@@ -171,8 +165,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
     let cacheKeys: string[] = this.cacheService.getCacheKeys();
 
-console.info('\nX. Cache on ngOnInit(): ' 
-    + this.cacheService.activeCachesToString());
+// console.info('\nX. Cache on ngOnInit(): ' 
+//     + this.cacheService.activeCachesToString());
 
 // console.info('\nCache keys before replenishment: ' + JSON.stringify(cacheKeys));
 
@@ -223,23 +217,23 @@ console.info('\nX. Cache on ngOnInit(): '
   */
 
   /**
-   * Responds to Generate button. Gets sudoku puzzle of desired difficulty
+   * Responds to Generate button. Gets sudoku of desired difficulty
    * from cache. Loads sudoku and switches to Play state.
    */
   generate(difficulty: Difficulty) : void {
-    this.currentPuzzle = Puzzle.deserialize(this.cacheService.getSudoku(difficulty));
+    this.currentSudoku = Sudoku.deserialize(this.cacheService.getSudoku(difficulty));
 
     // bind metadata for ui, load sudoku for user execution
     this.actualDifficulty = 
-        // Puzzle.getDifficultyLabel(this.currentPuzzle.actualDifficulty);
-        DIFFICULTY_LABELS[this.currentPuzzle.difficulty].label;
+        // Sudoku.getDifficultyLabel(this.currentSudoku.actualDifficulty);
+        DIFFICULTY_LABELS[this.currentSudoku.difficulty].label;
     this.solutionClues = this.createSolutionClues();
 
-    this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
+    this.sudokuService.loadProvidedSudoku(this.currentSudoku.initialValues);
     this.actionLog.initialize();
     this.actionsLog = '';
     
-console.log('\nSudoku:\n' + this.currentPuzzle.toString());
+console.log('\nSudoku:\n' + this.currentSudoku.toString());
 
     // go to sudoku execution by user
     this.startUserTimer();
@@ -366,20 +360,19 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
   }
 
   /**
-   * Returns true if this cell contains in initial value.
+   * Returns true if this cell's value is a given value.
    * Function based on view's cell indexes in html code.
    */
-  isCellLocked_(vb: number, vc: number) : boolean {
-    return this.isCellLocked(this.viewToCellIdx(vb, vc));
+  isGiven_(vb: number, vc: number) : boolean {
+    return this.isGiven(this.viewToCellIdx(vb, vc));
   } // isCellLocked()
   
   /**
-   * Returns true if this cell contains in initial value.
-   * Function based on cell's index.
+   * Returns true if the cell's value is a given value.
    */
-  isCellLocked(ci: number) : boolean {
-    return this.currentPuzzle &&
-        this.currentPuzzle.initialValues[ci] > 0
+  isGiven(ci: number) : boolean {
+    return this.currentSudoku &&
+        this.currentSudoku.initialValues[ci] > 0
   } // isCellLocked()
   
   /**
@@ -394,22 +387,22 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
    * row, column, or box.
    * Function based on view's cell indexes in html code.
    */
-  isCellInvalid(vb: number, vc: number) : boolean {
+  isInvalid_(vb: number, vc: number) : boolean {
     return !this.sudokuService.isCellValid(this.viewToCellIdx(vb, vc));
-  } // isCellInvalid()
+  } // isInvalid_()
   
   /**
    * Returns true if this cell's value is not the solution's value.
    * Function based on view's cell indexes in html code.
    */
-  isValueIncorrect(vb: number, vc: number) : boolean {
+  isIncorrect_(vb: number, vc: number) : boolean {
     if (this.playState != PlayStates.EXECUTE) {
       return false;
     }
     let ci = this.viewToCellIdx(vb, vc);
     return this.sudokuService.isCellValid(ci)
-        && this.sudokuService.getValue(ci) != this.currentPuzzle.completedPuzzle[ci];
-  } // isCellValueWrong()
+        && this.sudokuService.getValue(ci) != this.currentSudoku.completedSudoku[ci];
+  } // isIncorrect_()
   
   /**
    * Function based on view's cell indexes in html code.
@@ -422,7 +415,7 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     
     this.initializeHintStates();    // remove any hint 
     let ci = this.viewToCellIdx(vb, vc);
-    if (this.isCellLocked(ci)) {
+    if (this.isGiven(ci)) {
       return;         // can't accept click on locked cell
     }
 
@@ -696,32 +689,32 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
   } // undoLastAction()
   
   /**
-   * button 'Restart Current Puzzle' EXECUTION, SOLVED states
+   * button 'Restart Current Sudoku' EXECUTION, SOLVED states
    */
-  restartCurrentPuzzle() : void {
+  restartCurrentSudoku() : void {
     this.stopUserTimer();
     this.startUserTimer();
-    this.sudokuService.initializeModel();
+    this.sudokuService.initializeGrid();
     let temp = this.actualDifficulty;   // save
     this.initializeUserInterface();
-    this.currentPuzzle = this.sudokuService.loadProvidedSudoku(this.currentPuzzle.initialValues);
+    this.currentSudoku = this.sudokuService.loadProvidedSudoku(this.currentSudoku.initialValues);
     this.actualDifficulty = temp;       // restore
     this.playState = PlayStates.EXECUTE;
-  } // restartCurrentPuzzle()
+  } // restartCurrentSudoku()
   
-  // button 'Start New Puzzle' EXECUTION, SOLVED state
-  startNewPuzzle() : void {
+  // button 'Start New Sudoku' EXECUTION, SOLVED state
+  startNewSudoku() : void {
     this.stopUserTimer();
     this.initializeUserInterface();
-    this.sudokuService.initializeModel();
+    this.sudokuService.initializeGrid();
     this.playState = PlayStates.NEW;
-  } // startNewPuzzle()
+  } // startNewSudoku()
 
   /**
    * 
    */
-  enterPuzzle() : void {
-    this.currentPuzzle = Puzzle.getEmptyPuzzle();
+  enterSudoku() : void {
+    this.currentSudoku = Sudoku.getEmptySudoku();
     this.playState = PlayStates.ENTRY;
   }
 
@@ -733,12 +726,25 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
           is symetric
           is solvable
           difficulty
+
+        capture givens to array
+        create a sudoku with givens
+        solve the sudoku
+        get difficulty
         -->
 */
   entryFinished() : void {
 
-    // set given values
-    this.sudokuService.transferCellValuesToGivens(this.currentPuzzle);
+    // create a separate sudoku service to solve the sudoku
+    let solveService: SudokuService = new SudokuService();
+
+    // give the solve service the entered sudoku givens
+    solveService.replaceGrid(this.sudokuService.copyGrid());
+
+    // let values : string = this.sudokuService.toLineString();
+
+    // // set given values
+    // this.sudokuService.transferCellValuesToGivens(this.currentSudoku);
 
     if (!this.sudokuService.isSymetric()) {
       console.info('Is NOT symetric.')
@@ -751,12 +757,19 @@ console.log('\nSudoku:\n' + this.currentPuzzle.toString());
     // this.solve();
 
     // this.solve();
-    this.sudokuService.solve();
+    solveService.solve();
+
+    console.info('Difficulty: ' + DIFFICULTY_LABELS[solveService.maxDifficulty].label);
+
+    // cases
+    // solved, got difficulty
+    // could not be solved
+
     // determine difficulty
     // for (let ci of CELLS) {
-    //   this.currentPuzzle.initialValues[ci] = this..sudokuModel.cells[ci].value;
+    //   this.currentSudoku.initialValues[ci] = this..sudokuGrid.cells[ci].value;
     // }
-console.info('Puzzle 1: ' + this.currentPuzzle.toString());
+console.info('Sudoku 1: ' + this.currentSudoku.toString());
 
     /*
     get hint (loop)
@@ -765,7 +778,7 @@ console.info('Puzzle 1: ' + this.currentPuzzle.toString());
       promote difficulty, if exceeds previous diff
       apply hint
       if solved
-        complete currentPuzzle w/solution
+        complete currentSudoku w/solution
         set/display difficulty
         convert entered given from green to black
         this.playState = PlayStates.EXECUTE
@@ -780,7 +793,8 @@ console.info('Puzzle 1: ' + this.currentPuzzle.toString());
       user takes over
     */ 
 
-console.info('Puzzle 2: ' + this.currentPuzzle.toString());
+console.info('Sudoku 2: ' + this.currentSudoku.toString());
+
     this.playState = PlayStates.EXECUTE;
   }
 
@@ -817,10 +831,10 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
   // -----------------------------------------------------------------------
 
   /**
-   * Using puzzle statistics, prepare a solution clues string;
+   * Using sudoku statistics, prepare a solution clues string;
    */
   createSolutionClues() : string {
-    let hintCounts : HintCounts = <HintCounts> this.currentPuzzle.hintCounts;
+    let hintCounts : HintCounts = <HintCounts> this.currentSudoku.hintCounts;
     let s: string = '';
 
     if (hintCounts.getNakedPairs() > 0) {
@@ -897,8 +911,8 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
 
     // TODO embed this in handleCellClick
   // setGuessCell_(event: any, br: number, bc: number, cr: number, cc: number) {
-  //   let r = Common.viewToModelRow(br, cr);
-  //   let c = Common.viewToModelCol(bc, cc);
+  //   let r = Common.viewToGridRow(br, cr);
+  //   let c = Common.viewToGridCol(bc, cc);
     
   //   console.log('setGuessCell_() r,c:' + r + ',' + c);
 
@@ -975,147 +989,23 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
       let value = this.hint.getValue();
       this.valuesComplete[value] = this.sudokuService.isValueComplete(value);
       if (this.sudokuService.isSolved()) {
-        this.handlePuzzleComplete();
+        this.handleSudokuComplete();
       }
     }
     this.refreshActionsLog();
     this.hint = undefined;
   } // applyHint()
 
-
-
-  // /**
-  //  * Part of solving sudoku by brute force. see Solve()
-  //  */
-  // applyAvailableHints() {
-  //   let hint: Hint = undefined;
-  //   let difficultyRating = undefined;
-
-  //   console.info(this.sudokuService.toLineString());
-
-  //   // get hint of any difficulty; loop until no hints
-  //   while (hint = this.hintService.getHint(Difficulty.HARDEST)) {
-
-  //     difficultyRating = hint.getDifficultyRating();
-
-  //     // this will ratchet up with sucsessive interations
-  //     if (!this.maxDifficulty || difficultyRating > this.maxDifficulty) {
-  //       this.maxDifficulty = difficultyRating;
-  //     }
-
-  //     switch (hint.type) {
-
-  //       // value hints (easy)
-  //       case HintType.NAKED_SINGLE:
-  //       case HintType.HIDDEN_SINGLE_ROW:
-  //       case HintType.HIDDEN_SINGLE_COL:
-  //       case HintType.HIDDEN_SINGLE_BOX:
-  //         let vHint: ValueHint = <ValueHint> hint;
-  //         this.sudokuService.setValue(vHint.cell, vHint.value);
-  //         break;
-
-  //       // candidate hints (medium/hard)
-  //       default:
-  //         let kHint: CandidatesHint = <CandidatesHint> hint;
-  //         let removes = kHint.removes;
-  //         for (let remove of removes) {
-  //           this.sudokuService.removeCandidate(remove.cell, remove.candidate);
-  //         }
-  //     } // switch
-
-  //     // console.info(this.sudokuService.toLineString());
-
-  //   } // while
-  // } // applyAvailableHints()
-
-  // /**
-  //  * See https://www.youtube.com/watch?v=y1ahOBeyM40 (3min in)
-  //  * 
-  //  * If true returned -> sudoku is solved (is it unique???)
-  //  * If false returned -> there is no solution
-  //  */
-  // solve() : boolean {
-
-  //   let snapshot: SudokuModel = undefined;
-
-  //   console.info('Using hints');
-
-  //   // fill in "obvious" cells until we run out; if the puzzle is solved,
-  //   // return true
-  //   this.applyAvailableHints();
-  //   if (this.sudokuService.isSolved()) {
-  //     return true;
-  //   }
-
-  //   // see if there is a contradiction
-  //   if (this.sudokuService.isImpossible()) {
-  //     console.info('*** Contradiction ***');
-  //     return false;
-  //   }
-
-  //   // being here means we need to guess; did not completely solve, but not
-  //   // impossible at this point
-
-  //   // take snapshot of model state before guessing
-  //   snapshot = this.sudokuService.takeModelSnapshot();
-
-  //   console.info('Guessing -- Snapshot taken:\n' + this.sudokuService.toLineString());
-    
-  //   this.maxDifficulty = Difficulty.HARDEST;
-
-  //   // find first empty cell (has candidates)
-  //   let emptyCell: number = undefined;
-  //   for (let ci of CELLS) {
-  //     if (this.sudokuService.getValue(ci) == 0) {
-  //       emptyCell = ci;
-  //       break;
-  //     }
-  //   }
-
-  //   // get all candidates for the emoty cell
-  //   let candidates: number[] = this.sudokuService.getCandidates(emptyCell);
-
-  //   // loop through candidates, try each
-  //   for (let candidate of candidates) {
-
-  //     console.info('Guess cell: ' + emptyCell + ', candidate: ' + candidate);
-
-  //     this.sudokuService.setValue(emptyCell, candidate);
-
-  //     // recursively call this function; if the lower call retruns true,
-  //     // return true from this level
-  //     if (this.solve() == true) {     // recursive call
-  //       return true;                  // this unwinds the recursion
-
-  //     // lower level returned false -> contridiction/impossible
-  //     } else {
-
-  //       // restore SNAPSHOT here?
-  //       this.sudokuService.replaceModel(snapshot);
-
-  //       console.info('Snapshot restored:\n' + this.sudokuService.toLineString());
-  //       // undo all changes: 
-  //       // remove cell value, 
-  //       // restore cell candidates
-  //       // restore affiliated cells' candidates
-  //       //this.sudokuService.........
-  //     }
-  //   } // for - fall out of this loop when all candidates have been tried
-  
-  //   return false;
-  // } // solve()
-  
-
   /**
    * 
    */
   setCellValue(ci: number, v: number) : void {
 
-// console.info('completedPuzzle: ' + this.currentPuzzle.completedPuzzle);
+// console.info('completedSudoku: ' + this.currentSudoku.completedSudoku);
 
     // check for new values not that of solution
-    if (this.currentPuzzle.completedPuzzle
-        && v != this.currentPuzzle.completedPuzzle[ci]) {
+    if (this.currentSudoku.completedSudoku
+        && v != this.currentSudoku.completedSudoku[ci]) {
       console.warn('Not the solution value');
     }
 
@@ -1127,9 +1017,9 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
     this.valuesComplete[v] = this.sudokuService.isValueComplete(v);
     this.refreshActionsLog();
     if (this.sudokuService.isSolved()) {
-      this.handlePuzzleComplete();
+      this.handleSudokuComplete();
     } else {
-      let pseudoSudokuService = new PseudoSudokuService(this.sudokuService.copyModel())
+      let pseudoSudokuService = new PseudoSudokuService(this.sudokuService.copyGrid())
       if (pseudoSudokuService.hasNakedSinglesSolution()) {
 
         // FLAG
@@ -1170,12 +1060,12 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
   /**
    * 
    */
-  handlePuzzleComplete() : void {
+  handleSudokuComplete() : void {
     this.unselectCell();
     this.refreshActionsLog();
     this.stopUserTimer();
     this.playState = PlayStates.SOLVED;
-  } // handlePuzzleComplete()
+  } // handleSudokuComplete()
     
   /**
    * 
@@ -1216,7 +1106,7 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
    * 
    */
   initializeUserInterface() {
-    this.sudokuService.initializeModel();
+    this.sudokuService.initializeGrid();
     this.actionLog.initialize();
     this.actionsLog = '';
     this.actualDifficulty = undefined;
@@ -1250,9 +1140,9 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
   // testing methods
   // -----------------------------------------------------------------------
 
-  loadTestPuzzle(initialValues: string) : void {
-    this.currentPuzzle = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
-    this.sudokuService.transferCellValuesToGivens(this.currentPuzzle);
+  loadTestSudoku(initialValues: string) : void {
+    this.currentSudoku = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
+    this.sudokuService.transferCellValuesToGivens(this.currentSudoku);
 
     // this.maxDifficulty = undefined;
 
@@ -1268,14 +1158,14 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
 
   
   testExternal() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       // rated 5 stars -- requires 1 guess
       '3...4.81.......7.3..12..........4.7.8.6...1.9.4.1..........73..1.9.......87.2...6'
     );
   }
 
   testNakedTriple() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       // naked triple col 2, 138 in 2,2 2,4 2,7
       // https://www.sudokuoftheday.com/techniques/naked-pairs-triples/
       '6..8.27357.235694.3..4.7.621..975.242..183.79.79624..34..56.2.7.6724.3..92.7384.6'
@@ -1283,7 +1173,7 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
   }
 
   testHiddenPair() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
 
       // hidden pair col 3 29 7,3 9,3
       '2...3.......8.45...9.65.....23..5.9.9.......8.8.7..34.....47.1...42.3.......1...4'
@@ -1305,7 +1195,7 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
   }
 
   testHiddenTriple() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       // 3 good tests. Comment all getHint() checks except checkHiddenTriples()
 
       // // hidden triple col 5, 347 in 1,5 4,5 6,5
@@ -1334,7 +1224,7 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
   }
 
   testHiddenQuad() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
 
       // hidden quad row 5, 1289 in 5,1 5,2 5,4 5,5
       // https://www.sudokuoftheday.com/techniques/hidden-pairs-triples/
@@ -1344,67 +1234,67 @@ console.info('Puzzle 2: ' + this.currentPuzzle.toString());
   }
 
   testEasy() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '182....5...7..1..49......6.37.9....1..8...7..6....3.95.5......88..7..4...1....539'
     );
   }
 
   testMedium_1NP() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '.3.7.4.8.....9.2..8..3.5.....4...9.1.86...52.3.2...7.....6.3..2..3.5.....1.4.2.7.'
     );
   }
 
   testHard_1NP_3P_1G() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '..9..5...3..2.985..54....2......1..659.....132..3......3....48..756.8..2...1..6..'
     );
   }
 
   testHard_3NP_1P_4G() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '4.5.9...176..132...2.6.......1........47.13........4.......8.6...257..345...2.7.9'
     );
   }
 
   testGuess() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '.......132.31......1...79...21.7..4...62.41...9..5.62...47...8......57.173.......'
     );
   }
     
   testNakedPairBoxRow() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '.9....3....8.45.7...6..7....54..69136.......89834..56....7..1...4.28.7....5....9.'
     );
   }
   
   testPointingRow() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '6....3.18..95.....4...7.2...4.7.1....8..2.17.1..8..4....4.8...1.....79..52.6...3.'
     );
   }
   
   testPointingCol() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '6.4..1..5...48...2.9....4...5.7.8..6..7.2.8..3..1...7...2.14.9.1...7...38.....1..'
     );
   }
   
   testRowBoxReduction() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '6....3.18..95.....4...7.2...4.7.1....8..2.17.1..8..4....4.8...1.....79..52.6...3.'
     );
   }
   
   testColBoxReduction() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '6.4..1..5...48...2.9....4...5.7.8..6..7.2.8..3..1...7...2.14.9.1...7...38.....1..'
     );
   }
   
   testHiddenPairsRow() {
-    this.loadTestPuzzle(
+    this.loadTestSudoku(
       '9.7....321.32.78.....3967..69.782.433..169..727.534.....967.3..8.6..3.7573....4.6'
     );
   }

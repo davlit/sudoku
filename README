@@ -171,7 +171,7 @@ PlayComponent
 HintService
   HintLogService
 SudokuService
-  SudokuModel
+  SudokuGrid
   ActionLogService
 CacheService
   localStorage
@@ -182,7 +182,7 @@ CreationService
 HintService
   HintLogService
 SudokuService
-  SudokuModel
+  SudokuGrid
   ActionLogService
 
 Shared
@@ -190,7 +190,7 @@ Shared
 HintService
   HintLogService
 SudokuService
-  SudokuModel
+  SudokuGrid
   ActionLogService
 
 app.module
@@ -236,7 +236,7 @@ shared.module
 @NgModule({
   providers: [
     SudokuService,
-      SudokuModel, 
+      SudokuGrid, 
       ActionLogService, 
     HintService, 
       HintLogService
@@ -279,7 +279,7 @@ AppModule       AppComponent,       CreationModule,     CacheService,       AppC
 CreationModule                      SharedModule        CreationService
 
 SharedModule                                            SudokuService,
-                                                        SudokuModel, 
+                                                        SudokuGrid, 
                                                         ActionLogService, 
                                                         HintService, 
                                                         HintLogService
@@ -292,7 +292,7 @@ play.component.ts - generate(difficulty: Difficulty) : void
   this.cacheService.getSudoku(difficulty)
   - loads suduku for user execution
 
-cacheService.ts - this.cacheService.getSudoku(difficulty) : Puzzle
+cacheService.ts - this.cacheService.getSudoku(difficulty) : Sudoku
   this.creationService.createSudokuZ(difficulty)
 
   - TODO set up to receive web worker output

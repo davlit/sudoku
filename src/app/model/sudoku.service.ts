@@ -1,14 +1,12 @@
-import { Puzzle } from './puzzle';
-import { NakedType } from './naked.type';
-
+import { Sudoku } from            './sudoku';
+import { NakedType } from         './naked.type';
 import { Action,
          ActionType,
          GuessValueAction,
          RemoveCandidateAction,
          RemoveCandidatesAction,
          RestoreCandidateAction,
-         SetValueAction } from '../action/action';
-
+         SetValueAction } from    '../action/action';
 import { Common,
          CELLS,
          VALUES,
@@ -19,20 +17,18 @@ import { Common,
          BOXS,
          ROW_CELLS,
          COL_CELLS,
-         BOX_CELLS } from  '../common/common';
-
-import { CellCandidate } from '../common/cell.candidate';
-
-import { Difficulty }       from '../model/difficulty';
-import { DIFFICULTY_LABELS } from '../model/difficulty';
-import { Hint }             from '../hint/hint';
-import { HintService }      from '../hint/hint.service';
-import { ValueHint }        from '../hint/hint';
-import { CandidatesHint }   from '../hint/hint';
-import { HintType }         from '../hint/hint.type';
-import { SudokuModel } from './sudoku.model';
-import { Cell } from './cell';
-import { Group } from './group';
+         BOX_CELLS } from         '../common/common';
+import { CellCandidate } from     '../common/cell.candidate';
+import { Difficulty,
+         DIFFICULTY_LABELS } from '../model/difficulty';
+import { Hint,
+         ValueHint,
+         CandidatesHint } from    '../hint/hint';
+import { HintService } from       '../hint/hint.service';
+import { HintType } from          '../hint/hint.type';
+import { SudokuGrid } from        './sudoku.grid';
+import { Cell } from              './cell';
+import { Group } from             './group';
 
 /**
  * This service maintains the sudoku's state: essentially cell values and
@@ -48,55 +44,55 @@ import { Group } from './group';
  */
 export class SudokuService {
 
-  // private currentSudoku: Puzzle = undefined;
-  private sudokuModel: SudokuModel = undefined;
+  // private currentSudoku: Sudoku = undefined;
+  private sudokuGrid: SudokuGrid = undefined;
   private hintService: HintService = undefined;
   // ----- enter properties -----
   maxDifficulty: Difficulty;
 
 
   /**
-   * Create and initialize the data model.
+   * Create and initialize the data grid.
    */
   constructor() {
-    this.sudokuModel = new SudokuModel();
+    this.sudokuGrid = new SudokuGrid();
     this.hintService = new HintService(this);
-    this.initializeModel();
+    this.initializeGrid();
   } // constructor()
 
   /**
    * Initialize the entire sudoku.
    */
-  public initializeModel() : void {
+  public initializeGrid() : void {
     for (let c of CELLS) {
-      this.initializeCell(this.sudokuModel.cells[c]);
+      this.initializeCell(this.sudokuGrid.cells[c]);
     }
     for (let g of GROUPS) {
-      this.initializeGroup(this.sudokuModel.rows[g]);
-      this.initializeGroup(this.sudokuModel.cols[g]);
-      this.initializeGroup(this.sudokuModel.boxs[g]);
+      this.initializeGroup(this.sudokuGrid.rows[g]);
+      this.initializeGroup(this.sudokuGrid.cols[g]);
+      this.initializeGroup(this.sudokuGrid.boxs[g]);
     }
-  } // initializeModel()
+  } // initializeGrid()
 
   /**
    * TODO not sure this is needed. Used by Print sudoku.
    */
-  // public getCurrentSudoku() : Puzzle {
+  // public getCurrentSudoku() : Sudoku {
   //   return this.currentSudoku;
   // } // getCurrentSudoku()
 
   /**
-   * Sets up a sudoku puzzle with a set of initial vallues. The initial values
+   * Sets up a sudoku with a set of given values. The given values
    * will be an array of 81 numbers each 0..9. A zero indicates a blank or
    * empty cell. E.g.
    * [0,0,2,4,0,0,1,0,3,9,1,0,3,0,0,0,6,0,0, ...]
    */
-  public loadProvidedSudoku(values: number[]) : Puzzle {
-    let puzzle = new Puzzle();
-    puzzle.initialValues = values;
-    this.initializeModel();
+  public loadProvidedSudoku(values: number[]) : Sudoku {
+    let sudoku = new Sudoku();
+    sudoku.initialValues = values;
+    this.initializeGrid();
     for (let ci of CELLS) {
-      let cell = this.sudokuModel.cells[ci];   // cell at [c] in cells array
+      let cell = this.sudokuGrid.cells[ci];   // cell at [c] in cells array
       let value = values[ci];        // givenValue at [c] in givenValues array
       if (value === 0) {
         continue;
@@ -106,25 +102,25 @@ export class SudokuService {
       this.setValue(ci, value);
     } // for
 
-    return puzzle;
+    return sudoku;
   } // loadProvidedSudoku()
 
   /**
-   * Returns the curren state of the model.
+   * Returns the curren state of the grid.
    */
-  public takeModelSnapshot() : SudokuModel{
-    return this.sudokuModel.copyModel();
-  } // takeModelSnapshot()
+  public takeGridSnapshot() : SudokuGrid{
+    return this.sudokuGrid.copyGrid();
+  } // takeGridSnapshot()
 
   /**
-   * Replace the current model state with another. This is used in conjucntion
-   * with copy model which delivers a snapshot of the model state. This method
-   * replaces the current model which could be an earlier snapshot.
+   * Replace the current grid state with another. This is used in conjucntion
+   * with copy grid which delivers a snapshot of the grid state. This method
+   * replaces the current grid which could be an earlier snapshot.
    * 
-   * @param newModel
+   * @param newGrid
    */
-  public replaceModel(newModel: SudokuModel) {
-    this.sudokuModel = newModel;
+  public replaceGrid(newGrid: SudokuGrid) {
+    this.sudokuGrid = newGrid;
   }
 
   /**
@@ -133,15 +129,15 @@ export class SudokuService {
    */
   public setAllValues(values: number[]) : void {
     for (let ci of CELLS) {    // ci is 0..80
-      let cell = this.sudokuModel.cells[ci];
+      let cell = this.sudokuGrid.cells[ci];
       cell.value = values[ci];
       this.removeAllCellCandidates(ci);
     }
     for (let g of GROUPS) {
       for (let v of VALUES) {
-        this.sudokuModel.rows[g].vOccurrences[v] = 1;
-        this.sudokuModel.cols[g].vOccurrences[v] = 1;
-        this.sudokuModel.boxs[g].vOccurrences[v] = 1;
+        this.sudokuGrid.rows[g].vOccurrences[v] = 1;
+        this.sudokuGrid.cols[g].vOccurrences[v] = 1;
+        this.sudokuGrid.boxs[g].vOccurrences[v] = 1;
       }
     }
   } // setAllValues()
@@ -150,20 +146,20 @@ export class SudokuService {
    * Return givenValue of cell. Zero means no givenValue;
    */
   public getValue(ci: number) : number {
-    return this.sudokuModel.cells[ci].value;
+    return this.sudokuGrid.cells[ci].value;
   } // getValue()
 
   /**
    * 
-   * @param puzzle 
+   * @param sudoku 
    */
-  public transferCellValuesToGivens(puzzle) : void {
+  public transferCellValuesToGivens(sudoku) : void {
     let givens: number[] = [];
     for (let ci of CELLS) {
-      givens.push(this.sudokuModel.cells[ci].value);
+      givens.push(this.sudokuGrid.cells[ci].value);
     }
-    puzzle.initialValues = givens;
-    puzzle.completedPuzzle = givens;
+    sudoku.initialValues = givens;
+    sudoku.completedSudoku = givens;
   }
 
   /**
@@ -180,7 +176,7 @@ export class SudokuService {
    * @param newValue 
    */
   public setValue(ci: number, newValue: number) : void {
-    let cell = this.sudokuModel.cells[ci];
+    let cell = this.sudokuGrid.cells[ci];
 
     // if cell has value, remove it first
     if (cell.hasValue()) {
@@ -214,7 +210,7 @@ export class SudokuService {
    * with its row, column, and box.
    */
   public removeValue(ci: number) : void {
-    let cell = this.sudokuModel.cells[ci];
+    let cell = this.sudokuGrid.cells[ci];
     
     if (!cell.hasValue()) {
       return;			// nothing to remove
@@ -227,9 +223,9 @@ export class SudokuService {
     // decrement occurrences in cell's groups (row, column, box)
     this.decrementGroupOccurrences(ci, oldValue);
 
-    let row = this.sudokuModel.rows[cell.rowIndex];
-    let col = this.sudokuModel.cols[cell.colIndex];
-    let box = this.sudokuModel.boxs[cell.boxIndex];
+    let row = this.sudokuGrid.rows[cell.rowIndex];
+    let col = this.sudokuGrid.cols[cell.colIndex];
+    let box = this.sudokuGrid.boxs[cell.boxIndex];
 
     // add applicable candidates to cell
     for (let v of VALUES) {
@@ -243,10 +239,10 @@ export class SudokuService {
 
     // add candidate (this cell's old givenValue) to related cells
     for (let rc of Common.getRelatedCells(ci)) {
-      let relatedCell = this.sudokuModel.cells[rc];
-      let rcRow = this.sudokuModel.rows[relatedCell.rowIndex];
-      let rcCol = this.sudokuModel.cols[relatedCell.colIndex];
-      let rcBox = this.sudokuModel.boxs[relatedCell.boxIndex];
+      let relatedCell = this.sudokuGrid.cells[rc];
+      let rcRow = this.sudokuGrid.rows[relatedCell.rowIndex];
+      let rcCol = this.sudokuGrid.cols[relatedCell.colIndex];
+      let rcBox = this.sudokuGrid.boxs[relatedCell.boxIndex];
       if (   rcRow.vOccurrences[oldValue] > 0
           || rcCol.vOccurrences[oldValue] > 0
           || rcBox.vOccurrences[oldValue] > 0) {
@@ -278,13 +274,13 @@ export class SudokuService {
    * - remove log entry, don't create new one
    */
   public removeCandidate(c: number, k: number) : void {
-    this.sudokuModel.cells[c].candidates[k] = false;
+    this.sudokuGrid.cells[c].candidates[k] = false;
   } // removeCandidate()
 
   // TODO future use?
   // public removeCandidates(cellCandidates: CellCandidate[], hint: Rem) : void {
   //   for (let cellCandidate of cellCandidates) {
-  //     this.sudokuModel.cells[cellCandidate.cell].candidates[cellCandidate.candidate] = false;
+  //     this.sudokuGrid.cells[cellCandidate.cell].candidates[cellCandidate.candidate] = false;
   //   }
   //   this.actionLog.addEntry(
   //     new RemoveCandidatesAction(ActionType.REMOVE_CANDIDATES, cellCandidates, )
@@ -293,7 +289,7 @@ export class SudokuService {
 
   public restoreCandidate(c: number, k: number) : void {
     if (this.isPossibleCandidate(c, k)) {
-      this.sudokuModel.cells[c].candidates[k] = true;
+      this.sudokuGrid.cells[c].candidates[k] = true;
     }
   }
 
@@ -387,7 +383,7 @@ export class SudokuService {
   public isSolved() : boolean {
     for (let r of ROWS) {
       for (let v of VALUES) {
-        if (this.sudokuModel.rows[r].vOccurrences[v] != 1) {
+        if (this.sudokuGrid.rows[r].vOccurrences[v] != 1) {
           return false;
         }
       }
@@ -399,28 +395,28 @@ export class SudokuService {
    * Returns true if cell has a value;
    */
   public hasValue(c: number) : boolean {
-    return this.sudokuModel.cells[c].value > 0; 
+    return this.sudokuGrid.cells[c].value > 0; 
   } // hasValue()
 
   /**
    * Get the row object from the row index.
    */
   public getRow(r: number) : Group {
-    return this.sudokuModel.rows[r];
+    return this.sudokuGrid.rows[r];
   } // getRow()
 
   /**
    * Get the column object from the column index.
    */
   public getCol(c: number) : Group {
-    return this.sudokuModel.cols[c];
+    return this.sudokuGrid.cols[c];
   } // getCol()
 
   /**
    * Get the box object from the box index.
    */
   public getBox(b: number) : Group {
-    return this.sudokuModel.boxs[b];
+    return this.sudokuGrid.boxs[b];
   } // getBox()
 
   /**
@@ -463,7 +459,7 @@ export class SudokuService {
         if (this.hasValue(c)) {
           continue;   // next cell in group
         }
-        if (this.sudokuModel.cells[c].candidates[k]) {
+        if (this.sudokuGrid.cells[c].candidates[k]) {
           kCounts[k]++;
         }
       } // for cells in group
@@ -487,7 +483,7 @@ export class SudokuService {
     }
     let candidates: number[] = [];
     for (let k of CANDIDATES) {
-      if (this.sudokuModel.cells[c].candidates[k]) {
+      if (this.sudokuGrid.cells[c].candidates[k]) {
         candidates.push(k);
       }
     }
@@ -498,7 +494,7 @@ export class SudokuService {
    * Returns true if cell contains the candidate.
    */
   public isCandidate(c: number, k: number) : boolean {
-    return this.sudokuModel.cells[c].candidates[k];
+    return this.sudokuGrid.cells[c].candidates[k];
   } // isCandidate()
   
   /**
@@ -507,9 +503,9 @@ export class SudokuService {
    */
   public isCellValid(c: number) : boolean {
 try {
-    if (   this.isGroupValid(this.sudokuModel.rows[Common.rowIdx(c)])
-        && this.isGroupValid(this.sudokuModel.cols[Common.colIdx(c)]) 
-        && this.isGroupValid(this.sudokuModel.boxs[Common.boxIdx(c)])) {
+    if (   this.isGroupValid(this.sudokuGrid.rows[Common.rowIdx(c)])
+        && this.isGroupValid(this.sudokuGrid.cols[Common.colIdx(c)]) 
+        && this.isGroupValid(this.sudokuGrid.boxs[Common.boxIdx(c)])) {
       return true;
     }
 } catch (e) {
@@ -527,7 +523,7 @@ try {
   public isValueComplete(v: number) : boolean {
     let valueCount = 0;
     for (let c of CELLS) {
-      if (this.sudokuModel.cells[c].value === v) {
+      if (this.sudokuGrid.cells[c].value === v) {
         valueCount++;
       }
     }
@@ -539,7 +535,7 @@ try {
    */
   public getNumberOfCandidates(c: number) : number {
     let count = 0;
-    let cell = this.sudokuModel.cells[c];
+    let cell = this.sudokuGrid.cells[c];
     for (let k of CANDIDATES) {
       if (cell.candidates[k]) {
         count++;
@@ -554,7 +550,7 @@ try {
   public cellsToValuesArray() : number[] {
     let v: number[] = [];
     for (let c of CELLS) {
-      v.push(this.sudokuModel.cells[c].value);
+      v.push(this.sudokuGrid.cells[c].value);
     }
     return v;
   } // cellsToValuesArray()
@@ -584,27 +580,27 @@ try {
     public addCandidate(c: number, k: number) : void {
 
       // do not add if givenValue exists
-      if (this.sudokuModel.cells[c].value > 0) {
+      if (this.sudokuGrid.cells[c].value > 0) {
         // console.error('Cannot add candidate to cell with a givenValue.');
         return;
       }
   
       // do not add if any related cell has that givenValue
       for (let rc of Common.getRelatedCells(c)) {
-        if (this.sudokuModel.cells[rc].value === k) {
+        if (this.sudokuGrid.cells[rc].value === k) {
           return;
         }
       }
   
       // add candidate
-      this.sudokuModel.cells[c].candidates[k] = true;
+      this.sudokuGrid.cells[c].candidates[k] = true;
     } // addCandidate()
   
   /**
-   * Returns a copy of the current model state.
+   * Returns a copy of the current grid state.
    */
-  public copyModel() : SudokuModel {
-    return this.sudokuModel.copyModel();
+  public copyGrid() : SudokuGrid {
+    return this.sudokuGrid.copyGrid();
   }
 
   /**
@@ -685,11 +681,11 @@ try {
    */
   public solve() : boolean {
 
-    let snapshot: SudokuModel = undefined;
+    let snapshot: SudokuGrid = undefined;
 
     console.info('Using hints');
 
-    // fill in "obvious" cells until we run out; if the puzzle is solved,
+    // fill in "obvious" cells until we run out; if the sudoku is solved,
     // return true
     this.applyAvailableHints();
     if (this.isSolved()) {
@@ -705,8 +701,8 @@ try {
     // being here means we need to guess; did not completely solve, but not
     // impossible at this point
 
-    // take snapshot of model state before guessing
-    snapshot = this.takeModelSnapshot();
+    // take snapshot of grid state before guessing
+    snapshot = this.takeGridSnapshot();
 
     console.info('Guessing -- Snapshot taken:\n' + this.toLineString());
     
@@ -740,7 +736,7 @@ try {
       } else {
 
         // restore SNAPSHOT here?
-        this.replaceModel(snapshot);
+        this.replaceGrid(snapshot);
 
         console.info('Snapshot restored:\n' + this.toLineString());
         // undo all changes: 
@@ -789,10 +785,10 @@ try {
       return;
     }
 
-    let cell = this.sudokuModel.cells[c];
-    let row = this.sudokuModel.rows[cell.rowIndex];
-    let col = this.sudokuModel.cols[cell.colIndex];
-    let box = this.sudokuModel.boxs[cell.boxIndex];
+    let cell = this.sudokuGrid.cells[c];
+    let row = this.sudokuGrid.rows[cell.rowIndex];
+    let col = this.sudokuGrid.cols[cell.colIndex];
+    let box = this.sudokuGrid.boxs[cell.boxIndex];
     
     // add candidates to cell when value
     for (let v of VALUES) {
@@ -812,10 +808,10 @@ try {
    * @param value cell value
    */
   private incrementGroupOccurrences(ci: number, value: number) : void {
-    let cell = this.sudokuModel.cells[ci];
-    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]++;
-    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]++;
-    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]++;
+    let cell = this.sudokuGrid.cells[ci];
+    this.sudokuGrid.rows[cell.rowIndex].vOccurrences[value]++;
+    this.sudokuGrid.cols[cell.colIndex].vOccurrences[value]++;
+    this.sudokuGrid.boxs[cell.boxIndex].vOccurrences[value]++;
   }
 
   /**
@@ -826,10 +822,10 @@ try {
    * @param value cell value
    */
   private decrementGroupOccurrences(ci: number, value: number) : void {
-    let cell = this.sudokuModel.cells[ci];
-    this.sudokuModel.rows[cell.rowIndex].vOccurrences[value]--;
-    this.sudokuModel.cols[cell.colIndex].vOccurrences[value]--;
-    this.sudokuModel.boxs[cell.boxIndex].vOccurrences[value]--;
+    let cell = this.sudokuGrid.cells[ci];
+    this.sudokuGrid.rows[cell.rowIndex].vOccurrences[value]--;
+    this.sudokuGrid.cols[cell.colIndex].vOccurrences[value]--;
+    this.sudokuGrid.boxs[cell.boxIndex].vOccurrences[value]--;
   }
 
   /**
@@ -871,13 +867,13 @@ try {
       }
     }
     for (let g of GROUPS) {
-      if (!this.isGroupValid(this.sudokuModel.rows[g])) {
+      if (!this.isGroupValid(this.sudokuGrid.rows[g])) {
         return false;
       }
-      if (!this.isGroupValid(this.sudokuModel.cols[g])) {
+      if (!this.isGroupValid(this.sudokuGrid.cols[g])) {
         return false;
       }
-      if (!this.isGroupValid(this.sudokuModel.boxs[g])) {
+      if (!this.isGroupValid(this.sudokuGrid.boxs[g])) {
         return false;
       }
     }
@@ -893,9 +889,9 @@ try {
 
   /**
    * Return the number of cells in the group that have a value. That is cells
-   * that are closed or filled. It can be closed by having an initial given 
-   * value or by having a value assigned in solving the sudoku. A value cell 
-   * cannot have any candidates. Within a group (row, column, or box),
+   * that are closed or filled. It can be closed by having a given value or 
+   * by having a value assigned in solving the sudoku. A value cell cannot 
+   * have any candidates. Within a group (row, column, or box),
    *    value cells + candidate cells = 9.
    */
   private valueCellsCount(group: Group) : number {
@@ -913,7 +909,7 @@ try {
    */
   private hasCandidates(c: number) : boolean {
     for (let k of CANDIDATES) {
-      if (this.sudokuModel.cells[c].candidates[k]) {
+      if (this.sudokuGrid.cells[c].candidates[k]) {
         return true;
       }
     }
@@ -926,7 +922,7 @@ try {
   private cellValuesToArray() : number[] {
     let valuesArray: number[] = [];
     for (let c of CELLS) {
-      valuesArray.push(this.sudokuModel.cells[c].value);
+      valuesArray.push(this.sudokuGrid.cells[c].value);
     }
     return valuesArray;
   } // cellsValuesToArray()
@@ -938,7 +934,7 @@ try {
     let s = '';
     let v: number;
     for (let c of CELLS) {
-      v = this.sudokuModel.cells[c].value;
+      v = this.sudokuGrid.cells[c].value;
       s += (v === 0 ? '.' : v);
     }
     return s;
@@ -949,7 +945,7 @@ try {
    */
   private rowToString(r: number) : string {
     let s = 'Row' + ' ' + (r + 1) + ': ';
-    return s += this.groupToString(this.sudokuModel.rows[r]);
+    return s += this.groupToString(this.sudokuGrid.rows[r]);
   } // rowToString()
 
   /**
@@ -957,7 +953,7 @@ try {
    */
   private colToString(c: number) : string {
     let s = 'Col' + ' ' + (c + 1) + ': ';
-    return s += this.groupToString(this.sudokuModel.cols[c]);
+    return s += this.groupToString(this.sudokuGrid.cols[c]);
   } // colToString()
 
   /**
@@ -965,7 +961,7 @@ try {
    */
   private boxToString(b: number) : string {
     let s = 'Box' + ' ' + (b + 1) + ': ';
-    return s += this.groupToString(this.sudokuModel.boxs[b]);
+    return s += this.groupToString(this.sudokuGrid.boxs[b]);
   } // boxToString()
 
   /**
@@ -994,7 +990,7 @@ try {
    * Represent the state of a cell as a string.
    */
   private cellToString(c: number) : string {
-    let cell = this.sudokuModel.cells[c];
+    let cell = this.sudokuGrid.cells[c];
     let s = '' + Common.toRowColString(c) + ': '; 
     s += 'v:' + (cell.value != 0 ? cell.value : '.');
     s += ' k:';
@@ -1052,7 +1048,7 @@ try {
    */
   private isPossibleCandidate(c: number, k: number) : boolean {
     for (let rc of Common.getRelatedCells(c)) {
-      if (this.sudokuModel.cells[rc].value === k) {
+      if (this.sudokuGrid.cells[rc].value === k) {
         return false;
       }
     }
@@ -1064,14 +1060,14 @@ try {
    * values.
    */
   private setAllCellCandidates(c: number) : void {
-    this.sudokuModel.cells[c].setAllCandidates();
+    this.sudokuGrid.cells[c].setAllCandidates();
   } // setAllCellCandidates()
 
   /**
    * Remove all candidates from a cell.
    */
   private removeAllCellCandidates(c: number) : void {
-    this.sudokuModel.cells[c].unsetAllCandidates();
+    this.sudokuGrid.cells[c].unsetAllCandidates();
   } // removeAllCellCandidates()
 
   /**

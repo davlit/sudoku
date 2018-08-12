@@ -1,12 +1,12 @@
-import { Common }            from '../common/common';
-import { CELLS }             from '../common/common';
-import { Difficulty,
-         DIFFICULTY_LABELS } from './difficulty';
-import { HintCounts }        from '../hint/hintCounts';
+import { Common }               from '../common/common';
+import { CELLS }                from '../common/common';
+import { Difficulty }           from './difficulty';
+import { DIFFICULTY_LABELS }    from './difficulty';
+import { HintCounts }           from '../hint/hintCounts';
 
-export class Puzzle {
+export class Sudoku {
   private _initialValues: number[];
-  private _completedPuzzle: number[];
+  private _completedSudoku: number[];
   private _difficulty: Difficulty;
   private _generatePasses: number;
   private _solutionsCount: number;
@@ -14,7 +14,7 @@ export class Puzzle {
 
   constructor() {
     this._initialValues = [];
-    this._completedPuzzle = [];
+    this._completedSudoku = [];
     this._difficulty = undefined;
     this._generatePasses = 0;
     this._solutionsCount = 0;
@@ -22,23 +22,23 @@ export class Puzzle {
   }
 
   /**
-   * Returns a blank puzzle.
+   * Returns a blank sudoku.
    */
-  static getEmptyPuzzle() {
-    let emptyPuzzle = new Puzzle();
+  static getEmptySudoku() {
+    let emptySudoku = new Sudoku();
     for (let i of CELLS) {
-        emptyPuzzle._initialValues.push(0);
+        emptySudoku._initialValues.push(0);
     }
-    return emptyPuzzle;
+    return emptySudoku;
   }
 
   /**
-   * Returns a puzzle serialized as a string.
+   * Returns a sudoku serialized as a string.
    */
   serialize() : string {
     return JSON.stringify({
       "_initialValues": this._initialValues,
-      "_completedPuzzle": this._completedPuzzle,
+      "_completedSudoku": this._completedSudoku,
       "_difficulty": this._difficulty,
       "_generatePasses": this._generatePasses,
       "_solutionsCount": this._solutionsCount,
@@ -47,20 +47,23 @@ export class Puzzle {
   } // serialize()
 
   /**
-   * Converts a string-serialized puzzle to an object.
+   * Converts a string-serialized sudoku to an object.
    * 
-   * @param puzzleData 
+   * @param sudokuData 
    */
-  static deserialize(puzzleData: string) : Puzzle {
-    let data = JSON.parse(puzzleData);
-    let puzzle = new Puzzle();
-    puzzle._initialValues = data._initialValues;
-    puzzle._completedPuzzle = JSON.parse('[' + data._completedPuzzle + ']');
-    puzzle._difficulty = data._difficulty;
-    puzzle._generatePasses = data._generatePasses;
-    puzzle._solutionsCount = data._solutionsCount;
-    puzzle._hintCounts = HintCounts.deserialize(data._hintCounts);
-    return puzzle;
+  static deserialize(sudokuData: string) : Sudoku {
+
+    console.info('sudokuData:\n' + sudokuData);
+
+    let data = JSON.parse(sudokuData);
+    let sudoku = new Sudoku();
+    sudoku._initialValues = data._initialValues;
+    sudoku._completedSudoku = JSON.parse('[' + data._completedSudoku + ']');
+    sudoku._difficulty = data._difficulty;
+    sudoku._generatePasses = data._generatePasses;
+    sudoku._solutionsCount = data._solutionsCount;
+    sudoku._hintCounts = HintCounts.deserialize(data._hintCounts);
+    return sudoku;
   } // deserialize()
 
   get initialValues() : number[] {
@@ -71,12 +74,12 @@ export class Puzzle {
     this._initialValues = initialValues;
   }
 
-  get completedPuzzle() : number[] {
-    return this._completedPuzzle;
+  get completedSudoku() : number[] {
+    return this._completedSudoku;
   }
 
-  set completedPuzzle(completedPuzzle: number[]) {
-    this._completedPuzzle = completedPuzzle;
+  set completedSudoku(completedSudoku: number[]) {
+    this._completedSudoku = completedSudoku;
   }
 
   get difficulty() : Difficulty {
@@ -112,7 +115,7 @@ export class Puzzle {
   }
 
   /**
-   * Counts the number of empty cells in the puzzle.
+   * Counts the number of empty cells in the sudoku.
    */
   getInitialEmptyCells() : number {
     let emptyCells: number = 0;
@@ -125,7 +128,7 @@ export class Puzzle {
   }
 
   /**
-   * Counts the number of given cells in the puzzle.
+   * Counts the number of given cells in the sudoku.
    */
   getInitialFilledCells() : number {
     let filledCells: number = 0;
@@ -138,17 +141,17 @@ export class Puzzle {
   }
 
   /**
-   * Returns the puzzle as a displayable string.
+   * Returns the sudoku as a displayable string.
    */
   toString() : string {
     let s = '';
     s += '-Given/empty cells: ' 
         + this.getInitialFilledCells() + '/'
         + this.getInitialEmptyCells()  + '\n';
-    s += '-Initial values:\n';
+    s += '-given values:\n';
     s += Common.valuesArrayToString(this._initialValues) + '\n';
     s += '-Finished values:\n';
-    s += Common.valuesArrayToString(this._completedPuzzle) + '\n';
+    s += Common.valuesArrayToString(this._completedSudoku) + '\n';
     s += '-Difficulty: ';
     if (this._difficulty) {
       s += DIFFICULTY_LABELS[this._difficulty].label + '\n'; 

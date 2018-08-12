@@ -1,32 +1,39 @@
 import { Observable } from 'rxjs';
 
 import { Common } from '../../app/common/common';
-import { Difficulty } from '../../app/model/difficulty';
-import { DIFFICULTY_LABELS } from '../../app/model/difficulty';
-import { Puzzle } from '../../app/model/puzzle';
 
-import { Action } from '../../app/action/action';
-import { ActionType } from '../../app/action/action';
-import { SetValueAction } from '../../app/action/action';
-import { GuessValueAction } from '../../app/action/action';
-import { RemoveCandidateAction } from '../../app/action/action';
+import { Difficulty,
+         DIFFICULTY_LABELS } from '../../app/model/difficulty';
+
+import { Sudoku } from '../../app/model/sudoku';
+
+import { Action,
+         ActionType,
+         SetValueAction,
+         GuessValueAction,
+         RemoveCandidateAction } from '../../app/action/action';
+
 import { ActionLogService } from '../../app/action/action-log.service';
-import { ValueHint } from '../../app/hint/hint';
-import { CandidatesHint } from '../../app/hint/hint';
-import { Hint } from '../../app/hint/hint';
+
+import { ValueHint,
+         CandidatesHint,
+         Hint } from '../../app/hint/hint';
+
 import { HintType } from '../../app/hint/hint.type';
+
 import { HintService } from '../../app/hint/hint.service';
+
 import { HintLogService } from '../../app/hint/hint-log.service';
 
 import { SudokuService } from '../../app/model/sudoku.service';
 
-import { VALUES } from     '../../app/common/common';
-import { CELLS } from      '../../app/common/common';
-import { ROWS } from       '../../app/common/common';
-import { COLS } from       '../../app/common/common';
-import { ROW_CELLS } from  '../../app/common/common';
-import { COL_CELLS } from  '../../app/common/common';
-import { ROOT_VALUES } from  '../../app/common/common';
+import { VALUES,
+         CELLS,
+         ROWS,
+         COLS,
+         ROW_CELLS,
+         COL_CELLS,
+         ROOT_VALUES } from  '../../app/common/common';
 
 /**
  * This class creates sudokus of varying difficulty.
@@ -45,7 +52,7 @@ export class CreationService {
    * 
    */
   constructor() {
-console.warn('CreationService constructor')    ;
+// console.warn('CreationService constructor')    ;
     this.hintLog = new HintLogService();
     this.actionLog = new ActionLogService();
     this.sudokuService = new SudokuService();
@@ -62,16 +69,16 @@ console.warn('CreationService constructor')    ;
    * will not likely know a background task is working behind the scenes.
    */
   public createSudoku(desiredDiff: Difficulty) : string {
-// console.info('\nCreating ' + Puzzle.getDifficultyLabel(difficulty) + ' sudoku ...');
+// console.info('\nCreating ' + Sudoku.getDifficultyLabel(difficulty) + ' sudoku ...');
 console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff].label + ' sudoku ...');
 
     this.actionLog.initialize();
 
-    let sudoku = new Puzzle();
+    let sudoku = new Sudoku();
     // sudoku.desiredDifficulty = difficulty;
 
     // step 1 - generate random finished sudoku
-    sudoku.completedPuzzle = this.makeRandomSolution();
+    sudoku.completedSudoku = this.makeRandomSolution();
 
 // console.info('Step 1:\n' + this.sudokuService.toGridString()); 
 
@@ -91,8 +98,8 @@ console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff].label + ' sudoku ...
         continue;   // desired difficulty has not been attained
       }
 
-      // step 3 - solve puzzle to get stats and actual difficulty
-      this.completePuzzle(sudoku);
+      // step 3 - solve sudoku to get stats and actual difficulty
+      this.completeSudoku(sudoku);
 
 // console.log('Pass ' + pass + ' diff ' +  sudoku.actualDifficulty);
 // if (pass > 50) { break; }
@@ -100,7 +107,7 @@ console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff].label + ' sudoku ...
     } // while not getting desired difficulty
 
     sudoku.generatePasses = pass;
-// console.info('\nCreated ' + Puzzle.getDifficultyLabel(sudoku.actualDifficulty) 
+// console.info('\nCreated ' + Sudoku.getDifficultyLabel(sudoku.actualDifficulty) 
 console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label 
     + ' in ' + sudoku.generatePasses + ' passes');
     return sudoku.serialize();
@@ -128,7 +135,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
 
     let start: number = Date.now();   // for elapsed time
 
-    this.sudokuService.initializeModel();
+    this.sudokuService.initializeGrid();
     this.initializeLogs();
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues = Common.shuffleArray(VALUES.slice());
@@ -168,13 +175,13 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
   /**
    * [Step 2]
    * Remove symetric pairs of cell values to yield a sudoku with a set of
-   * symetric initial values.
+   * symetric given values.
    */
-  private pareToInitialValues0(puzzle: Puzzle, desiredDiff: Difficulty) : void {
+  private pareToInitialValues0(sudoku: Sudoku, desiredDiff: Difficulty) : void {
 
     let start: number = Date.now();   // for elapsed time
 
-    this.sudokuService.setAllValues(puzzle.completedPuzzle);
+    this.sudokuService.setAllValues(sudoku.completedSudoku);
     this.initializeLogs();
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues = Common.shuffleArray(VALUES.slice());
@@ -214,7 +221,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
         case Difficulty.HARD:
           let hard: boolean = false;
           let hint: Hint = this.hintService.getHint(desiredDiff);
-          // while (this.hintService.getHint(puzzle.desiredDifficulty)) {
+          // while (this.hintService.getHint(sudoku.desiredDifficulty)) {
           while (hint) {
 
             // count difficulty hard hints
@@ -252,13 +259,13 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
     } // for next random symmetric pairs of cells to pare
 
     // TODO
-    // at end of step 2 no initial values is a signal that desired difficulty
+    // at end of step 2 no given values is a signal that desired difficulty
     // is not being attained, so no use going on to step 3
     if (desiredDiff === Difficulty.HARD
         && hardCount === 0) {
-      puzzle.initialValues = undefined;
+      sudoku.initialValues = undefined;
     } else {
-      puzzle.initialValues = this.sudokuService.cellsToValuesArray();
+      sudoku.initialValues = this.sudokuService.cellsToValuesArray();
     }
 
     // activate to get and log step 2 elapsed times
@@ -270,13 +277,13 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
   /**
    * [Step 2]
    * Remove symetric pairs of cell values to yield a sudoku with a set of
-   * symetric initial values.
+   * symetric given values.
    */
-  private pareToInitialValues(puzzle: Puzzle, desiredDiff: Difficulty) : void {
+  private pareToInitialValues(sudoku: Sudoku, desiredDiff: Difficulty) : void {
 
 // let start: number = Date.now();   // for elapsed time
 
-    this.sudokuService.setAllValues(puzzle.completedPuzzle);
+    this.sudokuService.setAllValues(sudoku.completedSudoku);
     this.initializeLogs();
     this.randomCellIndexes = Common.shuffleArray(CELLS.slice());
     this.randomValues = Common.shuffleArray(VALUES.slice());
@@ -323,7 +330,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
 
     } // for next random symmetric pairs of cells to pare
 
-    puzzle.initialValues = this.sudokuService.cellsToValuesArray();
+    sudoku.initialValues = this.sudokuService.cellsToValuesArray();
 
 // let elapsed: number = Date.now() - start;
 // console.info('step 2 elapsed: ' + elapsed + 'ms');
@@ -332,12 +339,12 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
   
   /**
    * [Step 3]
-   * Now having a full solution and initial values, solve the sudoku using
+   * Now having a full solution and given values, solve the sudoku using
    * hints and guessing. While doing this, count the specific solution 
    * tehcniques (types of hints, and guesses) to properly determine the
    * actual difficulty rating.
    */
-  private completePuzzle(puzzle: Puzzle) : void {
+  private completeSudoku(sudoku: Sudoku) : void {
 
     let start: number = Date.now();   // for elapsed time
 
@@ -352,15 +359,15 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
     
     this.solve();
 
-    puzzle.completedPuzzle = this.sudokuService.cellsToValuesArray();
-    // puzzle.stats = this.hintService.getHintCounts();
-    puzzle.hintCounts = this.hintLog.getHintCounts();
-    puzzle.difficulty = puzzle.hintCounts.getActualDifficulty();
+    sudoku.completedSudoku = this.sudokuService.cellsToValuesArray();
+    // sudoku.stats = this.hintService.getHintCounts();
+    sudoku.hintCounts = this.hintLog.getHintCounts();
+    sudoku.difficulty = sudoku.hintCounts.getActualDifficulty();
 
     let elapsed: number = Date.now() - start;
     // console.log('Step 3 elapsed: ' + elapsed + 'ms');
 
-  } // completePuzzle() [step 3]
+  } // completeSudoku() [step 3]
 
   /**
    * The basic solving "machine". From any point of an incomplete or empty
@@ -584,7 +591,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
   } // rollbackToLastGuess()
 
   /**
-   * Called in step 3 to clear everything except initial (given) values
+   * Called in step 3 to clear everything except given (given) values
    */
   private rollbackAll() : void {
     while (this.actionLog.getLastEntry()) {
@@ -619,9 +626,9 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
 //   * Swap values of two given cells.
 //   */
 //  private swapCellValues(c1: number, c2: number) {
-//    let v1 = this.sudokuModel.cells[c1].value;
-//    this.sudokuModel.cells[c1].value = this.sudokuModel.cells[c2].value;
-//    this.sudokuModel.cells[c2].value = v1;
+//    let v1 = this.sudokuGrid.cells[c1].value;
+//    this.sudokuGrid.cells[c1].value = this.sudokuGrid.cells[c2].value;
+//    this.sudokuGrid.cells[c2].value = v1;
 //  } // swapCellValues()
   
 //   /**

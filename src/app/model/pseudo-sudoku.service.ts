@@ -5,24 +5,24 @@ import {
          CANDIDATES,
          ROWS
        } from  '../common/common';
-import { SudokuModel } from './sudoku.model';
+import { SudokuGrid } from './sudoku.grid';
 
 /**
  * This service looks ahead after any value has been set to see if the sudoku
  * can be solved with only naked singles. It does this by taking a copy or 
- * snapshot of the current model, a "pseudo" model, and attempts to solve the 
- * sudoko just using naked singles. By using this pseudo model, the state of 
+ * snapshot of the current grid, a "pseudo" grid, and attempts to solve the 
+ * sudoko just using naked singles. By using this pseudo grid, the state of 
  * the sudoku being played remains intact.
  */
 export class PseudoSudokuService {
 
-  private pseudoModel: SudokuModel = undefined;
+  private pseudoGrid: SudokuGrid = undefined;
 
   /**
    * Create this service by providing a copy of the current sudoku state.
    */
-  constructor(pseudoModel) {
-    this.pseudoModel = pseudoModel;
+  constructor(pseudoGrid) {
+    this.pseudoGrid = pseudoGrid;
   } // constructor()
 
   /**
@@ -51,13 +51,13 @@ export class PseudoSudokuService {
   } // hasNakedSinglesSolution() {
 
   /**
-   * Using a copy of the current model state, look for a cell with a naked 
+   * Using a copy of the current grid state, look for a cell with a naked 
    * single. If found, return the cell and the naked single value, otherwise
    * return null. 
    */
   private findNextNakedSingle() : {ci: number, value: number} {
     for (let c of CELLS) {
-      if (this.pseudoModel.cells[c].hasValue()) {
+      if (this.pseudoGrid.cells[c].hasValue()) {
         continue;
       }
       let single = this.findNakedSingleInCell(c);
@@ -69,7 +69,7 @@ export class PseudoSudokuService {
   } // findNextNakedSingle()
 
   /**
-   * Using a copy of the current model state and a given cell index, look for
+   * Using a copy of the current grid state and a given cell index, look for
    * a naked single in the cell. If found, return the naked single value,
    * otherwise return null;
    * 
@@ -78,7 +78,7 @@ export class PseudoSudokuService {
   private findNakedSingleInCell(ci: number) : number {
     let kandidates: number[] = [];
     for (let k of CANDIDATES) {
-      if (this.pseudoModel.cells[ci].candidates[k]) {
+      if (this.pseudoGrid.cells[ci].candidates[k]) {
         kandidates.push(k);
         if (kandidates.length > 1) {
           return null; // no naked single in cell
@@ -92,7 +92,7 @@ export class PseudoSudokuService {
   } // findNextNakedSingle()
 
   /**
-   * Using a copy of the current model state and a given cell index, set value 
+   * Using a copy of the current grid state and a given cell index, set value 
    * of a cell to the given value. In the specified cell, all 
    * candidates are removed. The candidate, equal to the value being set, is 
    * removed from every cell that shares the row, column, and box of the given
@@ -104,7 +104,7 @@ export class PseudoSudokuService {
    * @param value the value to be set
    */ 
   private setValue(ci: number, value: number) : void {
-    let cell = this.pseudoModel.cells[ci];
+    let cell = this.pseudoGrid.cells[ci];
 
     // set new value, remove candidates from cell
     cell.value = value;   
@@ -127,7 +127,7 @@ export class PseudoSudokuService {
    * @param ci cell index
    */
   private removeAllCellCandidates(ci: number) : void {
-    this.pseudoModel.cells[ci].unsetAllCandidates();
+    this.pseudoGrid.cells[ci].unsetAllCandidates();
   } // removeAllCellCandidates()
 
   /**
@@ -138,10 +138,10 @@ export class PseudoSudokuService {
    * @param value cell value
    */
   private incrementGroupOccurrences(ci: number, value: number) : void {
-    let cell = this.pseudoModel.cells[ci];
-    this.pseudoModel.rows[cell.rowIndex].vOccurrences[value]++;
-    this.pseudoModel.cols[cell.colIndex].vOccurrences[value]++;
-    this.pseudoModel.boxs[cell.boxIndex].vOccurrences[value]++;
+    let cell = this.pseudoGrid.cells[ci];
+    this.pseudoGrid.rows[cell.rowIndex].vOccurrences[value]++;
+    this.pseudoGrid.cols[cell.colIndex].vOccurrences[value]++;
+    this.pseudoGrid.boxs[cell.boxIndex].vOccurrences[value]++;
   }
 
   /**
@@ -150,7 +150,7 @@ export class PseudoSudokuService {
    * @param ci cell index
    */
   private hasValue(ci: number) : boolean {
-    return this.pseudoModel.cells[ci].value > 0; 
+    return this.pseudoGrid.cells[ci].value > 0; 
   } // hasValue()
 
   /**
@@ -160,7 +160,7 @@ export class PseudoSudokuService {
    * @param k candidate to be removed
    */
   private removeCandidate(ci: number, k: number) : void {
-    this.pseudoModel.cells[ci].candidates[k] = false;
+    this.pseudoGrid.cells[ci].candidates[k] = false;
   } // removeCandidate()
 
   /**
@@ -170,7 +170,7 @@ export class PseudoSudokuService {
   private isSolved() : boolean {
     for (let r of ROWS) {
       for (let v of VALUES) {
-        if (this.pseudoModel.rows[r].vOccurrences[v] != 1) {
+        if (this.pseudoGrid.rows[r].vOccurrences[v] != 1) {
           return false;
         }
       }

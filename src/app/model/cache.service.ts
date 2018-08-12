@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Difficulty,
          DIFFICULTIES,
          DIFFICULTY_LABELS }  from './difficulty';
-import { Puzzle }       from './puzzle';
+import { Sudoku }       from './sudoku';
 
 import * as CreationWorker from 
   'worker-loader!../../web-workers/creation-worker/creation.worker.bundle.js';
@@ -151,8 +151,8 @@ console.info('\n4. Call: replenishCache()');
       return;   // try again later
     }
     
-console.info('\n5. Cache before webworker replenishment: ' 
-  + this.activeCachesToString());
+// console.info('\n5. Cache before webworker replenishment: ' 
+//   + this.activeCachesToString());
 
     // priority seach to find first empty key
     // if none found, fall through - nothing to replenish
@@ -204,7 +204,7 @@ console.info('\n6. Trigger web worker to create replacement for cache');
    * Receive web worker output
    */
   private init() {
-console.info('\ninit()');
+// console.info('\ninit()');
     this.creationWorker.onmessage = ((event: MessageEvent) => {
 
 console.info('\n7. Replacement received to replenish cache');

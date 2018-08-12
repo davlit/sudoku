@@ -1,7 +1,7 @@
 export const TITLE = 'Sudoku Helper';
 export const MAJOR_VERSION = '1';
 export const VERSION = '1';
-export const SUB_VERSION = '0';
+export const SUB_VERSION = '1';
 export const COPYRIGHT = 
     'Copyright © 2016-2018 by David Little. All Rights Reserved.';
 
@@ -362,21 +362,21 @@ export class Common {
     return (Common.rowIdx(idx) + 1) + ',' + (Common.colIdx(idx) + 1);
   } // toRowColString()
 
-  // Translate view's box & row indexes to model row indexes (0..8)
+  // Translate view's box & row indexes to grid row indexes (0..8)
   // XXX
-  static viewToModelRow(br: number, cr: number) : number {
+  static viewToGridRow(br: number, cr: number) : number {
     return (br * 3) + cr + 1;
   } 
   
-  // Translate view's box column indexes to model column indexes (0..8)
+  // Translate view's box column indexes to grid column indexes (0..8)
   // XXX
-  static viewToModelCol(bc: number, cc: number) : number {
+  static viewToGridCol(bc: number, cc: number) : number {
     return (bc * 3) + cc + 1;
   } 
   
-  // Translate view's candidate cell indexes to model candidate (0..8)
+  // Translate view's candidate cell indexes to grid candidate (0..8)
   // XXX
-  static viewToModelCand(kr: number, kc: number) : number {
+  static viewToGridCand(kr: number, kc: number) : number {
     return ((kr % 3) * 3) + kc + 1;
   }
   

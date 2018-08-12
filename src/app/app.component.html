@@ -26,7 +26,7 @@ Sudoku grid based on
 - within each of the 9 boxes
     - 3 rows and 3 columns of cells
 - total of 81 cells
-Sudoku model is based on 9 rows and 9 columns of cells
+Sudoku grid is based on 9 rows and 9 columns of cells
 s: sudoku, b: box, c: cell, v: value, k: candidate
  -->
 <!-- <div id="gridsection">
@@ -47,9 +47,9 @@ s: sudoku, b: box, c: cell, v: value, k: candidate
               <!-- opt 1: value -->  <!-- span -->
               <div *ngSwitchCase="true" class="value"
                 [ngClass]="{
-                  'locked':   isCellLocked_(vb, vc),
-                  'invalid':  isCellInvalid(vb, vc),
-                  'incorrect': isValueIncorrect(vb, vc)}">
+                  'given':     isGiven_(vb, vc),
+                  'invalid':   isInvalid_(vb, vc),
+                  'incorrect': isIncorrect_(vb, vc)}">
                 {{valueToChar_(vb, vc)}}
               </div>
               <!-- end opt 1 -->
@@ -127,7 +127,7 @@ s: sudoku, b: box, c: cell, v: value, k: candidate
     </div>
 
     <div class="controlsRow cRow03">
-      <button (click)="enterPuzzle()">
+      <button (click)="enterSudoku()">
         Or enter your own Sudoku
       </button>
     </div>
@@ -314,11 +314,11 @@ s: sudoku, b: box, c: cell, v: value, k: candidate
       </div>
 
       <div class="controlsRow cRow10">
-        <button class="general" (click)="restartCurrentPuzzle()">
+        <button class="general" (click)="restartCurrentSudoku()">
             <!-- tooltip="Start over on same sudoku"  -->
             <!-- placement="bottom"> -->
             Restart Sudoku</button>&nbsp;
-        <button class="general" (click)="startNewPuzzle()">
+        <button class="general" (click)="startNewSudoku()">
           New Sudoku</button> 
       </div>
 
@@ -383,11 +383,11 @@ s: sudoku, b: box, c: cell, v: value, k: candidate
       <p>Hints viewed/applied: {{hintsViewed}}/{{hintsApplied}}</p>
 
       <p>
-        <button class="general" (click)="restartCurrentPuzzle()">
+        <button class="general" (click)="restartCurrentSudoku()">
             <!-- tooltip="Start over on same sudoku"  -->
             <!-- placement="top"> -->
             Restart Sudoku</button>&nbsp;
-        <button class="general" (click)="startNewPuzzle()">
+        <button class="general" (click)="startNewSudoku()">
             <!-- tooltip="Get a new sudoku"  -->
             <!-- placement="top"> -->
             New Sudoku</button>

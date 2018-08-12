@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Common } from '../common/common';
 // import { Sudoku } from '../model/sudoku';
 import { SudokuService } from '../model/sudoku.service';
-// import { Puzzle } from '../model/puzzle';
+// import { Sudoku } from '../model/sudoku';
 import { DIFFICULTY_LABELS } from '../model/difficulty';
 
 @Component({
@@ -22,7 +22,7 @@ export class PrintComponent implements OnInit {
   ngOnInit() {}
 
   getActualDifficulty() {
-    // return Puzzle.getDifficultyLabel(this.sudokuService.getCurrentSudoku().difficulty);
+    // return Sudoku.getDifficultyLabel(this.sudokuService.getCurrentSudoku().difficulty);
     // return DIFFICULTY_LABELS[this.sudokuService.getCurrentSudoku().difficulty];
   }
 
@@ -38,8 +38,8 @@ export class PrintComponent implements OnInit {
    * Function based on view's cell indexes in html code.
    */
   getValue_(br: number, bc: number, cr: number, cc: number) {
-      // return this.sudokuService.getValue_(Common.viewToModelRow(br, cr), 
-      //     Common.viewToModelCol(bc, cc));
+      // return this.sudokuService.getValue_(Common.viewToGridRow(br, cr), 
+      //     Common.viewToGridCol(bc, cc));
   }
   
   printGrid() {

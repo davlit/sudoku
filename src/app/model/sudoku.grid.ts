@@ -7,7 +7,7 @@ import { Common,
          COL_CELLS,
          BOX_CELLS } from  '../common/common';
 
-export class SudokuModel {
+export class SudokuGrid {
   private _cells: Cell[]
   private _rows: Group[];
   private _cols: Group[];
@@ -31,10 +31,10 @@ export class SudokuModel {
     }
   } // constructor
 
-  // public initializeModel() : void {
+  // public initializeGrid() : void {
   public initialize() : void {
     for (let ci of CELLS) {
-      // this.initializeCell(this.sudokuModel.cells[c]);
+      // this.initializeCell(this.sudokuGrid.cells[c]);
       this._cells[ci].initialize();
     }
     for (let g of GROUPS) {
@@ -42,7 +42,7 @@ export class SudokuModel {
       this._cols[g].initialize();
       this._boxs[g].initialize();
     }
-  } // initializeModel()
+  } // initializeGrid()
 
   get cells() {
     return this._cells;
@@ -61,19 +61,19 @@ export class SudokuModel {
   }
 
   /**
-   * Make a copy of the entire model.
+   * Make a copy of the entire grid.
    */
-  public copyModel() : SudokuModel {
-    let copiedModel = new SudokuModel;
+  public copyGrid() : SudokuGrid {
+    let copiedGrid = new SudokuGrid;
     for (let c of CELLS) {
-      copiedModel._cells[c] = this._cells[c].copyCell();
+      copiedGrid._cells[c] = this._cells[c].copyCell();
     }
     for (let g of GROUPS) {
-      copiedModel._rows[g] = this._rows[g].copyGroup();
-      copiedModel._cols[g] = this._cols[g].copyGroup();
-      copiedModel._boxs[g] = this._boxs[g].copyGroup();
+      copiedGrid._rows[g] = this._rows[g].copyGroup();
+      copiedGrid._cols[g] = this._cols[g].copyGroup();
+      copiedGrid._boxs[g] = this._boxs[g].copyGroup();
     }
-    return copiedModel;
-  } // copyModel()
+    return copiedGrid;
+  } // copyGrid()
 
-} // class SudokuModel
+} // class SudokuGrid
