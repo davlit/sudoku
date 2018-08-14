@@ -723,15 +723,15 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
   } // startNewSudoku()
 
   /**
-   * 
+   * User button: user will enter some outside sudoku givens.
    */
   enterSudoku() : void {
     this.currentSudoku = Sudoku.getEmptySudoku();
     this.playState = PlayStates.ENTRY;
-  }
+  } // enterSudoku()
 
   /**
-   * 
+   * User button: finished givens entry.
            <!--
         button: press when entry complete
         conditons after entry
@@ -755,41 +755,29 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
       console.info('Is symetric.')
     }
 
-    // get givens (array of values) based on values entered by user before solving
+    // get givens based on values entered by user before solving
     this.currentSudoku.givens = this.sudokuService.cellValuesToArray();
 
-
-    // create a separate sudoku service to solve the sudoku - WHY?
-    //let solveService: SudokuService = new SudokuService();
-
-    // give the solve service the entered sudoku givens
-    //solveService.replaceGrid(this.sudokuService.copyGrid());
-
-    // solve silently
-
     // solve the user-entered sudoku
-    //solveService.solve();
     this.sudokuService.solve();
 
-    // give the solve service the entered sudoku givens
-    //this.sudokuService.replaceGrid(solveService.copyGrid());
-
-    // cases
+    // cases:
     // solved, got difficulty
     // could not be solved
 
-    // this.currentSudoku.givens = [];          // set before solving
-    this.currentSudoku.completedSudoku = this.sudokuService.cellValuesToArray();    // set after solving
-    this.sudokuService.blankoutSolution(this.currentSudoku.givens);
-    // this.currentSudoku.difficulty = solveService.maxDifficulty;
+    // record solution
+    this.currentSudoku.completedSudoku = this.sudokuService.cellValuesToArray();
     this.currentSudoku.difficulty = this.sudokuService.maxDifficulty;
 
-    console.info('Sudoku\n: ' + this.currentSudoku.toString());
+    console.info('Sudoku:\n' + this.currentSudoku.toString());
 
+    // console.info('Grid state:\n' + this.sudokuService.toString());
+
+    // switch to user solving sudoku
+    this.sudokuService.blankoutSolution(this.currentSudoku.givens);
+    this.sudokuService.refreshAllCandidates();
     this.actionLog.removeAllEntries();
     this.actionsLog = '';
-    this.sudokuService.refreshAllCandidates();
-    console.info('Grid state:\n' + this.sudokuService.toString());
     this.startUserTimer();
     this.playState = PlayStates.EXECUTE;
   } // entryFinished()

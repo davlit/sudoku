@@ -813,8 +813,6 @@ try {
       return;
     }
 
-    console.info('setCellCandidates ' + c);
-
     let cell = this.sudokuGrid.cells[c];
     let row = this.sudokuGrid.rows[cell.rowIndex];
     let col = this.sudokuGrid.cols[cell.colIndex];
