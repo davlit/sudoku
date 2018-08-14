@@ -1,11 +1,11 @@
-import { Common }               from '../common/common';
-import { CELLS }                from '../common/common';
-import { Difficulty }           from './difficulty';
-import { DIFFICULTY_LABELS }    from './difficulty';
+import { Common,
+         CELLS }                from '../common/common';
+import { Difficulty,
+         DIFFICULTY_LABELS }    from './difficulty';
 import { HintCounts }           from '../hint/hintCounts';
 
 export class Sudoku {
-  private _initialValues: number[];
+  private _givens: number[];
   private _completedSudoku: number[];
   private _difficulty: Difficulty;
   private _generatePasses: number;
@@ -13,7 +13,7 @@ export class Sudoku {
   private _hintCounts: HintCounts;
 
   constructor() {
-    this._initialValues = [];
+    this._givens = [];
     this._completedSudoku = [];
     this._difficulty = undefined;
     this._generatePasses = 0;
@@ -27,7 +27,7 @@ export class Sudoku {
   static getEmptySudoku() {
     let emptySudoku = new Sudoku();
     for (let i of CELLS) {
-        emptySudoku._initialValues.push(0);
+        emptySudoku._givens.push(0);
     }
     return emptySudoku;
   }
@@ -37,7 +37,7 @@ export class Sudoku {
    */
   serialize() : string {
     return JSON.stringify({
-      "_initialValues": this._initialValues,
+      "_givens": this._givens,
       "_completedSudoku": this._completedSudoku,
       "_difficulty": this._difficulty,
       "_generatePasses": this._generatePasses,
@@ -57,7 +57,7 @@ export class Sudoku {
 
     let data = JSON.parse(sudokuData);
     let sudoku = new Sudoku();
-    sudoku._initialValues = data._initialValues;
+    sudoku._givens = data._givens;
     sudoku._completedSudoku = JSON.parse('[' + data._completedSudoku + ']');
     sudoku._difficulty = data._difficulty;
     sudoku._generatePasses = data._generatePasses;
@@ -66,12 +66,12 @@ export class Sudoku {
     return sudoku;
   } // deserialize()
 
-  get initialValues() : number[] {
-    return this._initialValues;
+  get givens() : number[] {
+    return this._givens;
   }
 
-  set initialValues(initialValues: number[]) {
-    this._initialValues = initialValues;
+  set givens(givens: number[]) {
+    this._givens = givens;
   }
 
   get completedSudoku() : number[] {
@@ -119,7 +119,7 @@ export class Sudoku {
    */
   getInitialEmptyCells() : number {
     let emptyCells: number = 0;
-    for (let i of this._initialValues) {
+    for (let i of this._givens) {
       if (i === 0) {
         emptyCells++;
       }
@@ -132,7 +132,7 @@ export class Sudoku {
    */
   getInitialFilledCells() : number {
     let filledCells: number = 0;
-    for (let i of this._initialValues) {
+    for (let i of this._givens) {
       if (i != 0) {
         filledCells++;
       }
@@ -148,12 +148,12 @@ export class Sudoku {
     s += '-Given/empty cells: ' 
         + this.getInitialFilledCells() + '/'
         + this.getInitialEmptyCells()  + '\n';
-    s += '-given values:\n';
-    s += Common.valuesArrayToString(this._initialValues) + '\n';
+    s += '-Given values:\n';
+    s += Common.valuesArrayToString(this._givens) + '\n';
     s += '-Finished values:\n';
     s += Common.valuesArrayToString(this._completedSudoku) + '\n';
     s += '-Difficulty: ';
-    if (this._difficulty) {
+    if (this._difficulty != undefined) {
       s += DIFFICULTY_LABELS[this._difficulty].label + '\n'; 
     } else {
       s += 'Pending\n';

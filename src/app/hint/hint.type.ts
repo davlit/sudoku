@@ -1,5 +1,4 @@
 export const enum HintType {
-  // INITIAL_VALUE,
 
   // easy
   NAKED_SINGLE,       // 0

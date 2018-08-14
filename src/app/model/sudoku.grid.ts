@@ -63,17 +63,49 @@ export class SudokuGrid {
   /**
    * Make a copy of the entire grid.
    */
+  // public copyGrid() : SudokuGrid {
+  //   let copiedGrid = new SudokuGrid;
+  //   for (let c of CELLS) {
+  //     copiedGrid._cells[c] = this._cells[c].copyCell();
+  //   }
+  //   for (let g of GROUPS) {
+  //     copiedGrid._rows[g] = this._rows[g].copyGroup();
+  //     copiedGrid._cols[g] = this._cols[g].copyGroup();
+  //     copiedGrid._boxs[g] = this._boxs[g].copyGroup();
+  //   }
+  //   return copiedGrid;
+  // } // copyGrid()
+
   public copyGrid() : SudokuGrid {
-    let copiedGrid = new SudokuGrid;
-    for (let c of CELLS) {
-      copiedGrid._cells[c] = this._cells[c].copyCell();
+    let toGrid : SudokuGrid = new SudokuGrid();
+    for (let i = 0; i < this._cells.length; i++) {
+      toGrid._cells[i] = this._cells[i].copyCell();
     }
-    for (let g of GROUPS) {
-      copiedGrid._rows[g] = this._rows[g].copyGroup();
-      copiedGrid._cols[g] = this._cols[g].copyGroup();
-      copiedGrid._boxs[g] = this._boxs[g].copyGroup();
+    for (let i = 0; i < this._rows.length; i++) {
+      toGrid._rows[i] = this._rows[i].copyGroup();
     }
-    return copiedGrid;
-  } // copyGrid()
+    for (let i = 0; i < this._cols.length; i++) {
+      toGrid._cols[i] = this._cols[i].copyGroup();
+    }
+    for (let i = 0; i < this._boxs.length; i++) {
+      toGrid._boxs[i] = this._boxs[i].copyGroup();
+    }
+    return toGrid;
+  }
+
+  public restoreGrid(fromGrid) : void {
+    for (let i = 0; i < fromGrid.cells.length; i++) {
+      this._cells[i] = fromGrid._cells[i].restoreCell();
+    }
+    for (let i = 0; i < fromGrid.rows.length; i++) {
+      this._rows[i] = fromGrid._rows[i].restoreGroup();
+    }
+    for (let i = 0; i < fromGrid.cols.length; i++) {
+      this._cols[i] = fromGrid._cols[i].restoreGroup();
+    }
+    for (let i = 0; i < fromGrid.boxs.length; i++) {
+      this._boxs[i] = fromGrid._boxs[i].restoreGroup();
+    }
+  }
 
 } // class SudokuGrid

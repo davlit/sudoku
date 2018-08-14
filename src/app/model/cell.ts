@@ -90,19 +90,38 @@ export class Cell {
   /**
    * Clear all candidates.
    */
-  public unsetAllCandidates() : void {
+  public removeAllCandidates() : void {
     for (let k of CANDIDATES) {
       this._candidates[k] = false;
     }
-  } // unsetAllCandidates()
+  } // removeAllCandidates()
+
+  // public copyCell() : Cell {
+  //   let copiedCell: Cell = new Cell(this._rowIndex, this._colIndex, this._boxIndex);
+  //   copiedCell._value = this._value;
+  //   for (let k of CANDIDATES) {
+  //     copiedCell._candidates[k] = this._candidates[k];
+  //   }
+  //   return copiedCell;
+  // } // copyCell()
 
   public copyCell() : Cell {
-    let copiedCell: Cell = new Cell(this._rowIndex, this._colIndex, this._boxIndex);
-    copiedCell._value = this._value;
-    for (let k of CANDIDATES) {
-      copiedCell._candidates[k] = this._candidates[k];
+    let toCell : Cell = new Cell(this.rowIndex, this.colIndex, this.boxIndex);
+    toCell._value = this._value;
+    for (let i = 0; i < this._candidates.length; i++) {
+      toCell._candidates[i] = this._candidates[i];
     }
-    return copiedCell;
-  } // copyCell()
+    return toCell;
+  }
+
+  public restoreCell(fromCell) : void {
+    this._value = fromCell._value;
+    for (let i = 0; i < this._candidates.length; i++) {
+      this._candidates[i] = fromCell._candidates[i];
+    }
+    this._rowIndex = fromCell._rowIndex;
+    this._colIndex = fromCell._colIndex;
+    this._boxIndex = fromCell._boxIndex;
+  }
 
 } // class Cell

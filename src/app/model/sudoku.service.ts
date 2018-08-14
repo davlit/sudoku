@@ -89,7 +89,7 @@ export class SudokuService {
    */
   public loadProvidedSudoku(values: number[]) : Sudoku {
     let sudoku = new Sudoku();
-    sudoku.initialValues = values;
+    sudoku.givens = values;
     this.initializeGrid();
     for (let ci of CELLS) {
       let cell = this.sudokuGrid.cells[ci];   // cell at [c] in cells array
@@ -108,9 +108,9 @@ export class SudokuService {
   /**
    * Returns the curren state of the grid.
    */
-  public takeGridSnapshot() : SudokuGrid{
-    return this.sudokuGrid.copyGrid();
-  } // takeGridSnapshot()
+  // public takeGridSnapshot() : SudokuGrid {
+  //   return this.sudokuGrid.copyGrid();
+  // } // takeGridSnapshot()
 
   /**
    * Replace the current grid state with another. This is used in conjucntion
@@ -119,9 +119,9 @@ export class SudokuService {
    * 
    * @param newGrid
    */
-  public replaceGrid(newGrid: SudokuGrid) {
-    this.sudokuGrid = newGrid;
-  }
+  // public restoreGrid(snapshotGrid: SudokuGrid) {
+  //   this.sudokuGrid.restoreGrid(snapshotGrid);
+  // }
 
   /**
    * Sets a given value in every cell and set all groups to complete.
@@ -158,7 +158,7 @@ export class SudokuService {
     for (let ci of CELLS) {
       givens.push(this.sudokuGrid.cells[ci].value);
     }
-    sudoku.initialValues = givens;
+    sudoku.givens = givens;
     sudoku.completedSudoku = givens;
   }
 
@@ -561,8 +561,9 @@ try {
    */
   public refreshAllCandidates() : void {
     for (let c of CELLS) {
+      this.removeAllCellCandidates(c);
       if (!this.hasValue(c)) {
-        this.removeAllCellCandidates(c);
+        // this.removeAllCellCandidates(c);
         this.setCellCandidates(c);
       }
     }
@@ -577,25 +578,36 @@ try {
    * - undoAction() - undo REMOVE_CANDIDATE
    * - removeValue()
    */
-    public addCandidate(c: number, k: number) : void {
+  public addCandidate(c: number, k: number) : void {
 
-      // do not add if givenValue exists
-      if (this.sudokuGrid.cells[c].value > 0) {
-        // console.error('Cannot add candidate to cell with a givenValue.');
+    // do not add if givenValue exists
+    if (this.sudokuGrid.cells[c].value > 0) {
+      // console.error('Cannot add candidate to cell with a givenValue.');
+      return;
+    }
+
+    // do not add if any related cell has that givenValue
+    for (let rc of Common.getRelatedCells(c)) {
+      if (this.sudokuGrid.cells[rc].value === k) {
         return;
       }
-  
-      // do not add if any related cell has that givenValue
-      for (let rc of Common.getRelatedCells(c)) {
-        if (this.sudokuGrid.cells[rc].value === k) {
-          return;
-        }
+    }
+
+    // add candidate
+    this.sudokuGrid.cells[c].candidates[k] = true;
+  } // addCandidate()
+
+  /**
+   * 
+   */
+  public blankoutSolution(givens: number[]) : void {
+    for (let ci of CELLS) {
+      if (givens[ci] == 0) {
+        this.removeValue(ci);
       }
-  
-      // add candidate
-      this.sudokuGrid.cells[c].candidates[k] = true;
-    } // addCandidate()
-  
+    }
+  } // blankoutSolution()
+
   /**
    * Returns a copy of the current grid state.
    */
@@ -611,11 +623,28 @@ try {
   } // toGridString()
 
   /**
+   * Represent the values of the sudoku as an array of 81 values.
+   */
+  public cellValuesToArray() : number[] {
+    let cellValues: number[] = [];
+    for (let ci of CELLS) {
+      cellValues.push( this.sudokuGrid.cells[ci].value);
+    }
+    return cellValues;
+  } // cellsValuesToArray()
+
+  /**
    * Represent the givenValues of the sudoku as a single line string.
    */
   public toLineString() : string {
-    return this.toOneLineString();
-  } // toGridString()
+    let s = '';
+    let v: number;
+    for (let c of CELLS) {
+      v = this.sudokuGrid.cells[c].value;
+      s += (v === 0 ? '.' : v);
+    }
+    return s;
+  } // toLineString()
 
   /**
    * Checks if sudoku givens are 180deg rotationally symetric.
@@ -681,8 +710,6 @@ try {
    */
   public solve() : boolean {
 
-    let snapshot: SudokuGrid = undefined;
-
     console.info('Using hints');
 
     // fill in "obvious" cells until we run out; if the sudoku is solved,
@@ -702,7 +729,7 @@ try {
     // impossible at this point
 
     // take snapshot of grid state before guessing
-    snapshot = this.takeGridSnapshot();
+    let snapshot: SudokuGrid = this.sudokuGrid.copyGrid();
 
     console.info('Guessing -- Snapshot taken:\n' + this.toLineString());
     
@@ -736,7 +763,8 @@ try {
       } else {
 
         // restore SNAPSHOT here?
-        this.replaceGrid(snapshot);
+        // this.restoreGrid(snapshot);
+        this.sudokuGrid.restoreGrid(snapshot);
 
         console.info('Snapshot restored:\n' + this.toLineString());
         // undo all changes: 
@@ -784,6 +812,8 @@ try {
     if (this.hasValue(c)) {
       return;
     }
+
+    console.info('setCellCandidates ' + c);
 
     let cell = this.sudokuGrid.cells[c];
     let row = this.sudokuGrid.rows[cell.rowIndex];
@@ -917,30 +947,6 @@ try {
   } // hasCandidates()
 
   /**
-   * Represent the values of the sudoku as an array of 81 values.
-   */
-  private cellValuesToArray() : number[] {
-    let valuesArray: number[] = [];
-    for (let c of CELLS) {
-      valuesArray.push(this.sudokuGrid.cells[c].value);
-    }
-    return valuesArray;
-  } // cellsValuesToArray()
-
-  /**
-   * Represent the givenValues of the sudoku as a single-line string.
-   */
-  private toOneLineString() : string {
-    let s = '';
-    let v: number;
-    for (let c of CELLS) {
-      v = this.sudokuGrid.cells[c].value;
-      s += (v === 0 ? '.' : v);
-    }
-    return s;
-  } // toOneLineString()
-
-  /**
    * Represent the state of a row as a string.
    */
   private rowToString(r: number) : string {
@@ -1007,7 +1013,7 @@ try {
   /**
    * Represent the state of the sudoku as a string.
    */
-  private toString() : string {
+  public toString() : string {
     let s = '';
     for (let r of ROWS) {
       s += this.rowToString(r) + '\n';
@@ -1067,8 +1073,16 @@ try {
    * Remove all candidates from a cell.
    */
   private removeAllCellCandidates(c: number) : void {
-    this.sudokuGrid.cells[c].unsetAllCandidates();
+    this.sudokuGrid.cells[c].removeAllCandidates();
   } // removeAllCellCandidates()
+
+  private sudokuValuesToString() : string {
+    let s: string = '';
+    for (let ci of CELLS) {
+      s += this.sudokuGrid.cells[ci].value;
+    }
+    return s;
+  }
 
   /**
    * Represent a givenValues array of sudoku cell givenValues as a grid string.

@@ -127,7 +127,7 @@ export class PseudoSudokuService {
    * @param ci cell index
    */
   private removeAllCellCandidates(ci: number) : void {
-    this.pseudoGrid.cells[ci].unsetAllCandidates();
+    this.pseudoGrid.cells[ci].removeAllCandidates();
   } // removeAllCellCandidates()
 
   /**

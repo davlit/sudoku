@@ -4,10 +4,15 @@ import { ChangeDetectionStrategy } from '@angular/core';
 import { NgZone } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
 
-import { TITLE, MAJOR_VERSION, VERSION, SUB_VERSION, COPYRIGHT } from './common/common'; 
-import { Common }           from './common/common';
-import { Difficulty }       from './model/difficulty';
-import { DIFFICULTY_LABELS } from './model/difficulty';
+import { CELLS,
+         TITLE, 
+         MAJOR_VERSION, 
+         VERSION, 
+         SUB_VERSION, 
+         COPYRIGHT,
+         Common }           from './common/common';
+import { Difficulty,
+         DIFFICULTY_LABELS } from './model/difficulty';
 import { SudokuService }    from './model/sudoku.service';
 import { CacheService }     from './model/cache.service';
 import { Sudoku }           from './model/sudoku';
@@ -229,7 +234,7 @@ export class AppComponent implements OnInit, OnDestroy {
         DIFFICULTY_LABELS[this.currentSudoku.difficulty].label;
     this.solutionClues = this.createSolutionClues();
 
-    this.sudokuService.loadProvidedSudoku(this.currentSudoku.initialValues);
+    this.sudokuService.loadProvidedSudoku(this.currentSudoku.givens);
     this.actionLog.initialize();
     this.actionsLog = '';
     
@@ -245,7 +250,7 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
    */
   handleKeyPress(keyEvent: any) : void {
       
-    console.info('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
+    // console.info('keyEvent: ' + keyEvent.keyCode + ', ' + keyEvent.shiftKey + ', ' + keyEvent.ctrlKey + ', ' + keyEvent.metaKey + ', ' + keyEvent.altKey);
     
     if (this.playState != PlayStates.ENTRY 
         && this.playState != PlayStates.EXECUTE) {
@@ -372,7 +377,7 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
    */
   isGiven(ci: number) : boolean {
     return this.currentSudoku &&
-        this.currentSudoku.initialValues[ci] > 0
+        this.currentSudoku.givens[ci] > 0
   } // isCellLocked()
   
   /**
@@ -403,6 +408,13 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
     return this.sudokuService.isCellValid(ci)
         && this.sudokuService.getValue(ci) != this.currentSudoku.completedSudoku[ci];
   } // isIncorrect_()
+
+  /**
+   * 
+   */
+  isInvisible_(vb: number, vc: number) : boolean {
+    return false;
+  } // isInvisible_()
   
   /**
    * Function based on view's cell indexes in html code.
@@ -697,7 +709,7 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
     this.sudokuService.initializeGrid();
     let temp = this.actualDifficulty;   // save
     this.initializeUserInterface();
-    this.currentSudoku = this.sudokuService.loadProvidedSudoku(this.currentSudoku.initialValues);
+    this.currentSudoku = this.sudokuService.loadProvidedSudoku(this.currentSudoku.givens);
     this.actualDifficulty = temp;       // restore
     this.playState = PlayStates.EXECUTE;
   } // restartCurrentSudoku()
@@ -735,17 +747,7 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
 */
   entryFinished() : void {
 
-    // create a separate sudoku service to solve the sudoku
-    let solveService: SudokuService = new SudokuService();
-
-    // give the solve service the entered sudoku givens
-    solveService.replaceGrid(this.sudokuService.copyGrid());
-
-    // let values : string = this.sudokuService.toLineString();
-
-    // // set given values
-    // this.sudokuService.transferCellValuesToGivens(this.currentSudoku);
-
+    // check symetry - 180deg rotational
     if (!this.sudokuService.isSymetric()) {
       console.info('Is NOT symetric.')
       // TODO: warn user, correct or accept
@@ -753,50 +755,44 @@ console.log('\nSudoku:\n' + this.currentSudoku.toString());
       console.info('Is symetric.')
     }
 
+    // get givens (array of values) based on values entered by user before solving
+    this.currentSudoku.givens = this.sudokuService.cellValuesToArray();
+
+
+    // create a separate sudoku service to solve the sudoku - WHY?
+    //let solveService: SudokuService = new SudokuService();
+
+    // give the solve service the entered sudoku givens
+    //solveService.replaceGrid(this.sudokuService.copyGrid());
+
     // solve silently
-    // this.solve();
 
-    // this.solve();
-    solveService.solve();
+    // solve the user-entered sudoku
+    //solveService.solve();
+    this.sudokuService.solve();
 
-    console.info('Difficulty: ' + DIFFICULTY_LABELS[solveService.maxDifficulty].label);
+    // give the solve service the entered sudoku givens
+    //this.sudokuService.replaceGrid(solveService.copyGrid());
 
     // cases
     // solved, got difficulty
     // could not be solved
 
-    // determine difficulty
-    // for (let ci of CELLS) {
-    //   this.currentSudoku.initialValues[ci] = this..sudokuGrid.cells[ci].value;
-    // }
-console.info('Sudoku 1: ' + this.currentSudoku.toString());
+    // this.currentSudoku.givens = [];          // set before solving
+    this.currentSudoku.completedSudoku = this.sudokuService.cellValuesToArray();    // set after solving
+    this.sudokuService.blankoutSolution(this.currentSudoku.givens);
+    // this.currentSudoku.difficulty = solveService.maxDifficulty;
+    this.currentSudoku.difficulty = this.sudokuService.maxDifficulty;
 
-    /*
-    get hint (loop)
-    if hint
-      determine difficulty (1st time)
-      promote difficulty, if exceeds previous diff
-      apply hint
-      if solved
-        complete currentSudoku w/solution
-        set/display difficulty
-        convert entered given from green to black
-        this.playState = PlayStates.EXECUTE
-        user takes over
-      else (not solved)
-        loop to get hint
-    if no hint (not solved)
-      guess - brute force solve
-      set difficulty HARDEST
-      convert entered given from green to black
-      this.playState = PlayStates.EXECUTE
-      user takes over
-    */ 
+    console.info('Sudoku\n: ' + this.currentSudoku.toString());
 
-console.info('Sudoku 2: ' + this.currentSudoku.toString());
-
+    this.actionLog.removeAllEntries();
+    this.actionsLog = '';
+    this.sudokuService.refreshAllCandidates();
+    console.info('Grid state:\n' + this.sudokuService.toString());
+    this.startUserTimer();
     this.playState = PlayStates.EXECUTE;
-  }
+  } // entryFinished()
 
   /**
    * 
@@ -1004,8 +1000,9 @@ console.info('Sudoku 2: ' + this.currentSudoku.toString());
 // console.info('completedSudoku: ' + this.currentSudoku.completedSudoku);
 
     // check for new values not that of solution
-    if (this.currentSudoku.completedSudoku
-        && v != this.currentSudoku.completedSudoku[ci]) {
+    if (this.playState == PlayStates.EXECUTE 
+          // && this.currentSudoku.completedSudoku
+          && v != this.currentSudoku.completedSudoku[ci]) {
       console.warn('Not the solution value');
     }
 
@@ -1140,8 +1137,8 @@ console.info('Sudoku 2: ' + this.currentSudoku.toString());
   // testing methods
   // -----------------------------------------------------------------------
 
-  loadTestSudoku(initialValues: string) : void {
-    this.currentSudoku = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(initialValues));
+  loadTestSudoku(givens: string) : void {
+    this.currentSudoku = this.sudokuService.loadProvidedSudoku(Common.valuesStringToArray(givens));
     this.sudokuService.transferCellValuesToGivens(this.currentSudoku);
 
     // this.maxDifficulty = undefined;

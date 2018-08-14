@@ -58,12 +58,32 @@ export class Group {
     return this._cells;
   }
 
+  // public copyGroup() : Group {
+  //   let copiedGroup : Group = new Group(this._cells);
+  //   for (let v of VALUES) {
+  //     copiedGroup._vOccurrences[v] = this._vOccurrences[v];
+  //   }
+  //   return copiedGroup;
+  // }
+
   public copyGroup() : Group {
-    let copiedGroup : Group = new Group(this._cells);
-    for (let v of VALUES) {
-      copiedGroup._vOccurrences[v] = this._vOccurrences[v];
+    let toGroup : Group = new Group(this._cells);
+    for (let i = 0; i < this._vOccurrences.length; i++) {
+      toGroup._vOccurrences[i] = this._vOccurrences[i];
     }
-    return copiedGroup;
+    for (let i = 0; i < this._cells.length; i++) {
+      toGroup._cells[i] = this._cells[i];
+    }
+    return toGroup;
+  }
+
+  public restoreGroup(fromGroup) : void {
+    for (let i = 0; i < this._vOccurrences.length; i++) {
+      this._vOccurrences[i] = fromGroup._vOccurrences[i];
+    }
+    for (let i = 0; i < this._cells.length; i++) {
+      this._cells[i] = fromGroup._cells[i];
+    }
   }
 
   /**

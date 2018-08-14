@@ -91,10 +91,10 @@ console.info('\nCreating ' + DIFFICULTY_LABELS[desiredDiff].label + ' sudoku ...
 
       // step 2 - create starting values by paring cells
 // console.log('Pass: ' + pass);
-      // this.pareToInitialValues(sudoku, desiredDifficulty);
-      this.pareToInitialValues(sudoku, desiredDifficulty);
+      // this.pareToGivens(sudoku, desiredDifficulty);
+      this.pareToGivens(sudoku, desiredDifficulty);
 
-      if (sudoku.initialValues === undefined) {
+      if (sudoku.givens === undefined) {
         continue;   // desired difficulty has not been attained
       }
 
@@ -177,7 +177,7 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
    * Remove symetric pairs of cell values to yield a sudoku with a set of
    * symetric given values.
    */
-  private pareToInitialValues0(sudoku: Sudoku, desiredDiff: Difficulty) : void {
+  private pareToGivens0(sudoku: Sudoku, desiredDiff: Difficulty) : void {
 
     let start: number = Date.now();   // for elapsed time
 
@@ -263,23 +263,23 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
     // is not being attained, so no use going on to step 3
     if (desiredDiff === Difficulty.HARD
         && hardCount === 0) {
-      sudoku.initialValues = undefined;
+      sudoku.givens = undefined;
     } else {
-      sudoku.initialValues = this.sudokuService.cellsToValuesArray();
+      sudoku.givens = this.sudokuService.cellsToValuesArray();
     }
 
     // activate to get and log step 2 elapsed times
     // let elapsed: number = Date.now() - start;
     // console.info('Step 2 elapsed: ' + elapsed + 'ms');
 
-  } // pareToInitialValues0() [step 2 - no guesses]
+  } // pareToGivens0() [step 2 - no guesses]
   
   /**
    * [Step 2]
    * Remove symetric pairs of cell values to yield a sudoku with a set of
    * symetric given values.
    */
-  private pareToInitialValues(sudoku: Sudoku, desiredDiff: Difficulty) : void {
+  private pareToGivens(sudoku: Sudoku, desiredDiff: Difficulty) : void {
 
 // let start: number = Date.now();   // for elapsed time
 
@@ -330,12 +330,12 @@ console.info('\nCreated ' + DIFFICULTY_LABELS[sudoku.difficulty].label
 
     } // for next random symmetric pairs of cells to pare
 
-    sudoku.initialValues = this.sudokuService.cellsToValuesArray();
+    sudoku.givens = this.sudokuService.cellsToValuesArray();
 
 // let elapsed: number = Date.now() - start;
 // console.info('step 2 elapsed: ' + elapsed + 'ms');
 
-  } // pareToInitialValues() [step 2]
+  } // pareToGivens() [step 2]
   
   /**
    * [Step 3]
